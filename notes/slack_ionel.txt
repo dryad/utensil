@@ -1,0 +1,134 @@
+source venv/bin/activate
+
+Adam  9:13 AM
+ok now that worked
+
+Ionel  9:13 AM
+pip3 install -r requirements.txt
+
+Adam  9:13 AM
+one second, let me try something
+9:14
+haha i forget out to exit the venv
+9:14
+hello?
+
+Ionel  9:15 AM
+you need to activate venv
+
+Adam  9:15 AM
+i am going to try this in a different terminal
+
+Ionel  9:15 AM
+and install python dependencies at venv
+
+Adam  9:15 AM
+yes clearly
+9:15
+but i need to get out of this termainl
+
+Ionel  9:16 AM
+python3 -v
+
+Adam  9:16 AM
+I think it’s the fact that I’m on a Mac using new ARM chips
+
+Ionel  9:16 AM
+I am using windows and python 3.9.6
+9:17
+I am not familiar about mac
+
+Adam  9:17 AM
+OK let me get the requirements installed and I”ll let you know when I solved it
+
+Ionel  9:17 AM
+one more thing
+9:17
+have you installed node.js?
+
+Adam  9:17 AM
+i dont’ think so
+9:17
+npm node
+
+Ionel  9:17 AM
+let's share once more
+
+Adam  9:17 AM
+or something like that?
+
+Ionel  9:18 AM
+you need to install node.js and build frontend
+9:18
+frontend is react
+9:18
+backendi<Escape>s django
+
+Adam  9:18 AM
+pip3 install -r requirements.txt
+
+Ionel  9:18 AM
+it's for back-end
+
+Adam  9:18 AM
+https://zoom.us/j/91384113596?pwd=UHNYSEE3NWZoMndVL1YxZXZOcCt2UT09
+9:18
+ok to get node?
+
+Ionel  9:18 AM
+https://nodejs.org/en/download/
+Node.jsNode.js
+Download | Node.js
+Node.js® is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+
+Adam  9:19 AM
+is that it?
+
+Ionel  9:19 AM
+please instal it
+9:19
+yes that's it
+
+Adam  9:19 AM
+ok i can do that
+9:19
+no need to share screen you can just send the link and i can do it
+
+Ionel  9:19 AM
+after install it
+9:20
+go to the source code
+9:20
+cd clarity
+9:20
+npm install
+9:20
+npm start
+9:20
+then frontend will work
+9:20
+python manage.py runserver
+9:20
+this will start backend
+
+Adam  9:20 AM
+awesome
+9:20
+thanks that is great i will play around with it
+9:20
+so long as i can get requirement
+9:20
+s
+
+Ionel  9:21 AM
+you need to copy this file to the source code directory
+.env 
+DATABASE_URL=sqlite:///db.sqlite3
+
+
+9:21
+.env file will let the backend now database file
+9:21
+it uses sqlite3 at the moment
+9:21
+that's all 
