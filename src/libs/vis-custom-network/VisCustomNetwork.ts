@@ -3,6 +3,7 @@ import { Network } from "vis-network";
 import { DataSet } from "vis-data";
 
 import { NODE_COLORS } from "constants/colors";
+import { truncateSync } from "fs";
 
 export default class VisCustomNetwork extends EventTarget {
   dom: HTMLElement;
@@ -61,13 +62,14 @@ export default class VisCustomNetwork extends EventTarget {
         color: NODE_COLORS[level],
         opacity: 0.5,
         x: (from.x + to.x) / 2,
-        y: (from.y + to.y) / 2,
+        y: (from.y + to.y) / 2
+        //middle: true
       };
 
       this.nodes.add(middle);
 
       this.edges.add([
-        { from: from.id, to: id },
+        { from: from.id, to: id, eventual: to.id },
         { from: id, to: to.id, arrows },
       ]);
     });
