@@ -63,12 +63,12 @@ export default class VisCustomNetwork extends EventTarget {
         opacity: 0.5,
         x: (from.x + to.x) / 2,
         y: (from.y + to.y) / 2
-        //middle: true
       };
 
       this.nodes.add(middle);
 
       this.edges.add([
+        //{ from: from.id, to: id },
         { from: from.id, to: id, eventual: to.id },
         { from: id, to: to.id, arrows },
       ]);

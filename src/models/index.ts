@@ -13,4 +13,5 @@ export type Node = {
 export type Edge = {
   from: string;
   to: string;
+  eventual: string;
 };
