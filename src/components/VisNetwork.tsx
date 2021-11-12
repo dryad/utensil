@@ -46,8 +46,8 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         callback: nodeFnRef.current,
         node,
       });
-
       toggleNodeDialog();
+
     };
 
     const handleNodeDialogClose = () => {

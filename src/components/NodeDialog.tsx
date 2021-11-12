@@ -19,7 +19,6 @@ const NodeDialog: React.FC<IDialogProps> = ({
   onOk,
 }) => {
   const [nodeLabel, setNodeLabel] = useState(label);
-  
   const okButton = useRef(null);
   useEffect(() => {
     setNodeLabel(label);
@@ -27,6 +26,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
 
   return (
     <Dialog
+      disableEnforceFocus
       fullWidth
       maxWidth="sm"
       aria-labelledby="customized-dialog-title"
@@ -37,6 +37,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
       </DialogTitle>
       <DialogContent dividers>
         <TextField
+          autoFocus
           fullWidth
           id="label"
           label="Label"
@@ -53,7 +54,6 @@ const NodeDialog: React.FC<IDialogProps> = ({
       <DialogActions>
         <Button
           ref={okButton}
-          autoFocus
           variant="outlined"
           color="primary"
           onClick={onOk(nodeLabel)}
