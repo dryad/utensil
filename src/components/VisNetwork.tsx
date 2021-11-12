@@ -29,7 +29,9 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
     const edgeFnRef = useRef<Function | null>(null);
     const edgeRef = useRef<any>(null);
 
-    const toggleNodeDialog = () => setNodeDialogOpen(!nodeDialogOpen);
+    const toggleNodeDialog = () => {
+      setNodeDialogOpen(!nodeDialogOpen);
+    }
 
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
@@ -44,8 +46,8 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         callback: nodeFnRef.current,
         node,
       });
-
       toggleNodeDialog();
+
     };
 
     const handleNodeDialogClose = () => {

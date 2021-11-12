@@ -70,7 +70,7 @@ export default class VisCustomNetwork extends EventTarget {
       this.edges.add([
         //{ from: from.id, to: id },
         { from: from.id, to: id, eventual: to.id },
-        { from: id, to: to.id, arrows },
+        { from: from.id, to: to.id, arrows },
       ]);
     });
   }

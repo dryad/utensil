@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Button, Dialog, TextField } from "@material-ui/core";
 
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
@@ -19,13 +19,14 @@ const NodeDialog: React.FC<IDialogProps> = ({
   onOk,
 }) => {
   const [nodeLabel, setNodeLabel] = useState(label);
-
+  const okButton = useRef(null);
   useEffect(() => {
     setNodeLabel(label);
   }, [label]);
 
   return (
     <Dialog
+      disableEnforceFocus
       fullWidth
       maxWidth="sm"
       aria-labelledby="customized-dialog-title"
@@ -42,6 +43,9 @@ const NodeDialog: React.FC<IDialogProps> = ({
           label="Label"
           value={nodeLabel}
           variant="outlined"
+          onKeyDown={e => {
+            if (e.key === 'Enter') { okButton.current.click(); }
+          }} 
           onChange={(e) => {
             setNodeLabel(e.target.value);
           }}
@@ -49,7 +53,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button
-          autoFocus
+          ref={okButton}
           variant="outlined"
           color="primary"
           onClick={onOk(nodeLabel)}
