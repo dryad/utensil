@@ -1,5 +1,15 @@
 # React-Django-Heroku Web App Deployment
 
+## Development environment instructions
+1. Clone vis-network and utensil into seperate folders under the same folder. Ie, /utensil/utensil and /utensil/vis-network
+2. vis-network must have prerequisites installed and be built with ```npm install ; npm run build```
+3. install utensil prerequisites with ```npm install```
+4. Start python virtual environment and install those prerequisites with ```pip3 install -r requirements.txt```
+5. Start Django server with ```python3 manage.py runserver```
+6. Start React development server with ```npm run start```
+
+The React development server will run on localhost:3000 and proxy backend requests to localhost:8000
+
 ## Introduction
 
 This is a simple Todo web application built using **React.js (front-end)** and **Django (back-end)**.
