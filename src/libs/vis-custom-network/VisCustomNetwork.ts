@@ -44,6 +44,12 @@ export default class VisCustomNetwork extends EventTarget {
       this.options
     );
 
+    this.network.on("click", function (params) {
+      if (params.nodes[0]) {
+        this.editNode();
+      }      
+    });
+
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
     });
