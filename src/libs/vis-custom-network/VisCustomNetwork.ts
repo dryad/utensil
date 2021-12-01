@@ -33,6 +33,11 @@ export default class VisCustomNetwork extends EventTarget {
       edges: {
         color: "#411811",
         chosen: false,
+        width: 3,
+      },
+      nodes: {
+        shape: 'dot',
+        size: 10,
       },
       physics: {
         enabled: false,
@@ -43,12 +48,6 @@ export default class VisCustomNetwork extends EventTarget {
       { nodes: this.nodes, edges: this.edges },
       this.options
     );
-
-    this.network.on("click", function (params) {
-      if (params.nodes[0]) {
-        this.editNode();
-      }      
-    });
 
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
@@ -95,6 +94,14 @@ export default class VisCustomNetwork extends EventTarget {
 
     data.nodes.forEach((node) => {
       this.network.moveNode(node.id, node.x, node.y);
+    });
+
+    this.network.on("click", function (params) {
+      console.log('click event');
+      if (params.nodes[0]) {
+        console.log('node clicked', params.nodes[0]);
+        this.editNode();
+      }      
     });
   };
 
