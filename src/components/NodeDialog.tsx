@@ -49,6 +49,9 @@ const NodeDialog: React.FC<IDialogProps> = ({
           onChange={(e) => {
             setNodeLabel(e.target.value);
           }}
+          onFocus={event => {
+            event.target.select();
+          }}
         />
       </DialogContent>
       <DialogActions>

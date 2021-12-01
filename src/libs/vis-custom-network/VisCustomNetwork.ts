@@ -48,7 +48,11 @@ export default class VisCustomNetwork extends EventTarget {
       { nodes: this.nodes, edges: this.edges },
       this.options
     );
-
+    this.network.on("click", function (params) { // enable event on new network
+      if (params.nodes[0]) {
+        this.editNode();
+      }      
+    });
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
     });
@@ -96,10 +100,8 @@ export default class VisCustomNetwork extends EventTarget {
       this.network.moveNode(node.id, node.x, node.y);
     });
 
-    this.network.on("click", function (params) {
-      console.log('click event');
+    this.network.on("click", function (params) {  // enable event on network that has just been loaded
       if (params.nodes[0]) {
-        console.log('node clicked', params.nodes[0]);
         this.editNode();
       }      
     });
