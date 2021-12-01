@@ -81,6 +81,7 @@ export default class VisCustomNetwork extends EventTarget {
         { from: from.id, to: id, eventual: to.id },
         { from: from.id, to: to.id, arrows },
       ]);
+      this.network.enableEditMode(); // enable edit mode on;
     });
   }
 
@@ -105,6 +106,8 @@ export default class VisCustomNetwork extends EventTarget {
         this.editNode();
       }      
     });
+
+    this.network.enableEditMode(); // enable edit mode on network that has just been loaded
   };
 
   addNode = (node: any, callback: any): void => {
