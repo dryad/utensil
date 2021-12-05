@@ -13,35 +13,41 @@ export default function NetworkButtons() {
     return(
         <div>
             <Box m={1}>
-            <IconButton aria-label="Undo">
-                <Undo/>
-            </IconButton>
-            <IconButton aria-label="Redo">
-                <Redo/>
-            </IconButton>
+                <IconButton aria-label="Undo">
+                    <Undo/>
+                </IconButton>
+                <IconButton aria-label="Redo">
+                    <Redo/>
+                </IconButton>
             </Box>
-            <ToggleButtonGroup
-                orientation="vertical"
-                value={view}
-                exclusive
-                onChange={handleChange}
-                >
-                <ToggleButton value="node" aria-label="node">
-                    <IconButton aria-label="Node">
-                        <Circle/>
-                    </IconButton>
-                </ToggleButton>
-                <ToggleButton value="directed-edge" aria-label="directed-edge">
-                    <IconButton aria-label="Directed Edge">
-                        <ArrowRightAlt style={{'transform': 'rotate(-45deg)'}}/>
-                    </IconButton>
-                </ToggleButton>
-                <ToggleButton value="edge" aria-label="edge">
-                    <IconButton aria-label="Undirected Edge">
-                        <Minimize style={{'transform': 'translate(-7px, -5px) rotate(-45deg)'}}/>
-                    </IconButton>
-                </ToggleButton>
-            </ToggleButtonGroup>
+            <Box 
+              display="flex"
+              justifyContent="center"
+              alignItems="center">
+                <ToggleButtonGroup
+                    style={{'marginBottom': 10}}
+                    orientation="vertical"
+                    value={view}
+                    exclusive
+                    onChange={handleChange}
+                    >
+                    <ToggleButton value="node" aria-label="node">
+                        <IconButton aria-label="Node">
+                            <Circle/>
+                        </IconButton>
+                    </ToggleButton>
+                    <ToggleButton value="directed-edge" aria-label="directed-edge">
+                        <IconButton aria-label="Directed Edge">
+                            <ArrowRightAlt style={{'transform': 'rotate(-45deg)'}}/>
+                        </IconButton>
+                    </ToggleButton>
+                    <ToggleButton value="edge" aria-label="edge">
+                        <IconButton aria-label="Undirected Edge">
+                            <Minimize style={{'transform': 'translate(-7px, -5px) rotate(-45deg)'}}/>
+                        </IconButton>
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
       </div>
     )
 }
