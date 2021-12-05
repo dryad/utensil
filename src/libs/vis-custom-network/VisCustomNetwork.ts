@@ -64,23 +64,28 @@ export default class VisCustomNetwork extends EventTarget {
 
       const id = uuidv4();
       const level = Math.max(from.level, to.level) + 1;
-      const middle = {
-        id,
-        label: "",
-        level,
-        color: NODE_COLORS[level],
-        opacity: 0.5,
-        x: (from.x + to.x) / 2,
-        y: (from.y + to.y) / 2
-      };
-
-      this.nodes.add(middle);
-
-      this.edges.add([
-        //{ from: from.id, to: id },
-        { from: from.id, to: id, eventual: to.id },
-        { from: from.id, to: to.id, arrows },
-      ]);
+      if (from !== to) { // if not self-loop
+        const middle = {
+          id,
+          label: "",
+          level,
+          color: NODE_COLORS[level],
+          opacity: 0.5,
+          x: (from.x + to.x) / 2,
+          y: (from.y + to.y) / 2
+        };
+        this.nodes.add(middle);
+        this.edges.add([
+          //{ from: from.id, to: id },
+          { from: from.id, to: id, eventual: to.id },
+          { from: from.id, to: to.id, arrows },
+        ]);
+      }
+      else {
+        this.edges.add([
+          { from: from.id, to: to.id, arrows },
+        ]);
+      }
     });
     this.network.enableEditMode(); // enable edit mode on new network;
   }
