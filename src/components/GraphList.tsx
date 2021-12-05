@@ -6,8 +6,8 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-} from "@material-ui/core";
-import { Delete } from "@material-ui/icons";
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
 import { Graph } from "models";
 
 type IGraphListProps = {
@@ -39,7 +39,7 @@ const GraphList: React.FC<IGraphListProps> = (props) => {
                   onClick={(e: any) => {
                     props.onGraphDelete(g.id);
                   }}
-                >
+                  size="large">
                   <Delete />
                 </IconButton>
               </ListItemSecondaryAction>
