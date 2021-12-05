@@ -6,16 +6,26 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-  Button
+  Button,
+  Box
 } from "@mui/material";
 // import UndoIcon from '@mui/icons-material/Undo';
-import { Undo, Redo } from "@mui/icons-material";
+import { Undo, Redo, Circle, ArrowRightAlt, Minimize } from "@mui/icons-material";
+import SvgIcon from '@mui/material/SvgIcon';
 
 
 export const NetworkButtons = () => <aside>
-  <div></div>
-  <Undo/>
-  <Redo/>
-  <Button>test</Button>
-  <Button>test</Button>
+  <Box m={1}>
+    <Undo/>
+    <Redo/>
+  </Box>
+  <Box m={1}>
+    <Circle/>
+  </Box>
+  <Box m={1}>
+    <ArrowRightAlt style={{'transform': 'rotate(-45deg)'}}/>
+  </Box>
+  <Box m={1}>
+    <Minimize style={{'transform': 'translate(-7px, -5px) rotate(-45deg)'}}/>
+  </Box>
   </aside>
