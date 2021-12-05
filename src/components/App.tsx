@@ -82,7 +82,7 @@ function App() {
       <Grid container spacing={0}>
         <Grid item>
           <Paper>
-          <NetworkButtons/>
+            <NetworkButtons network={networkRef} />
           </Paper>
         </Grid>
         <Grid item xs={7}>
