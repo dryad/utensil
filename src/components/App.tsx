@@ -17,7 +17,7 @@ import axios from "libs/axios";
 import VisCustomNetwork from "libs/vis-custom-network";
 import VisNetwork from "./VisNetwork";
 import GraphList from "./GraphList";
-import { NetworkButtons } from "./NetworkButtons";
+import NetworkButtons from "./NetworkButtons";
 
 function App() {
   const networkRef = useRef<VisCustomNetwork | null>(null);
@@ -79,13 +79,13 @@ function App() {
 
   return (
     <Container>
-      <Grid container>
-        <Grid item xs={1}>
+      <Grid container spacing={0}>
+        <Grid item>
           <Paper>
           <NetworkButtons/>
           </Paper>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={7}>
           <Paper>
             <VisNetwork ref={networkRef} />
             <Box m={1}>
