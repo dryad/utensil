@@ -63,8 +63,9 @@ export default class VisCustomNetwork extends EventTarget {
       const { arrows } = edge;
 
       const id = uuidv4();
-      const level = Math.max(from.level, to.level) + 1;
+      
       if (from !== to) { // if not self-loop
+        const level = Math.max(from.level, to.level) + 1;
         const middle = {
           id,
           label: "",
@@ -78,12 +79,23 @@ export default class VisCustomNetwork extends EventTarget {
         this.edges.add([
           //{ from: from.id, to: id },
           { from: from.id, to: id, eventual: to.id },
-          { from: from.id, to: to.id, arrows },
+          //{ from: id, to: to.id, arrows }, // do we need this?
         ]);
       }
       else {
+        const level = from.level + 1;
+        const unary = {
+          id,
+          label: "",
+          level,
+          color: NODE_COLORS[level],
+          opacity: 0.5,
+          x: from.x + 50,
+          y: from.y - 50,
+        }
+        this.nodes.add(unary);
         this.edges.add([
-          { from: from.id, to: to.id, arrows },
+          { from: unary.id, to: to.id, arrows },
         ]);
       }
     });
