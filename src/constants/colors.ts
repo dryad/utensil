@@ -1,4 +1,4 @@
-import { red, orange, yellow, green, blue, purple } from '@material-ui/core/colors';
+import { red, orange, yellow, green, blue, purple } from '@mui/material/colors';
 
 export const NODE_COLORS = [
     "#333",

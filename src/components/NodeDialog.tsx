@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import { Button, Dialog, TextField } from "@material-ui/core";
+import { Button, Dialog, TextField } from "@mui/material";
 
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 
@@ -48,6 +48,9 @@ const NodeDialog: React.FC<IDialogProps> = ({
           }} 
           onChange={(e) => {
             setNodeLabel(e.target.value);
+          }}
+          onFocus={event => {
+            event.target.select();
           }}
         />
       </DialogContent>

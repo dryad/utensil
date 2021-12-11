@@ -33,6 +33,11 @@ export default class VisCustomNetwork extends EventTarget {
       edges: {
         color: "#411811",
         chosen: false,
+        width: 3,
+      },
+      nodes: {
+        shape: 'dot',
+        size: 10,
       },
       physics: {
         enabled: false,
@@ -43,7 +48,11 @@ export default class VisCustomNetwork extends EventTarget {
       { nodes: this.nodes, edges: this.edges },
       this.options
     );
-
+    this.network.on("click", function (params) { // enable event on new network
+      if (params.nodes[0]) {
+        this.editNode();
+      }      
+    });
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
     });
@@ -54,25 +63,43 @@ export default class VisCustomNetwork extends EventTarget {
       const { arrows } = edge;
 
       const id = uuidv4();
-      const level = Math.max(from.level, to.level) + 1;
-      const middle = {
-        id,
-        label: "",
-        level,
-        color: NODE_COLORS[level],
-        opacity: 0.5,
-        x: (from.x + to.x) / 2,
-        y: (from.y + to.y) / 2
-      };
-
-      this.nodes.add(middle);
-
-      this.edges.add([
-        //{ from: from.id, to: id },
-        { from: from.id, to: id, eventual: to.id },
-        { from: from.id, to: to.id, arrows },
-      ]);
+      
+      if (from !== to) { // if not self-loop
+        const level = Math.max(from.level, to.level) + 1;
+        const middle = {
+          id,
+          label: "",
+          level,
+          color: NODE_COLORS[level],
+          opacity: 0.5,
+          x: (from.x + to.x) / 2,
+          y: (from.y + to.y) / 2
+        };
+        this.nodes.add(middle);
+        this.edges.add([
+          //{ from: from.id, to: id },
+          { from: from.id, to: id, eventual: to.id },
+          //{ from: id, to: to.id, arrows }, // do we need this?
+        ]);
+      }
+      else {
+        const level = from.level + 1;
+        const unary = {
+          id,
+          label: "",
+          level,
+          color: NODE_COLORS[level],
+          opacity: 0.5,
+          x: from.x + 50,
+          y: from.y - 50,
+        }
+        this.nodes.add(unary);
+        this.edges.add([
+          { from: unary.id, to: to.id, arrows },
+        ]);
+      }
     });
+    this.network.enableEditMode(); // enable edit mode on new network;
   }
 
   setData = (data: any): void => {
@@ -90,6 +117,14 @@ export default class VisCustomNetwork extends EventTarget {
     data.nodes.forEach((node) => {
       this.network.moveNode(node.id, node.x, node.y);
     });
+
+    this.network.on("click", function (params) {  // enable event on network that has just been loaded
+      if (params.nodes[0]) {
+        this.editNode();
+      }      
+    });
+    this.network.enableEditMode(); // enable edit mode on network that has just been loaded;
+
   };
 
   addNode = (node: any, callback: any): void => {

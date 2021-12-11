@@ -1,10 +1,11 @@
 import React from "react";
-import { IconButton, Typography, Theme } from "@material-ui/core";
-import MuiDialogTitle from "@material-ui/core/DialogTitle";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogActions from "@material-ui/core/DialogActions";
-import CloseIcon from "@material-ui/icons/Close";
-import { withStyles, createStyles } from "@material-ui/core/styles";
+import { IconButton, Typography, Theme } from "@mui/material";
+import MuiDialogTitle from "@mui/material/DialogTitle";
+import MuiDialogContent from "@mui/material/DialogContent";
+import MuiDialogActions from "@mui/material/DialogActions";
+import CloseIcon from "@mui/icons-material/Close";
+import withStyles from '@mui/styles/withStyles';
+import createStyles from '@mui/styles/createStyles';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -30,7 +31,7 @@ const DialogTitle = withStyles(styles)((props: any) => {
           aria-label="close"
           className={classes.closeButton}
           onClick={onClose}
-        >
+          size="large">
           <CloseIcon />
         </IconButton>
       ) : null}
