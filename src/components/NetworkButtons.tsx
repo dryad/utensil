@@ -8,7 +8,7 @@ export default function NetworkButtons(props) {
     const [view, setView] = React.useState('');
 
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: string) => {
-        props.onButton();
+        props.onButton(nextView=nextView);
         setView(nextView);
     };
     return(

@@ -46,9 +46,22 @@ function App() {
     await refreshList();
   };
 
-  const onButton = (id: any) => {
-      console.log('onButton fired');
-      networkRef.current?.network.addNodeMode();
+  const onButton = (nextView: string) => {
+      console.log('onButton fired', nextView);
+      switch(nextView) {
+        case null:
+          networkRef.current?.network.disableEditMode();
+          break;
+        case "node":
+          networkRef.current?.network.addNodeMode();
+          break;
+        case "directed-edge":
+          networkRef.current?.network.addEdgeMode();
+          break;
+        case "edge":
+          break;
+      }
+      
   };
 
   const handleSave = async () => {
