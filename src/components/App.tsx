@@ -46,6 +46,11 @@ function App() {
     await refreshList();
   };
 
+  const onButton = (id: any) => {
+      console.log('onButton fired');
+      networkRef.current?.network.addNodeMode();
+  };
+
   const handleSave = async () => {
     // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
     //   return x;
@@ -82,7 +87,10 @@ function App() {
       <Grid container spacing={0}>
         <Grid item>
           <Paper>
-            <NetworkButtons network={networkRef} />
+            <NetworkButtons 
+              networkRef={networkRef}
+              onButton={onButton}
+            />
           </Paper>
         </Grid>
         <Grid item xs={7}>

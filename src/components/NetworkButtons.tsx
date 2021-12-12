@@ -4,10 +4,11 @@ import { Undo, Redo, Circle, ArrowRightAlt, Minimize } from "@mui/icons-material
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-export default function NetworkButtons(network) {
+export default function NetworkButtons(props) {
     const [view, setView] = React.useState('');
 
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: string) => {
+        props.onButton();
         setView(nextView);
     };
     return(
