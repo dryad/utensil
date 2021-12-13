@@ -64,6 +64,15 @@ function App() {
       
   };
 
+  const addNodeComplete = () => {
+    networkRef.current?.network.addNodeMode(); // Makes adding nodes continual
+  }
+
+  const addEdgeComplete = () => {
+    networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
+  }
+
+
   const handleSave = async () => {
     // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
     //   return x;
@@ -108,7 +117,11 @@ function App() {
         </Grid>
         <Grid item xs={7}>
           <Paper>
-            <VisNetwork ref={networkRef} />
+            <VisNetwork 
+              ref={networkRef}
+              addNodeComplete={addNodeComplete}
+              addEdgeComplete={addEdgeComplete}
+            />
             <Box m={1}>
               <TextField
                 id="outlined-basic"

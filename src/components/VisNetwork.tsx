@@ -11,6 +11,8 @@ type INetworkProps = {
   nodes?: Node[];
   edges?: Edge[];
   onSelectNode?: Function;
+  addNodeComplete: Function;
+  addEdgeComplete: Function;
 };
 
 const VisNetwork: React.FC<INetworkProps> = forwardRef(
@@ -47,12 +49,13 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         node,
       });
       toggleNodeDialog();
-
+      props.addNodeComplete(); // causes nodes to be added until button is toggled
     };
 
     const handleNodeDialogClose = () => {
       nodeFnRef.current(nodeRef.current);
       toggleNodeDialog();
+      props.addNodeComplete(); // causes nodes to be added until button is toggled
     }
 
     const toggleEdgeDialog = () => setEdgeDialogOpen(!edgeDialogOpen);
@@ -70,6 +73,7 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
       });
 
       toggleEdgeDialog();
+      props.addEdgeComplete(); // causes edges to be added until button is toggled
     };
 
     useEffect(() => {
