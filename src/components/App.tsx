@@ -49,7 +49,7 @@ function App() {
   const onButton = (nextView: string) => {
       console.log('onButton fired', nextView);
       switch(nextView) {
-        case null:
+        case "pan":
           networkRef.current?.network.disableEditMode();
           break;
         case "node":

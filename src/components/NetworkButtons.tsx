@@ -1,16 +1,42 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { IconButton, Box } from "@mui/material";
-import { Undo, Redo, Circle, ArrowRightAlt, Minimize } from "@mui/icons-material";
+import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize } from "@mui/icons-material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import makeStyles from '@mui/styles/makeStyles';
 
 export default function NetworkButtons(props) {
-    const [view, setView] = React.useState('');
-
+    const [view, setView] = React.useState('pan');
+    const escFunction = useCallback((event) => {
+        if(event.keyCode === 27) { //Escape key
+            setPanMode();
+        }
+    }, []);
+    const setPanMode = () => {
+        props.onButton('pan');
+        setView('pan');
+    }
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: string) => {
-        props.onButton(nextView=nextView);
-        setView(nextView);
+        if (nextView !== null) { //disallow unselecting an item. 
+            props.onButton(nextView=nextView);
+            setView(nextView);
+        }
     };
+    const useStyles = makeStyles((theme) => ({
+        selected: {
+          "&&": {
+            backgroundColor: '#cccccc',
+          }
+        }
+    }));
+    useEffect(() => {
+        document.addEventListener("keydown", escFunction, false);
+    
+        return () => {
+          document.removeEventListener("keydown", escFunction, false);
+        };
+    }, []);
+    const classes = useStyles();
     return(
         <div>
             <Box m={1}>
@@ -31,18 +57,24 @@ export default function NetworkButtons(props) {
                     value={view}
                     exclusive
                     onChange={handleChange}
+                    
                     >
-                    <ToggleButton value="node" aria-label="node">
+                    <ToggleButton value="pan" aria-label="pan" classes={{ selected: classes.selected }}>
+                        <IconButton aria-label="Node">
+                            <PanTool/>
+                        </IconButton>
+                    </ToggleButton>
+                    <ToggleButton value="node" aria-label="node" classes={{ selected: classes.selected }}>
                         <IconButton aria-label="Node">
                             <Circle/>
                         </IconButton>
                     </ToggleButton>
-                    <ToggleButton value="directed-edge" aria-label="directed-edge">
+                    <ToggleButton value="directed-edge" aria-label="directed-edge" classes={{ selected: classes.selected }}>
                         <IconButton aria-label="Directed Edge">
                             <ArrowRightAlt style={{'transform': 'rotate(-45deg)'}}/>
                         </IconButton>
                     </ToggleButton>
-                    <ToggleButton value="edge" aria-label="edge">
+                    <ToggleButton value="edge" aria-label="edge" classes={{ selected: classes.selected }}>
                         <IconButton aria-label="Undirected Edge">
                             <Minimize style={{'transform': 'translate(-7px, -5px) rotate(-45deg)'}}/>
                         </IconButton>
