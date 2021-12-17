@@ -26,6 +26,15 @@ function App() {
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphName, setGraphName] = useState("");
   const [graphNote, setGraphNote] = useState("");
+  const [historyListBack, setHistoryListBack] = useState([]);
+  const [historyListForward, setHistoryListForward] = useState([]);
+
+  const addHistoryBack = (newHistory) => {
+    setHistoryListBack(state => [newHistory, ...state]); 
+  }
+  useEffect(() => {
+    console.log('new historyListBack', historyListBack);
+ }, [historyListBack]);
 
   const refreshList = async () => {
     const { data } = await axios.get("/api/graphs/");
@@ -121,6 +130,7 @@ function App() {
               ref={networkRef}
               addNodeComplete={addNodeComplete}
               addEdgeComplete={addEdgeComplete}
+              addHistoryBack={addHistoryBack}
             />
             <Box m={1}>
               <TextField
