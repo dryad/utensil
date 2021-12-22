@@ -40,10 +40,16 @@ export default function NetworkButtons(props) {
     return(
         <div>
             <Box m={1}>
-                <IconButton aria-label="Undo">
+                <IconButton 
+                    aria-label="Undo"
+                    disabled={props.undoDisabled}
+                >
                     <Undo/>
                 </IconButton>
-                <IconButton aria-label="Redo">
+                <IconButton 
+                    aria-label="Redo"
+                    disabled={props.redoDisabled}
+                >
                     <Redo/>
                 </IconButton>
             </Box>

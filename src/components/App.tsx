@@ -29,12 +29,14 @@ function App() {
   const [historyListBack, setHistoryListBack] = useState([]);
   const [historyListForward, setHistoryListForward] = useState([]);
 
-  const addHistoryBack = (newHistory) => {
-    setHistoryListBack(state => [newHistory, ...state]); 
-  }
+  const addHistoryBack = () => {
+    const newHistory : string = stringifyGraph();
+    setHistoryListBack(state=> [newHistory, ...state]); 
+  };
+
   useEffect(() => {
     console.log('new historyListBack', historyListBack);
- }, [historyListBack]);
+  }, [historyListBack]);
 
   const refreshList = async () => {
     const { data } = await axios.get("/api/graphs/");
@@ -81,14 +83,7 @@ function App() {
     networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
   }
 
-
-  const handleSave = async () => {
-    // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
-    //   return x;
-    // });
-    // const edges = clone.body.data.edges.get();
-    // const nodes = clone.body.data.nodes.get();
-
+  const stringifyGraph = () => { //used in both handeSave and addHistoryBack
     const edges = networkRef.current?.edges.get();
     const nodes = networkRef.current?.nodes.get();
     const positions = networkRef.current?.network.getPositions();
@@ -97,13 +92,21 @@ function App() {
       node.x = positions[node.id].x;
       node.y = positions[node.id].y;
     }
+    return JSON.stringify({ edges, nodes });
+  
+  };
 
-    console.log(nodes);
-
+  const handleSave = async () => {
+    // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
+    //   return x;
+    // });
+    // const edges = clone.body.data.edges.get();
+    // const nodes = clone.body.data.nodes.get();
+    const data = stringifyGraph();
     await axios.post("/api/graphs/", {
       name: graphName,
       note: graphNote,
-      data: JSON.stringify({ edges, nodes }),
+      data: data,
     });
 
     await refreshList();
@@ -121,6 +124,8 @@ function App() {
             <NetworkButtons 
               networkRef={networkRef}
               onButton={onButton}
+              undoDisabled={historyListBack.length === 0}
+              redoDisabled={historyListForward.length === 0}
             />
           </Paper>
         </Grid>

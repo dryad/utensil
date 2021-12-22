@@ -83,10 +83,10 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         
         ref.current.on("node-added", ({ callback, node }: any) => {
       
-          const nodes_his = ref.current.nodes.get(ref.current.nodes.getIds());
-          const edges_his = ref.current.edges.get(ref.current.edges.getIds());
-          const new_history = { nodes_his: nodes_his, edges_his: edges_his};
-          props.addHistoryBack(new_history);
+          // const nodes_his = ref.current.nodes.get(ref.current.nodes.getIds());
+          // const edges_his = ref.current.edges.get(ref.current.edges.getIds());
+          // const new_history = { nodes_his: nodes_his, edges_his: edges_his};
+          props.addHistoryBack();
           callback(node);
         });
         ref.current.on("add-node", ({ node, callback }: any) => {
