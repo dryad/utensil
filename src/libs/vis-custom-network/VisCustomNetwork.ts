@@ -58,7 +58,7 @@ export default class VisCustomNetwork extends EventTarget {
       const { arrows } = edge;
 
       const id = uuidv4();
-      
+
       if (from !== to) { // if not self-loop
         const level = Math.max(from.level, to.level) + 1;
         const middle = {

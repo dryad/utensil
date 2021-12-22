@@ -38,9 +38,25 @@ function App() {
     console.log('new historyListBack', historyListBack);
   }, [historyListBack]);
 
+  useEffect(() => {
+    console.log('new historyListForward', historyListForward);
+  }, [historyListForward]);
+
   const refreshList = async () => {
     const { data } = await axios.get("/api/graphs/");
     setGraphs(data);
+  };
+
+  const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
+    if (graph !== null) {
+     
+      //load json into graph instance
+      const newGraph : Graph = JSON.parse(graph);
+      console.log('attempting to load graph', newGraph);
+
+      setGraph(newGraph);
+      networkRef.current?.setData(newGraph);
+    }
   };
 
   const handleGraphSelected = (id: any) => {
@@ -57,6 +73,23 @@ function App() {
     await refreshList();
   };
 
+  const onUndo = () => {
+    console.log('onUndo');
+    if (historyListBack.length > 1) {
+      const shifted :string = historyListBack.shift()!;
+      setHistoryListBack(historyListBack);
+      //setHistoryListForward(historyListForward => [shifted, ...historyListForward]);
+      
+      //must turn off events to prevent infinite loop
+      loadGraphFromString(shifted);
+
+    }
+  }
+  
+  const onRedo = () => {
+    console.log('onRedo');
+  }
+  
   const onButton = (nextView: string) => {
       console.log('onButton fired', nextView);
       switch(nextView) {
@@ -126,6 +159,8 @@ function App() {
               onButton={onButton}
               undoDisabled={historyListBack.length === 0}
               redoDisabled={historyListForward.length === 0}
+              onUndo={onUndo}
+              onRedo={onRedo}
             />
           </Paper>
         </Grid>

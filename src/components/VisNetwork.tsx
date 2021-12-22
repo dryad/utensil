@@ -81,14 +81,10 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
       if (!ref.current && domRef.current) {
         ref.current = new VisCustomNetwork(domRef.current);
         
-        ref.current.on("node-added", ({ callback, node }: any) => {
-          props.addHistoryBack();
-          callback(node);
-        });
-        ref.current.on("edge-added", ({ callback, edge }: any) => {
-          props.addHistoryBack();
-          callback(edge);
-        });
+        //Save Undo history when graph is modified
+        ref.current.nodes.on("*", props.addHistoryBack);
+        ref.current.edges.on("*", props.addHistoryBack);
+
         ref.current.on("add-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;
           nodeRef.current = node;

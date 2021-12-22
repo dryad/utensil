@@ -43,12 +43,14 @@ export default function NetworkButtons(props) {
                 <IconButton 
                     aria-label="Undo"
                     disabled={props.undoDisabled}
+                    onClick={() => props.onUndo()}
                 >
                     <Undo/>
                 </IconButton>
                 <IconButton 
                     aria-label="Redo"
                     disabled={props.redoDisabled}
+                    onClick={() => props.onRedo()}
                 >
                     <Redo/>
                 </IconButton>
