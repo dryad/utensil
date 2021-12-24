@@ -29,14 +29,12 @@ function App() {
   const [historyListBack, setHistoryListBack] = useState([]);
   const [historyListForward, setHistoryListForward] = useState([]);
 
-  let undoEventsEnabled = true;
 
   const addHistoryBack = () => {
-    console.log("addHistoryBack with undoEventsEnabled:", undoEventsEnabled);
-    if (undoEventsEnabled) {
       const newHistory : string = stringifyGraph();
-      setHistoryListBack(state=> [newHistory, ...state]); 
-    }
+      if (newHistory != '{\"edges\":[],\"nodes\":[]}') { //prevent empty graph from being added to history
+        setHistoryListBack(state=> [newHistory, ...state]); 
+      }
   };
 
   useEffect(() => {
@@ -57,7 +55,6 @@ function App() {
      
       //load json into graph instance
       const newGraph : Graph = JSON.parse(graph);
-      //console.log('attempting to load graph', newGraph);
 
       setGraph(newGraph);
       networkRef.current?.setData(newGraph);
@@ -78,42 +75,32 @@ function App() {
     await refreshList();
   };
 
+
   const onUndo = () => {
-    undoEventsEnabled = false;
     console.log('onUndo');
-    if (historyListBack.length > 0) {
-      const historyListBackMutable = [...historyListBack];
-      const mostRecentGraph :string = historyListBackMutable.shift()!;
-      setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
+      if (historyListBack.length > 0) {
+        const historyListBackMutable = [...historyListBack];
+        const mostRecentGraph :string = historyListBackMutable.shift()!;
+        setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
 
-      const previousGraph :string = historyListBackMutable.shift()!;
-      console.log('previousGraph', previousGraph);
-      loadGraphFromString(previousGraph);
+        const previousGraph :string = historyListBackMutable.shift()!;
+        loadGraphFromString(previousGraph);
 
-      console.log('BACK setting historyBack with ', historyListBackMutable);
-      setHistoryListBack(historyListBackMutable);
-    }
-    undoEventsEnabled = true;
-
+        // console.log('BACK setting historyBack with ', historyListBackMutable);
+        setHistoryListBack(historyListBackMutable);
+      }
   }
   
   const onRedo = () => {
-
     console.log('onRedo');
-    undoEventsEnabled = false;
     if (historyListForward.length > 0) {
       const historyListForwardMutable = [...historyListForward];
       const nextGraph :string = historyListForwardMutable.shift()!;
       setHistoryListForward(historyListForwardMutable);
-      
-      let backGraph = stringifyGraph();
-      if (backGraph !== '{\"edges\":[],\"nodes\":[]}') {
-        setHistoryListBack(historyListBack => [stringifyGraph(), ...historyListBack]);
-      }
-
+      setHistoryListBack(historyListBack => [stringifyGraph(), ...historyListBack]);
       loadGraphFromString(nextGraph);
     }
-    undoEventsEnabled = true;
+
   }
   
   const onButton = (nextView: string) => {
