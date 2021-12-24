@@ -32,6 +32,7 @@ function App() {
   let undoEventsEnabled = true;
 
   const addHistoryBack = () => {
+    console.log("addHistoryBack with undoEventsEnabled:", undoEventsEnabled);
     if (undoEventsEnabled) {
       const newHistory : string = stringifyGraph();
       setHistoryListBack(state=> [newHistory, ...state]); 
@@ -80,14 +81,14 @@ function App() {
   const onUndo = () => {
     undoEventsEnabled = false;
     console.log('onUndo');
-    if (historyListBack.length > 1) {
+    if (historyListBack.length > 0) {
       const historyListBackMutable = [...historyListBack];
       const mostRecentGraph :string = historyListBackMutable.shift()!;
       setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
-      loadGraphFromString(mostRecentGraph);
-      //const previousGraph :string = historyListBackMutable.shift()!;
-      //console.log('previousGraph', previousGraph);
-      //loadGraphFromString(previousGraph);
+
+      const previousGraph :string = historyListBackMutable.shift()!;
+      console.log('previousGraph', previousGraph);
+      loadGraphFromString(previousGraph);
 
       console.log('BACK setting historyBack with ', historyListBackMutable);
       setHistoryListBack(historyListBackMutable);
