@@ -78,7 +78,7 @@ function App() {
 
   const onUndo = () => {
     console.log('onUndo');
-      if (historyListBack.length > 0) {
+      if (historyListBack.length > 1) {
         const historyListBackMutable = [...historyListBack];
         const mostRecentGraph :string = historyListBackMutable.shift()!;
         setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
@@ -88,6 +88,14 @@ function App() {
 
         // console.log('BACK setting historyBack with ', historyListBackMutable);
         setHistoryListBack(historyListBackMutable);
+      }
+      else if (historyListBack.length === 1) {
+        const historyListBackMutable = [...historyListBack];
+        const mostRecentGraph :string = historyListBackMutable.shift()!;
+        setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
+        // console.log('BACK setting historyBack with empty array');
+        setHistoryListBack([]);
+        loadGraphFromString(mostRecentGraph);
       }
   }
   
