@@ -1,23 +1,28 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useEffect, useRef, forwardRef } from "react";
 
 import { Node, Edge } from "models";
 import { NODE_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
 import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
+import useState from 'react-usestateref';
 
 type INetworkProps = {
-  ref: any;
+  networkRef: any;
   nodes?: Node[];
   edges?: Edge[];
   onSelectNode?: Function;
   addNodeComplete: Function;
   addEdgeComplete: Function;
-  addHistoryBack: Function;
+  historyListBack: string[];
+  historyListForward: string[];
+  setHistoryListBack: Function;
+  setHistoryListForward: Function;
+  historyListBackRef: any;
+  stringifyGraph: Function;
 };
 
-const VisNetwork: React.FC<INetworkProps> = forwardRef(
-  (props: INetworkProps, ref: any) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, setHistoryListBack, setHistoryListForward, historyListBackRef, stringifyGraph }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -32,6 +37,25 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
     const edgeFnRef = useRef<Function | null>(null);
     const edgeRef = useRef<any>(null);
 
+    useEffect(() => {
+      console.log('new historyListBack', historyListBack);
+    }, [historyListBack]);
+
+    const addHistoryBack = () => {
+      const newHistory : string = stringifyGraph();
+      function setHistory(newHistory: string) {
+        setHistoryListBack((state) => [newHistory, ...state]); 
+        setHistoryListForward([]);
+      }
+      
+      if (historyListBackRef.current.length == 0) { //if historyListBack is empty - working 
+         setHistory("{\"edges\":[],\"nodes\":[]}");
+      }
+
+      if (newHistory != '{\"edges\":[],\"nodes\":[]}') {
+        setHistory(newHistory);
+      }
+  };
     const toggleNodeDialog = () => {
       setNodeDialogOpen(!nodeDialogOpen);
     }
@@ -45,18 +69,18 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         node.font = { color: "#fff" };
       }
 
-      ref.current?.triggerEvent("node-added", {
+      networkRef.current?.triggerEvent("node-added", {
         callback: nodeFnRef.current,
         node,
       });
       toggleNodeDialog();
-      props.addNodeComplete(); // causes nodes to be added until button is toggled
+      addNodeComplete(); // causes nodes to be added until button is toggled
     };
 
     const handleNodeDialogClose = () => {
       nodeFnRef.current(nodeRef.current);
       toggleNodeDialog();
-      props.addNodeComplete(); // causes nodes to be added until button is toggled
+      addNodeComplete(); // causes nodes to be added until button is toggled
     }
 
     const toggleEdgeDialog = () => setEdgeDialogOpen(!edgeDialogOpen);
@@ -68,24 +92,24 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
         edge["arrows"] = { to: { enabled: true, type: "arrow" } };
       }
 
-      ref.current?.triggerEvent("edge-added", {
+      networkRef.current?.triggerEvent("edge-added", {
         callback: edgeFnRef.current,
         edge,
       });
 
       toggleEdgeDialog();
-      props.addEdgeComplete(); // causes edges to be added until button is toggled
+      addEdgeComplete(); // causes edges to be added until button is toggled
     };
 
     useEffect(() => {
-      if (!ref.current && domRef.current) {
-        ref.current = new VisCustomNetwork(domRef.current);
+      if (!networkRef.current && domRef.current) {
+        networkRef.current = new VisCustomNetwork(domRef.current);
         
         //Save Undo history when graph is modified
-        ref.current.nodes.on("*", props.addHistoryBack);
-        ref.current.edges.on("*", props.addHistoryBack);
+        networkRef.current.nodes.on("*", addHistoryBack);
+        networkRef.current.edges.on("*", addHistoryBack);
 
-        ref.current.on("add-node", ({ node, callback }: any) => {
+        networkRef.current.on("add-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;
           nodeRef.current = node;
 
@@ -94,7 +118,7 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
           setNodeDialogOpen(true);
         });
 
-        ref.current.on("edit-node", ({ node, callback }: any) => {
+        networkRef.current.on("edit-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;
           nodeRef.current = node;
 
@@ -103,7 +127,7 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
           setNodeDialogOpen(true);
         });
 
-        ref.current.on("add-edge", ({ edge, callback }: any) => {
+        networkRef.current.on("add-edge", ({ edge, callback }: any) => {
           edgeFnRef.current = callback;
           edgeRef.current = edge;
 
@@ -112,7 +136,7 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
           setEdgeDialogOpen(true);
         });
       }
-    }, [ref]);
+    }, [networkRef]);
 
     return (
       <>
@@ -134,6 +158,6 @@ const VisNetwork: React.FC<INetworkProps> = forwardRef(
       </>
     );
   }
-);
+// );
 
 export default VisNetwork;

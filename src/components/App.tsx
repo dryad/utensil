@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Container,
   Paper,
@@ -18,7 +18,7 @@ import VisCustomNetwork from "libs/vis-custom-network";
 import VisNetwork from "./VisNetwork";
 import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
-
+import useState from 'react-usestateref';
 function App() {
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
@@ -26,16 +26,8 @@ function App() {
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphName, setGraphName] = useState("");
   const [graphNote, setGraphNote] = useState("");
-  const [historyListBack, setHistoryListBack] = useState([]);
+  const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward] = useState([]);
-
-
-  const addHistoryBack = () => {
-      const newHistory : string = stringifyGraph();
-      if (newHistory != '{\"edges\":[],\"nodes\":[]}') { //prevent empty graph from being added to history
-        setHistoryListBack(state=> [newHistory, ...state]); 
-      }
-  };
 
   useEffect(() => {
     console.log('new historyListBack', historyListBack);
@@ -188,10 +180,16 @@ function App() {
         <Grid item xs={7}>
           <Paper>
             <VisNetwork 
-              ref={networkRef}
+              networkRef={networkRef}
+              
               addNodeComplete={addNodeComplete}
               addEdgeComplete={addEdgeComplete}
-              addHistoryBack={addHistoryBack}
+              historyListBack={historyListBack}
+              historyListForward={historyListForward}
+              setHistoryListBack={setHistoryListBack}
+              setHistoryListForward={setHistoryListForward}
+              historyListBackRef={historyListBackRef}
+              stringifyGraph={stringifyGraph}
             />
             <Box m={1}>
               <TextField
