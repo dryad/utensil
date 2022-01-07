@@ -53,7 +53,27 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       }
 
       if (newHistory != '{\"edges\":[],\"nodes\":[]}') {
-        setHistory(newHistory);
+        //determine if edges were added or deleted
+        if (historyListBackRef.current.length > 0) {
+          const lastHistory = historyListBackRef.current[0];
+          const lastHistoryGraph = JSON.parse(lastHistory);
+          const lastHistoryEdges = lastHistoryGraph.edges.length;
+          const currentGraph = JSON.parse(newHistory);
+          const currentEdges = currentGraph.edges.length;
+          if (lastHistoryEdges !== currentEdges) {
+            console.log('edges were added or deleted');
+            //edges were added or deleted during this update
+            //replace first member of historyListBack with newHistory, squashing the last two events
+            //because adding an edge or deleting an edge will result in two events
+            //TODO: test when multiple edges are deleted
+            setHistoryListBack((state) => [newHistory, ...state.slice(1)]);
+          }
+          else { 
+            //only nodes were added, so add graph to history untouched
+            setHistory(newHistory); 
+          }
+        }
+
       }
   };
     const toggleNodeDialog = () => {
