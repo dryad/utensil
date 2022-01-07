@@ -70,34 +70,31 @@ function App() {
 
   const onUndo = () => {
     console.log('onUndo');
-      if (historyListBack.length > 1) {
-        const historyListBackMutable = [...historyListBack];
-        const mostRecentGraph :string = historyListBackMutable.shift()!;
-        setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
 
-        const previousGraph :string = historyListBackMutable.shift()!;
-        loadGraphFromString(previousGraph);
+    if (historyListBack.length > 1) {
+      const newHistoryForward : string = stringifyGraph();
 
-        // console.log('BACK setting historyBack with ', historyListBackMutable);
-        setHistoryListBack(historyListBackMutable);
-      }
-      else if (historyListBack.length === 1) {
-        const historyListBackMutable = [...historyListBack];
-        const mostRecentGraph :string = historyListBackMutable.shift()!;
-        setHistoryListForward(historyListForward => [mostRecentGraph, ...historyListForward]);
-        // console.log('BACK setting historyBack with empty array');
-        setHistoryListBack([]);
-        loadGraphFromString(mostRecentGraph);
-      }
+      //previousGraph is second element in historyListBack
+      const previousGraph : string = historyListBack[1];
+      //remove first two elements with setHistoryListBack
+      setHistoryListBack((state) => state.slice(2));
+      loadGraphFromString(previousGraph);
+      
+      //save current graph to newHistoryForward
+      setHistoryListForward((state) => [newHistoryForward, ...state]); 
+    }
+
   }
   
   const onRedo = () => {
     console.log('onRedo');
     if (historyListForward.length > 0) {
-      const historyListForwardMutable = [...historyListForward];
-      const nextGraph :string = historyListForwardMutable.shift()!;
-      setHistoryListForward(historyListForwardMutable);
-      setHistoryListBack(historyListBack => [stringifyGraph(), ...historyListBack]);
+      
+      //load graph from first element of historyListForward
+      const nextGraph : string = historyListForward[0];
+      
+      //remove graph from historyListForward
+      setHistoryListForward((state) => state.slice(1));
       loadGraphFromString(nextGraph);
     }
 
@@ -170,7 +167,7 @@ function App() {
             <NetworkButtons 
               networkRef={networkRef}
               onButton={onButton}
-              undoDisabled={historyListBack.length === 0}
+              undoDisabled={historyListBack.length <= 1}
               redoDisabled={historyListForward.length === 0}
               onUndo={onUndo}
               onRedo={onRedo}

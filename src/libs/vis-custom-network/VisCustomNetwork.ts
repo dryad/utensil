@@ -151,7 +151,7 @@ export default class VisCustomNetwork extends EventTarget {
   addEdge = (edge: any, callback: any): void => {
     this.triggerEvent("add-edge", { edge, callback });
   };
-
+  
   /***************************
    * Custom Event Management *
    ***************************/

@@ -37,15 +37,28 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const edgeFnRef = useRef<Function | null>(null);
     const edgeRef = useRef<any>(null);
 
-    useEffect(() => {
-      console.log('new historyListBack', historyListBack);
-    }, [historyListBack]);
+    // useEffect(() => {
+    //   console.log('new historyListBack', historyListBack);
+    // }, [historyListBack]);
+
+    const addHistoryBackNode = () => {
+      console.log('addHistoryBackNode');
+      addHistoryBack();
+    };
+
+    const addHistoryBackEdge = () => {
+      console.log('addHistoryBackEdge');
+      addHistoryBack();
+    };
 
     const addHistoryBack = () => {
       const newHistory : string = stringifyGraph();
       function setHistory(newHistory: string) {
         setHistoryListBack((state) => [newHistory, ...state]); 
-        setHistoryListForward([]);
+
+        //re-enable this when undo button does not fire an event, or when we have a better way to handle this
+        //historyListForward should be cleared when a change is made that is not the result of undo/redo
+        //setHistoryListForward([]);
       }
       
       if (historyListBackRef.current.length == 0) { //if historyListBack is empty - working 
@@ -126,8 +139,8 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         networkRef.current = new VisCustomNetwork(domRef.current);
         
         //Save Undo history when graph is modified
-        networkRef.current.nodes.on("*", addHistoryBack);
-        networkRef.current.edges.on("*", addHistoryBack);
+        networkRef.current.nodes.on("*", addHistoryBackNode);
+        networkRef.current.edges.on("*", addHistoryBackEdge);
 
         networkRef.current.on("add-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;
