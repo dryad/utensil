@@ -28,31 +28,33 @@ function App() {
   const [graphNote, setGraphNote] = useState("");
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
-
+  const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
     async function detectChange() {
-      const newHistory : string = stringifyGraph();
-      const lastHistory : string = historyListBackRef.current[0];
-      if (newHistory !== lastHistory) {
-        async function processHistory() {
-          //check if newHistory is the same as any element of historyListBack or historyListForward
-          //then we can assume that the user has performed an undo/redo
-          const newHistoryIndexBack = historyListBackRef.current.indexOf(newHistory);
-          const newHistoryIndexForward = historyListForwardRef.current.indexOf(newHistory);
-          const undo_redo_performed : boolean = (newHistoryIndexBack !== -1 || newHistoryIndexForward !== -1);
+      if (!isUserDraggingRef.current) {
+        const newHistory : string = stringifyGraph();
+        const lastHistory : string = historyListBackRef.current[0];
+        if (newHistory !== lastHistory) {
+          async function processHistory() {
+            //check if newHistory is the same as any element of historyListBack or historyListForward
+            //then we can assume that the user has performed an undo/redo
+            const newHistoryIndexBack = historyListBackRef.current.indexOf(newHistory);
+            const newHistoryIndexForward = historyListForwardRef.current.indexOf(newHistory);
+            const undo_redo_performed : boolean = (newHistoryIndexBack !== -1 || newHistoryIndexForward !== -1);
 
-          //if newHistory is neither in historyListBack nor historyListForward, then we can assume that the user has performed a new change
-          if (!undo_redo_performed) {
-            setHistoryListForward([]); 
+            //if newHistory is neither in historyListBack nor historyListForward, then we can assume that the user has performed a new change
+            if (!undo_redo_performed) {
+              setHistoryListForward([]); 
+            }
           }
+          await processHistory();
+          console.log('Undo timer is saving new graph to setHistoryListBack')
+          setHistoryListBack((state) => [newHistory, ...state]);         
         }
-        await processHistory();
-        console.log('Undo timer is saving new graph to setHistoryListBack')
-        setHistoryListBack((state) => [newHistory, ...state]);         
       }
-      repeat = setTimeout(detectChange, 1000);
+      repeat = setTimeout(detectChange, 500);
     }
     detectChange();
     return () => {
@@ -96,7 +98,6 @@ function App() {
       //clear Undo/Redo history
       setHistoryListBack([]);
       setHistoryListForward([]);
-
     }
   };
 
@@ -221,12 +222,12 @@ function App() {
           <Paper>
             <VisNetwork 
               networkRef={networkRef}
-              
               addNodeComplete={addNodeComplete}
               addEdgeComplete={addEdgeComplete}
               historyListBack={historyListBack}
               historyListForward={historyListForward}
               historyListBackRef={historyListBackRef}
+              setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
             />
             <Box m={1}>

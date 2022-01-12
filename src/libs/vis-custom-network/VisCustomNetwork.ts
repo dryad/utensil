@@ -48,7 +48,14 @@ export default class VisCustomNetwork extends EventTarget {
       { nodes: this.nodes, edges: this.edges },
       this.options
     );
-    
+
+    this.network.on("dragStart", ({params}) => {
+      this.triggerEvent("drag-start", {});
+    });
+    this.network.on("dragEnd", ({params}) => {
+      this.triggerEvent("drag-end", {});
+    });
+
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
     });
@@ -97,6 +104,7 @@ export default class VisCustomNetwork extends EventTarget {
     });
     this.network.enableEditMode(); // enable edit mode on new network;
   }
+
 
   setData = (data: any): void => {
     this.nodes.clear();

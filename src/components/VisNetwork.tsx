@@ -18,9 +18,10 @@ type INetworkProps = {
   historyListForward: string[];
   historyListBackRef: any;
   stringifyGraph: Function;
+  setIsUserDragging: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -83,6 +84,17 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     useEffect(() => {
       if (!networkRef.current && domRef.current) {
         networkRef.current = new VisCustomNetwork(domRef.current);
+
+        //events received from VisCustomNetwork.ts when user starts or stops dragging
+        //updates React state so we can disable undo/redo timer functionality during drag.
+        networkRef.current.on("drag-start", (event: any) => {
+          console.log('drag on');
+          setIsUserDragging(true);
+        });
+        networkRef.current.on("drag-end", (event: any) => {
+          console.log('drag off');
+          setIsUserDragging(false);
+        });
 
         networkRef.current.on("add-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;
