@@ -122,6 +122,16 @@ export default class VisCustomNetwork extends EventTarget {
       this.network.moveNode(node.id, node.x, node.y);
     });
 
+    //this is duplicated code from the constructor, but it's necessary to make the events work after a graph is loaded
+    //or if Undo/Redo is used
+    this.network.on("dragStart", ({params}) => {
+      this.triggerEvent("drag-start", {});
+    });
+    this.network.on("dragEnd", ({params}) => {
+      this.triggerEvent("drag-end", {});
+    });
+    //this is duplicated code from the constructor, but it's necessary to enable edit mode after a graph is loaded
+    //or if Undo/Redo is used
     this.network.enableEditMode(); // enable edit mode on network that has just been loaded;
 
   };
