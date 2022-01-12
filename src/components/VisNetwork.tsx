@@ -16,13 +16,11 @@ type INetworkProps = {
   addEdgeComplete: Function;
   historyListBack: string[];
   historyListForward: string[];
-  setHistoryListBack: Function;
-  setHistoryListForward: Function;
   historyListBackRef: any;
   stringifyGraph: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, setHistoryListBack, setHistoryListForward, historyListBackRef, stringifyGraph }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -37,58 +35,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const edgeFnRef = useRef<Function | null>(null);
     const edgeRef = useRef<any>(null);
 
-    // useEffect(() => {
-    //   console.log('new historyListBack', historyListBack);
-    // }, [historyListBack]);
-
-    const addHistoryBackNode = () => {
-      console.log('addHistoryBackNode');
-      addHistoryBack();
-    };
-
-    const addHistoryBackEdge = () => {
-      console.log('addHistoryBackEdge');
-      addHistoryBack();
-    };
-
-    const addHistoryBack = () => {
-      const newHistory : string = stringifyGraph();
-      function setHistory(newHistory: string) {
-        setHistoryListBack((state) => [newHistory, ...state]); 
-
-        //re-enable this when undo button does not fire an event, or when we have a better way to handle this
-        //historyListForward should be cleared when a change is made that is not the result of undo/redo
-        //setHistoryListForward([]);
-      }
-      
-      if (historyListBackRef.current.length == 0) { //if historyListBack is empty - working 
-         setHistory("{\"edges\":[],\"nodes\":[]}");
-      }
-
-      if (newHistory != '{\"edges\":[],\"nodes\":[]}') {
-        //determine if edges were added or deleted
-        if (historyListBackRef.current.length > 0) {
-          const lastHistory = historyListBackRef.current[0];
-          const lastHistoryGraph = JSON.parse(lastHistory);
-          const lastHistoryEdges = lastHistoryGraph.edges.length;
-          const currentGraph = JSON.parse(newHistory);
-          const currentEdges = currentGraph.edges.length;
-          if (lastHistoryEdges !== currentEdges) {
-            console.log('edges were added or deleted');
-            //edges were added or deleted during this update
-            //replace first member of historyListBack with newHistory, squashing the last two events
-            //because adding an edge or deleting an edge will result in two events
-            //TODO: test when multiple edges are deleted
-            setHistoryListBack((state) => [newHistory, ...state.slice(1)]);
-          }
-          else { 
-            //only nodes were added, so add graph to history untouched
-            setHistory(newHistory); 
-          }
-        }
-
-      }
-  };
     const toggleNodeDialog = () => {
       setNodeDialogOpen(!nodeDialogOpen);
     }
@@ -137,10 +83,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     useEffect(() => {
       if (!networkRef.current && domRef.current) {
         networkRef.current = new VisCustomNetwork(domRef.current);
-        
-        //Save Undo history when graph is modified
-        networkRef.current.nodes.on("*", addHistoryBackNode);
-        networkRef.current.edges.on("*", addHistoryBackEdge);
 
         networkRef.current.on("add-node", ({ node, callback }: any) => {
           nodeFnRef.current = callback;

@@ -48,6 +48,7 @@ export default class VisCustomNetwork extends EventTarget {
       { nodes: this.nodes, edges: this.edges },
       this.options
     );
+    
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
     });
