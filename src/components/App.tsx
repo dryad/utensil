@@ -29,36 +29,22 @@ function App() {
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
 
-  function undo_timer() {
-  // useEffect(() => {
+  function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
     async function detectChange() {
-      // console.log('Undo timer fired');
-
       const newHistory : string = stringifyGraph();
       const lastHistory : string = historyListBackRef.current[0];
-      // console.log(newHistory == lastHistory);
-      // console.log(newHistory, lastHistory);
       if (newHistory !== lastHistory) {
         async function processHistory() {
-          console.log('Undo timer fired with new graph');
           //check if newHistory is the same as any element of historyListBack or historyListForward
           //then we can assume that the user has performed an undo/redo
-          console.log('this is what im evaluating', newHistory);
-          console.log('this is what i think the history back list is now', historyListBackRef.current);
           const newHistoryIndexBack = historyListBackRef.current.indexOf(newHistory);
           const newHistoryIndexForward = historyListForwardRef.current.indexOf(newHistory);
-        
           const undo_redo_performed : boolean = (newHistoryIndexBack !== -1 || newHistoryIndexForward !== -1);
-          console.log('Indexes: ', newHistoryIndexBack, newHistoryIndexForward);
-          //if it is neither in historyListBack nor historyListForward, then we can assume that the user has performed a new change
-          if (undo_redo_performed) {
-            console.log('This was an undo/redo, so we are NOT clearing historyListFoward');
 
-          }
-          else {
-            console.log('This was not an undo/redo, so we ARE clearing historyListForward');
+          //if newHistory is neither in historyListBack nor historyListForward, then we can assume that the user has performed a new change
+          if (!undo_redo_performed) {
             setHistoryListForward([]); 
           }
         }
@@ -66,8 +52,6 @@ function App() {
         console.log('Undo timer is saving new graph to setHistoryListBack')
         setHistoryListBack((state) => [newHistory, ...state]);         
       }
-
-
       repeat = setTimeout(detectChange, 1000);
     }
     detectChange();
@@ -76,8 +60,6 @@ function App() {
           clearTimeout(repeat);
       }
     }
-
-  // }, [graph]);
   }
 
   useEffect(() => {
@@ -129,12 +111,10 @@ function App() {
       const previousGraph : string = historyListBack[1];
       //remove first element with setHistoryListBack
       
-      console.log('onUndo is removing first element of historyListBack');
       setHistoryListBack((state) => state.slice(1));
       loadGraphFromString(previousGraph);
       
       //save current graph to newHistoryForward
-      console.log('onUndo is saving current graph to newHistoryForward');
       setHistoryListForward((state) => [newHistoryForward, ...state]); 
     }
 
@@ -148,11 +128,9 @@ function App() {
       const nextGraph : string = historyListForward[0];
       
       //remove graph from historyListForward
-      console.log('onRedo is removing first element of historyListForward');
       setHistoryListForward((state) => state.slice(1));
 
       //save nextGraph to historyListBack with setHistoryListBack
-      console.log('onRedo is saving nextGraph to historyListBack');
       setHistoryListBack((state) => [nextGraph, ...state]);
       loadGraphFromString(nextGraph);
     }
@@ -216,7 +194,7 @@ function App() {
 
   useEffect(() => {
     refreshList();
-    undo_timer();
+    initializeUndoTimer();
   }, []);
   
   return (
