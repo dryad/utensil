@@ -92,6 +92,11 @@ function App() {
       setGraph(graph);
       const data = JSON.parse(graph?.data);
       networkRef.current?.setData(data);
+      
+      //clear Undo/Redo history
+      setHistoryListBack([]);
+      setHistoryListForward([]);
+
     }
   };
 
