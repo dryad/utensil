@@ -117,8 +117,6 @@ function App() {
 
 
   const onUndo = () => {
-    console.log('onUndo');
-
     if (historyListBack.length > 1) {
       const newHistoryForward : string = stringifyGraph();
 
@@ -136,7 +134,6 @@ function App() {
   }
   
   const onRedo = () => {
-    console.log('onRedo');
     if (historyListForward.length > 0) {
       
       //load graph from first element of historyListForward
@@ -153,7 +150,6 @@ function App() {
   }
   
   const onButton = (nextMode: string) => {
-      console.log('onButton fired', nextMode);
       setButtonMode(nextMode); // update buttonMode state so that the proper button will become selected.
       switch(nextMode) {  // update vis-network mode
         case "pan":
