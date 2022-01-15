@@ -89,7 +89,7 @@ function App() {
       networkRef.current?.setData(newGraph);
       
       onButton(buttonMode); // 'buttonMode' is a React state string of which button is selected.
-                            // After a graph is loaded via Undo/Redo, or selecting a graph, vis-network will be in pan mode. The UI buttons will stay in the same mode (ie, add node, add edge, etc)
+                            // After a graph is loaded via Undo/Redo, vis-network will be in pan mode. The UI buttons will stay in the same mode (ie, add node, add edge, etc)
                             // If a different button was selected, we put vis into that mode by sending the selected button string to the onButton function.
     }
   };
@@ -104,6 +104,9 @@ function App() {
       //clear Undo/Redo history
       setHistoryListBack([]);
       setHistoryListForward([]);
+
+      //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
+      onButton('pan');
     }
   };
 
