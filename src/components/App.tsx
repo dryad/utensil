@@ -48,7 +48,7 @@ function App() {
 
         if (newHistory !== lastHistory) { // the graph has changed on this timer update.
           async function processHistory() {
-            //if newHistory is an undo step, we want to maintain historyListForward. If it is a brand new step, we want to clear historyListFoward.
+            //if newHistory is an undo step, we want to maintain historyListForward. If it is a brand new step, we want to clear historyListForward.
             if (!JSON.parse(newHistory).isUndoStep) {
               setHistoryListForward([]); 
             }
