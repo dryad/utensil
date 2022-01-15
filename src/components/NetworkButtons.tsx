@@ -6,7 +6,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
 
 export default function NetworkButtons(props) {
-    const [view, setView] = React.useState('pan');
+    
     const escFunction = useCallback((event) => {
         if(event.keyCode === 27) { //Escape key
             setPanMode();
@@ -14,12 +14,10 @@ export default function NetworkButtons(props) {
     }, []);
     const setPanMode = () => {
         props.onButton('pan');
-        setView('pan');
     }
-    const handleChange = (event: React.MouseEvent<HTMLElement>, nextView: string) => {
-        if (nextView !== null) { //disallow unselecting an item. 
-            props.onButton(nextView=nextView);
-            setView(nextView);
+    const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
+        if (nextMode !== null) { //disallow unselecting an item. 
+            props.onButton(nextMode); // Tell App.tsx to change the button mode
         }
     };
     const useStyles = makeStyles((theme) => ({
@@ -62,7 +60,7 @@ export default function NetworkButtons(props) {
                 <ToggleButtonGroup
                     style={{'marginBottom': 10}}
                     orientation="vertical"
-                    value={view}
+                    value={props.buttonMode} // The value of the selected button comes from App.tsx as a React prop
                     exclusive
                     onChange={handleChange}
                     

@@ -29,6 +29,8 @@ function App() {
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
+  const [buttonMode, setButtonMode] = React.useState('pan');
+
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
@@ -85,6 +87,10 @@ function App() {
 
       setGraph(newGraph);
       networkRef.current?.setData(newGraph);
+      
+      onButton(buttonMode); // 'buttonMode' is a React state string of which button is selected.
+                            // After a graph is loaded via Undo/Redo, or selecting a graph, vis-network will be in pan mode. The UI buttons will stay in the same mode (ie, add node, add edge, etc)
+                            // If a different button was selected, we put vis into that mode by sending the selected button string to the onButton function.
     }
   };
 
@@ -143,9 +149,10 @@ function App() {
 
   }
   
-  const onButton = (nextView: string) => {
-      console.log('onButton fired', nextView);
-      switch(nextView) {
+  const onButton = (nextMode: string) => {
+      console.log('onButton fired', nextMode);
+      setButtonMode(nextMode); // update buttonMode state so that the proper button will become selected.
+      switch(nextMode) {  // update vis-network mode
         case "pan":
           networkRef.current?.network.disableEditMode();
           break;
@@ -210,11 +217,12 @@ function App() {
           <Paper>
             <NetworkButtons 
               networkRef={networkRef}
-              onButton={onButton}
+              onButton={onButton} // The function to handle button presses lives in App.tsx and is passed down here. This lets us set the button mode programmatically within App.tsx
               undoDisabled={historyListBack.length <= 1}
               redoDisabled={historyListForward.length === 0}
               onUndo={onUndo}
               onRedo={onRedo}
+              buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
             />
           </Paper>
         </Grid>
