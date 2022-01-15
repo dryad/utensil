@@ -37,23 +37,27 @@ function App() {
     async function detectChange() {
       if (!isUserDraggingRef.current) {
         const newHistory : string = stringifyGraph();
-        const lastHistory : string = historyListBackRef.current[0];
-        if (newHistory !== lastHistory) {
-          async function processHistory() {
-            //check if newHistory is the same as any element of historyListBack or historyListForward
-            //then we can assume that the user has performed an undo/redo
-            const newHistoryIndexBack = historyListBackRef.current.indexOf(newHistory);
-            const newHistoryIndexForward = historyListForwardRef.current.indexOf(newHistory);
-            const undo_redo_performed : boolean = (newHistoryIndexBack !== -1 || newHistoryIndexForward !== -1);
+        let lastHistory : string = historyListBackRef.current[0];
+        
+        //remove isUndoStep field from lastHistory JSON string, because for the first comparison we just want to see if the graph has changed.
+        if (lastHistory) {
+          let lastHistoryObject = JSON.parse(lastHistory);
+          delete lastHistoryObject.isUndoStep;
+          lastHistory = JSON.stringify(lastHistoryObject);
+        }
 
-            //if newHistory is neither in historyListBack nor historyListForward, then we can assume that the user has performed a new change
-            if (!undo_redo_performed) {
+        if (newHistory !== lastHistory) { // the graph has changed on this timer update.
+          async function processHistory() {
+            //if newHistory is an undo step, we want to maintain historyListForward. If it is a brand new step, we want to clear historyListFoward.
+            if (!JSON.parse(newHistory).isUndoStep) {
               setHistoryListForward([]); 
             }
           }
           await processHistory();
           console.log('Undo timer is saving new graph to setHistoryListBack')
-          setHistoryListBack((state) => [newHistory, ...state]);         
+          let newHistoryObject = JSON.parse(newHistory);
+          newHistoryObject.isUndoStep = true;
+          setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state]);         
         }
       }
       repeat = setTimeout(detectChange, 500);
