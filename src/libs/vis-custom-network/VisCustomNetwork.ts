@@ -55,6 +55,9 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("dragEnd", ({params}) => {
       this.triggerEvent("drag-end", {});
     });
+    this.network.on("controlNodeDragEnd", ({params}) => { // This extra vis event is needed because dragging an "add edge" control point did not trigger the dragEnd event
+      this.triggerEvent("drag-end", {});
+    });
 
     this.on("node-added", ({ callback, node }: any) => {
       callback(node);
