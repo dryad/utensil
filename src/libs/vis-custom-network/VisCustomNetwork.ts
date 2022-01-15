@@ -133,6 +133,9 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("dragEnd", ({params}) => {
       this.triggerEvent("drag-end", {});
     });
+    this.network.on("controlNodeDragEnd", ({params}) => { // This extra vis event is needed because dragging an "add edge" control point did not trigger the dragEnd event
+      this.triggerEvent("drag-end", {});
+    });
     //this is duplicated code from the constructor, but it's necessary to enable edit mode after a graph is loaded
     //or if Undo/Redo is used
     this.network.enableEditMode(); // enable edit mode on network that has just been loaded;
