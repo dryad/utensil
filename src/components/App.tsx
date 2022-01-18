@@ -36,7 +36,8 @@ function App() {
     let repeat: any;
     async function detectChange() {
       if (!isUserDraggingRef.current) {
-        const newHistory : string = stringifyGraph();
+        let newHistory : string = stringifyGraph();
+        let newHistoryObject = JSON.parse(newHistory);
         let lastHistory : string = historyListBackRef.current[0];
         
         //remove isUndoStep field from lastHistory JSON string, because for the first comparison we just want to see if the graph has changed.
@@ -71,11 +72,11 @@ function App() {
   }
 
   useEffect(() => {
-    console.log('new historyListBack', historyListBack);
+    // console.log('new historyListBack', historyListBack);
   }, [historyListBack]);
 
   useEffect(() => {
-    console.log('new historyListForward', historyListForward);
+    // console.log('new historyListForward', historyListForward);
   }, [historyListForward]);
 
   const refreshList = async () => {
@@ -95,6 +96,15 @@ function App() {
       onButton(buttonMode); // 'buttonMode' is a React state string of which button is selected.
                             // After a graph is loaded via Undo/Redo, vis-network will be in pan mode. The UI buttons will stay in the same mode (ie, add node, add edge, etc)
                             // If a different button was selected, we put vis into that mode by sending the selected button string to the onButton function.
+      
+      if (newGraph.viewPosition) { // loaded graphs from database might not have a viewPosition property.
+        //move vis-network to the viewport position of the loaded graph.
+        networkRef.current?.network.moveTo({
+          position: { x: newGraph.viewPosition.x, y: newGraph.viewPosition.y },
+          scale: 1,
+          animation: false,
+        });
+      }
     }
   };
 
@@ -188,7 +198,11 @@ function App() {
       node.x = positions[node.id].x;
       node.y = positions[node.id].y;
     }
-    return JSON.stringify({ edges, nodes });
+
+    //create viewPosition using the getViewPosition function of vis-network
+    const viewPosition = networkRef.current?.network.getViewPosition();
+
+    return JSON.stringify({ edges, nodes, viewPosition });
   
   };
 
