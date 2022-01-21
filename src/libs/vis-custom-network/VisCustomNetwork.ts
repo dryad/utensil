@@ -79,7 +79,8 @@ export default class VisCustomNetwork extends EventTarget {
           color: NODE_COLORS[level],
           opacity: 0.5,
           x: (from.x + to.x) / 2,
-          y: (from.y + to.y) / 2
+          y: (from.y + to.y) / 2,
+          isLabelNode: true, // but it will set any name regardless if its defined in the object
         };
         this.nodes.add(middle);
         this.edges.add([
