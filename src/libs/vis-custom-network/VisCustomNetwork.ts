@@ -71,13 +71,13 @@ export default class VisCustomNetwork extends EventTarget {
           size: 14,
           color: "#000000",
         },
-        x: node.x + 10,
-        y: node.y + 10,
+        x: 10, //test of labelNode position as offset from node
+        y: 10,
         isLabelNode: true,
+        labelOfNode: node.id,
         level: 1,
       };
       this.nodes.add(labelNode);
-      node.labelNode = labelNode;
       this.nodes.add(node);
       //callback(node);
     });
