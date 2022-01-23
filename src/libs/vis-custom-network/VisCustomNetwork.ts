@@ -60,7 +60,25 @@ export default class VisCustomNetwork extends EventTarget {
     });
 
     this.on("node-added", ({ callback, node }: any) => {
-      callback(node);
+      
+      //create labelNode
+      const labelNode = {
+        id: uuidv4(),
+        label: node.label,
+        //color: NODE_COLORS[node.color],
+        //shape: "box",
+        font: {
+          size: 14,
+          color: "#000000",
+        },
+        x: node.x + 10,
+        y: node.y + 10,
+        isLabelNode: true,
+        level: 1,
+      };
+      this.nodes.add(labelNode);
+      this.nodes.add(node);
+      //callback(node);
     });
 
     this.on("edge-added", ({ callback, edge }: any) => {
@@ -80,7 +98,6 @@ export default class VisCustomNetwork extends EventTarget {
           opacity: 0.5,
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
-          isLabelNode: true, // but it will set any name regardless if its defined in the object
         };
         this.nodes.add(middle);
         this.edges.add([
