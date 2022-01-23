@@ -77,6 +77,7 @@ export default class VisCustomNetwork extends EventTarget {
         level: 1,
       };
       this.nodes.add(labelNode);
+      node.labelNode = labelNode;
       this.nodes.add(node);
       //callback(node);
     });
