@@ -192,11 +192,10 @@ function App() {
   const stringifyGraph = () => { //used in both handeSave and addHistoryBack
     const edges = networkRef.current?.edges.get();
     const nodes = networkRef.current?.nodes.get();
-    console.log('nodes', nodes);
+    //console.log('nodes', nodes);
     const positions = networkRef.current?.network.getPositions();
 
     for (const node of nodes) {
-      console.log('isLabelNode', node.isLabelNode);
       node.x = positions[node.id].x;
       node.y = positions[node.id].y;
     }
