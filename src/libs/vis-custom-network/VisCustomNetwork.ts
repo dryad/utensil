@@ -60,6 +60,8 @@ export default class VisCustomNetwork extends EventTarget {
     });
 
     this.on("node-added", ({ callback, node }: any) => {
+      //create node before creating labelNode
+      callback(node);
       
       //create labelNode
       const labelNode = {
@@ -75,11 +77,9 @@ export default class VisCustomNetwork extends EventTarget {
         y: -10,
         isLabelNode: true,
         labelOfNode: node.id,
-        level: 1,
+        level: node.level,
       };
       this.nodes.add(labelNode);
-      this.nodes.add(node);
-      //callback(node);
     });
 
     this.on("edge-added", ({ callback, edge }: any) => {
