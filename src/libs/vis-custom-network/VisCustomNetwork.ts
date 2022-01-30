@@ -71,7 +71,7 @@ export default class VisCustomNetwork extends EventTarget {
           size: 14,
           color: "#000000",
         },
-        x: -10, //test of labelNode position as offset from node
+        x: -10, //labelNode position is an offset from node
         y: -10,
         isLabelNode: true,
         labelOfNode: node.id,
