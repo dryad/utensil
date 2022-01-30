@@ -72,7 +72,7 @@ function App() {
   }
 
   useEffect(() => {
-    console.log('new historyListBack', historyListBack);
+    // console.log('new historyListBack', historyListBack);
   }, [historyListBack]);
 
   useEffect(() => {
