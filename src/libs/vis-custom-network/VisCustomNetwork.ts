@@ -113,8 +113,8 @@ export default class VisCustomNetwork extends EventTarget {
         },
         shape: "ellipse",
         ctxRenderer: labelNodeRenderer,
-        x: -10, //labelNode position is an offset from node
-        y: -10,
+        x: -20, //labelNode position is an offset from node
+        y: -20,
         isLabelNode: true,
         labelOfNode: node.id,
         level: node.level,
