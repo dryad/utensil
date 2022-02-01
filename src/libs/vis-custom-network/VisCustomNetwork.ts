@@ -59,6 +59,44 @@ export default class VisCustomNetwork extends EventTarget {
       this.triggerEvent("drag-end", {});
     });
 
+    const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
+    }
+
+    function labelNodeRenderer({ ctx, id, x, y, state: { selected, hover }, style, label }) {
+      // do some math here
+      return {
+        // bellow arrows
+        // primarily meant for nodes and the labels inside of their boundaries
+        drawNode() {
+          const r = style.size;
+          ctx.beginPath();
+          const sides = 6;
+          const a = (Math.PI * 2) / sides;
+          ctx.moveTo(x , y + r);
+          for (let i = 1; i < sides; i++) {
+              ctx.lineTo(x + r * Math.sin(a * i), y + r * Math.cos(a * i));
+          }
+          ctx.closePath();
+          ctx.save();
+          ctx.fillStyle = 'red';
+          ctx.fill(); 
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.font = "normal 12px sans-serif";
+          ctx.fillStyle = 'black';
+          
+        },
+        // above arrows
+        // primarily meant for labels outside of the node
+        drawExternalLabel() {
+          //ctx.drawSomeTextOutsideOfTheNode();
+        },
+        // node dimensions defined by node drawing
+        nodeDimensions: { width: 50, height: 50 },
+      };
+    }
+
     this.on("node-added", ({ callback, node }: any) => {
       //create node before creating labelNode
       callback(node);
@@ -73,6 +111,8 @@ export default class VisCustomNetwork extends EventTarget {
           size: 14,
           color: "#000000",
         },
+        shape: "ellipse",
+        ctxRenderer: labelNodeRenderer,
         x: -10, //labelNode position is an offset from node
         y: -10,
         isLabelNode: true,
