@@ -98,28 +98,37 @@ export default class VisCustomNetwork extends EventTarget {
     }
 
     this.on("node-added", ({ callback, node }: any) => {
-      //create node before creating labelNode
+      //handle create or update node before create or update labelNode
       callback(node);
-      
-      //create labelNode
-      const labelNode = {
-        id: uuidv4(),
-        label: node.label,
-        //color: NODE_COLORS[node.color],
-        //shape: "box",
-        font: {
-          size: 14,
-          color: "#000000",
-        },
-        shape: "ellipse",
-        ctxRenderer: labelNodeRenderer,
-        x: -20, //labelNode position is an offset from node
-        y: -20,
-        isLabelNode: true,
-        labelOfNode: node.id,
-        level: node.level,
-      };
-      this.nodes.add(labelNode);
+
+      //create labelNode if it doesn't exist - otherwise update it
+      const existingLabelNode = this.nodes.get().find((n: any) => n.labelOfNode === node.id)
+      if (existingLabelNode) {
+        //node already has a label, update it.
+        existingLabelNode.label = node.label;
+        this.nodes.update(existingLabelNode);
+      }
+      else {
+        //node does not have label, create it.
+        const labelNode = {
+          id: uuidv4(),
+          label: node.label,
+          font: {
+            size: 14,
+            color: "#000000",
+          },
+          shape: "ellipse",
+          ctxRenderer: labelNodeRenderer,
+          x: -20, //labelNode position is an offset from node
+          y: -20,
+          isLabelNode: true,
+          labelOfNode: node.id,
+          level: node.level,
+        };
+        this.nodes.add(labelNode);
+
+      }
+
     });
 
     this.on("edge-added", ({ callback, edge }: any) => {
