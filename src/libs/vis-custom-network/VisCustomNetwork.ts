@@ -225,16 +225,27 @@ export default class VisCustomNetwork extends EventTarget {
       const connectedNodeIds = this.network.getConnectedNodes(
         nodeId
       ) as string[];
-
+      //add to the deletion queue: the labelNode
+      const labelNode = this.nodes.get().find((n: any) => n.labelOfNode === nodeId);
+      if (labelNode) {
+        data.nodes.push(labelNode.id);
+        queue.push(labelNode.id);
+      }
       const node = this.nodes.get(nodeId);
       for (const connectedNodeId of connectedNodeIds) {
         const connectedNode = this.nodes.get(connectedNodeId);
         if (
           connectedNode.level > node.level &&
           !data.nodes.includes(connectedNodeId)
-        ) {
+        ) {   
           data.nodes.push(connectedNodeId);
           queue.push(connectedNodeId);
+          //add to the deletion queue: the labelNode of any connected nodes flagged for deletion
+          const labelNode = this.nodes.get().find((n: any) => n.labelOfNode === connectedNodeId);
+          if (labelNode) {
+            data.nodes.push(labelNode.id);
+            queue.push(labelNode.id);
+          }
         }
       }
     }
