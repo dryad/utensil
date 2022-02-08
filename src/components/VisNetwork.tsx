@@ -54,14 +54,19 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         node,
       });
       toggleNodeDialog();
-      addNodeComplete(); // allows nodes to be added until button is turned off
+      if (nodeDialogTitle != "Edit Node") {
+        addNodeComplete(); // allows nodes to be added until button is turned off
+      }
+      
     };
 
     const handleNodeDialogClose = () => {
       //nodeFnRef.current(nodeRef.current); // with this disabled, it will not create a blank node when the dialog is closed
       toggleNodeDialog();
-      addNodeComplete(); // allows nodes to be added until button is turned off
-    }
+      if (nodeDialogTitle != "Edit Node") {
+        addNodeComplete(); // allows nodes to be added until button is turned off
+      }
+    };
 
     const toggleEdgeDialog = () => setEdgeDialogOpen(!edgeDialogOpen);
 
