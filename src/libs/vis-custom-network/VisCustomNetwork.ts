@@ -29,7 +29,7 @@ export default class VisCustomNetwork extends EventTarget {
       },
       interaction: {
         selectConnectedEdges: false,
-        selectable: false,
+        // selectable: false,
       },
       edges: {
         color: "#411811",
@@ -59,6 +59,18 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("controlNodeDragEnd", ({params}) => { // This extra vis event is needed because dragging an "add edge" control point did not trigger the dragEnd event
       this.triggerEvent("drag-end", {});
     });
+
+    this.network.on("click", params => {
+      console.log(params);
+      if (params.nodes.length > 0) {
+        for (const nodeId of params.nodes) {
+          const node = this.nodes.get(nodeId);
+          if (node && node.isLabelNode) {
+            console.log('clicked labelNode');
+          }
+        }
+      }
+    })
 
     const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
     }
