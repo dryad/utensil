@@ -61,12 +61,12 @@ export default class VisCustomNetwork extends EventTarget {
     });
 
     this.network.on("click", params => {
-      console.log(params);
-      if (params.nodes.length > 0) {
-        for (const nodeId of params.nodes) {
-          const node = this.nodes.get(nodeId);
-          if (node && node.isLabelNode) {
-            console.log('clicked labelNode');
+      if (params.nodes.length > 0) {  //if we clicked on any node
+        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && node.isLabelNode) { //if the node exists and is a labelNode
+            const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
+            this.editNode(labelOfNode, undefined); //pop up the edit box for that node
           }
         }
       }

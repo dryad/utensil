@@ -111,7 +111,11 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         });
 
         networkRef.current.on("edit-node", ({ node, callback }: any) => {
-          nodeFnRef.current = callback;
+          //when coming from a labelNode click, we are editing the parent node, but callback is undefined
+          if (callback != undefined) {
+            nodeFnRef.current = callback;
+          }
+          
           nodeRef.current = node;
 
           setNodeDialogTitle("Edit Node");
