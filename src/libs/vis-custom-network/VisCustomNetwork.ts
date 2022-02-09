@@ -71,7 +71,16 @@ export default class VisCustomNetwork extends EventTarget {
         }
       }
     })
-
+    this.network.on("doubleClick", params => {
+      if (params.nodes.length > 0) {  //if we double clicked on any node
+        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && !node.isLabelNode) { //if the node exists and is a labelNode
+            this.editNode(node, undefined); //pop up the edit box for that node
+          }
+        }
+      }
+    })
     const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
     }
 
