@@ -15,4 +15,5 @@ export type Edge = {
   from: string;
   to: string;
   eventual: string;
+  directed: boolean;
 };

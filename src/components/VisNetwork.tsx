@@ -73,9 +73,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const handleEdgeDialog = (directed: number) => () => {
       const edge = edgeRef.current;
 
-      if (directed) {
-        edge["arrows"] = { to: { enabled: true, type: "arrow" } };
-      }
+      //pass directed property to edge (coming from a number from previous developer since it was a pull-down box)
+      //This will later be set by whether the directed or undirected edge tool was used
+      edge.directed = directed == 1 ? true : false;
 
       networkRef.current?.triggerEvent("edge-added", {
         callback: edgeFnRef.current,

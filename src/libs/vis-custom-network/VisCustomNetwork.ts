@@ -173,9 +173,9 @@ export default class VisCustomNetwork extends EventTarget {
         };
         this.nodes.add(middle);
         this.edges.add([
-          //{ from: from.id, to: id },
-          { from: from.id, to: id, eventual: to.id },
-          //{ from: id, to: to.id, arrows }, // do we need this?
+          //create the three-part edge, from -> to -> eventual
+          //set whether the edge is directed or not, from the original edge that vis tries to create
+          { from: from.id, to: id, eventual: to.id, directed: edge.directed},
         ]);
       }
       else {
