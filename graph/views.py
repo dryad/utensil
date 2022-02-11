@@ -9,7 +9,7 @@ import json
 @csrf_exempt
 def graphs(request):
     if request.method == 'GET':
-        search_query = request.GET.get('search', None)
+        search_query = request.GET.get('q', None)
         if search_query is not None:
             graphs = Graph.objects.filter(
                 Q(name__icontains=search_query) |

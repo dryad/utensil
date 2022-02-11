@@ -30,7 +30,10 @@ function App() {
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
   const [buttonMode, setButtonMode] = React.useState('pan');
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const clearSearch = () => {
+    setSearchQuery('');
+  }
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
@@ -79,8 +82,12 @@ function App() {
     // console.log('new historyListForward', historyListForward);
   }, [historyListForward]);
 
+  useEffect(() => {
+    refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
+  }, [searchQuery]);
+
   const refreshList = async () => {
-    const { data } = await axios.get("/api/graphs/");
+    const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
     setGraphs(data);
   };
 
@@ -288,6 +295,23 @@ function App() {
           </Paper>
         </Grid>
         <Grid item xs={3}>
+          <Paper>
+          <Box m={1}>
+            <TextField
+              margin="normal"
+              id="outlined-basic"
+              label="Search"
+              rows={1}
+              variant="outlined"
+              size="small"
+              value={searchQuery}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
+              fullWidth
+              InputProps={{disableUnderline: true , endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button>}}
+            />
+
+          </Box>
+          </Paper>
           <GraphList
             graphs={graphs}
             onGraphSelected={handleGraphSelected}
