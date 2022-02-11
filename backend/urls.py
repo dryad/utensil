@@ -16,16 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path, include
 from django.views.generic import TemplateView
-from rest_framework import routers
-from todo import views as todoViews
-from graph import views as graphViews
-
-router = routers.DefaultRouter()
-router.register(r'todos', todoViews.TodoView, 'todo')
-router.register(r'graphs', graphViews.GraphView, 'graph')
+from graph import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),         
-    path('api/', include(router.urls)),
+    path('api/graphs/', views.graphs),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]
