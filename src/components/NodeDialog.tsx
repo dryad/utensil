@@ -6,23 +6,24 @@ import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 type IDialogProps = {
   open: boolean;
   title?: string;
-  label?: string;
+  nodeLabel?: string;
   onClose: Function;
   onOk: Function;
+  setNodeLabel: Function;
 };
 
 const NodeDialog: React.FC<IDialogProps> = ({
   open,
   title,
-  label,
+  nodeLabel,
   onClose,
   onOk,
+  setNodeLabel,
 }) => {
-  const [nodeLabel, setNodeLabel] = useState(label);
   const okButton = useRef(null);
   useEffect(() => {
-    setNodeLabel(label);
-  }, [label]);
+    setNodeLabel(nodeLabel);
+  }, [nodeLabel]);
 
   return (
     <Dialog

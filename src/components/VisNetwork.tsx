@@ -160,9 +160,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         <NodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}
-          label={nodeDialogLabel}
+          nodeLabel={nodeDialogLabel}
           onClose={handleNodeDialogClose}
           onOk={handleNodeDialogOk}
+          setNodeLabel={setNodeDialogLabel}
         />
         <EdgeDialog
           open={edgeDialogOpen}
