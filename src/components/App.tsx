@@ -230,6 +230,10 @@ function App() {
     await refreshList();
   };
 
+  const handleSaveAsNew = async () => {
+    handleSave();
+  }
+
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
@@ -290,6 +294,9 @@ function App() {
             <Box>
               <Button variant="outlined" color="primary" onClick={handleSave}>
                 Save
+              </Button>
+              <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
+                Save As New
               </Button>
             </Box>
           </Paper>
