@@ -9,12 +9,15 @@ import json
 @csrf_exempt
 def graphs(request):
     if request.method == 'GET':
-        search_query = "test3"
-        graphs = Graph.objects.filter(
-            Q(name__icontains=search_query) |
-            Q(data__icontains=search_query) |
-            Q(note__icontains=search_query)
-        )
+        search_query = request.GET.get('search', None)
+        if search_query is not None:
+            graphs = Graph.objects.filter(
+                Q(name__icontains=search_query) |
+                Q(data__icontains=search_query) |
+                Q(note__icontains=search_query)
+            )
+        else:
+            graphs = Graph.objects.all()
         serializer = GraphSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
