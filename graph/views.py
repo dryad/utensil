@@ -1,4 +1,3 @@
-from re import S
 from .serializers import GraphSerializer
 from .models import Graph
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
