@@ -72,7 +72,7 @@ function App() {
   }
 
   useEffect(() => {
-    // console.log('new historyListBack', historyListBack);
+    console.log('new historyListBack', historyListBack);
   }, [historyListBack]);
 
   useEffect(() => {
@@ -192,6 +192,7 @@ function App() {
   const stringifyGraph = () => { //used in both handeSave and addHistoryBack
     const edges = networkRef.current?.edges.get();
     const nodes = networkRef.current?.nodes.get();
+    //console.log('nodes', nodes);
     const positions = networkRef.current?.network.getPositions();
 
     for (const node of nodes) {

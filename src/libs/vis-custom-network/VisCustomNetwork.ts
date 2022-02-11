@@ -29,6 +29,7 @@ export default class VisCustomNetwork extends EventTarget {
       },
       interaction: {
         selectConnectedEdges: false,
+        // selectable: false,
       },
       edges: {
         color: "#411811",
@@ -59,8 +60,97 @@ export default class VisCustomNetwork extends EventTarget {
       this.triggerEvent("drag-end", {});
     });
 
+    this.network.on("click", params => {
+      if (params.nodes.length > 0) {  //if we clicked on any node
+        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && node.isLabelNode) { //if the node exists and is a labelNode
+            const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
+            this.editNode(labelOfNode, undefined); //pop up the edit box for that node
+          }
+        }
+      }
+    })
+    this.network.on("doubleClick", params => {
+      if (params.nodes.length > 0) {  //if we double clicked on any node
+        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && !node.isLabelNode) { //if the node exists and is a labelNode
+            this.editNode(node, undefined); //pop up the edit box for that node
+          }
+        }
+      }
+    })
+    const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
+    }
+
+    function labelNodeRenderer({ ctx, id, x, y, state: { selected, hover }, style, label }) {
+      // do some math here
+      return {
+        // bellow arrows
+        // primarily meant for nodes and the labels inside of their boundaries
+        drawNode() {
+          const r = style.size;
+          ctx.beginPath();
+          const sides = 6;
+          const a = (Math.PI * 2) / sides;
+          ctx.moveTo(x , y + r);
+          for (let i = 1; i < sides; i++) {
+              ctx.lineTo(x + r * Math.sin(a * i), y + r * Math.cos(a * i));
+          }
+          ctx.closePath();
+          ctx.save();
+          ctx.fillStyle = 'red';
+          ctx.fill(); 
+          ctx.stroke();
+          ctx.restore();
+
+          ctx.font = "normal 12px sans-serif";
+          ctx.fillStyle = 'black';
+          
+        },
+        // above arrows
+        // primarily meant for labels outside of the node
+        drawExternalLabel() {
+          //ctx.drawSomeTextOutsideOfTheNode();
+        },
+        // node dimensions defined by node drawing
+        nodeDimensions: { width: 50, height: 50 },
+      };
+    }
+
     this.on("node-added", ({ callback, node }: any) => {
+      //handle create or update node before create or update labelNode
       callback(node);
+
+      //create labelNode if it doesn't exist - otherwise update it
+      const existingLabelNode = this.nodes.get().find((n: any) => n.labelOfNode === node.id)
+      if (existingLabelNode) {
+        //node already has a label, update it.
+        existingLabelNode.label = node.label;
+        this.nodes.update(existingLabelNode);
+      }
+      else {
+        //node does not have label, create it.
+        const labelNode = {
+          id: uuidv4(),
+          label: node.label,
+          font: {
+            size: 14,
+            color: "#000000",
+          },
+          shape: "ellipse",
+          ctxRenderer: labelNodeRenderer,
+          x: -20, //labelNode position is an offset from node
+          y: -20,
+          isLabelNode: true,
+          labelOfNode: node.id,
+          level: node.level,
+        };
+        this.nodes.add(labelNode);
+
+      }
+
     });
 
     this.on("edge-added", ({ callback, edge }: any) => {
@@ -79,13 +169,13 @@ export default class VisCustomNetwork extends EventTarget {
           color: NODE_COLORS[level],
           opacity: 0.5,
           x: (from.x + to.x) / 2,
-          y: (from.y + to.y) / 2
+          y: (from.y + to.y) / 2,
         };
         this.nodes.add(middle);
         this.edges.add([
-          //{ from: from.id, to: id },
-          { from: from.id, to: id, eventual: to.id },
-          //{ from: id, to: to.id, arrows }, // do we need this?
+          //create the three-part edge, from -> to -> eventual
+          //set whether the edge is directed or not, from the original edge that vis tries to create
+          { from: from.id, to: id, eventual: to.id, directed: edge.directed},
         ]);
       }
       else {
@@ -157,16 +247,27 @@ export default class VisCustomNetwork extends EventTarget {
       const connectedNodeIds = this.network.getConnectedNodes(
         nodeId
       ) as string[];
-
+      //add to the deletion queue: the labelNode
+      const labelNode = this.nodes.get().find((n: any) => n.labelOfNode === nodeId);
+      if (labelNode) {
+        data.nodes.push(labelNode.id);
+        queue.push(labelNode.id);
+      }
       const node = this.nodes.get(nodeId);
       for (const connectedNodeId of connectedNodeIds) {
         const connectedNode = this.nodes.get(connectedNodeId);
         if (
           connectedNode.level > node.level &&
           !data.nodes.includes(connectedNodeId)
-        ) {
+        ) {   
           data.nodes.push(connectedNodeId);
           queue.push(connectedNodeId);
+          //add to the deletion queue: the labelNode of any connected nodes flagged for deletion
+          const labelNode = this.nodes.get().find((n: any) => n.labelOfNode === connectedNodeId);
+          if (labelNode) {
+            data.nodes.push(labelNode.id);
+            queue.push(labelNode.id);
+          }
         }
       }
     }

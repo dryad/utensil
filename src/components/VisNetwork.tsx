@@ -54,23 +54,28 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         node,
       });
       toggleNodeDialog();
-      addNodeComplete(); // causes nodes to be added until button is toggled
+      if (nodeDialogTitle != "Edit Node") {
+        addNodeComplete(); // allows nodes to be added until button is turned off
+      }
+      
     };
 
     const handleNodeDialogClose = () => {
-      nodeFnRef.current(nodeRef.current);
+      //nodeFnRef.current(nodeRef.current); // with this disabled, it will not create a blank node when the dialog is closed
       toggleNodeDialog();
-      addNodeComplete(); // causes nodes to be added until button is toggled
-    }
+      if (nodeDialogTitle != "Edit Node") {
+        addNodeComplete(); // allows nodes to be added until button is turned off
+      }
+    };
 
     const toggleEdgeDialog = () => setEdgeDialogOpen(!edgeDialogOpen);
 
     const handleEdgeDialog = (directed: number) => () => {
       const edge = edgeRef.current;
 
-      if (directed) {
-        edge["arrows"] = { to: { enabled: true, type: "arrow" } };
-      }
+      //pass directed property to edge (coming from a number from previous developer since it was a pull-down box)
+      //This will later be set by whether the directed or undirected edge tool was used
+      edge.directed = directed == 1 ? true : false;
 
       networkRef.current?.triggerEvent("edge-added", {
         callback: edgeFnRef.current,
@@ -78,7 +83,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       });
 
       toggleEdgeDialog();
-      addEdgeComplete(); // causes edges to be added until button is toggled
+      addEdgeComplete(); // allows edges to be added until button is turned off
     };
 
     useEffect(() => {
@@ -106,7 +111,11 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         });
 
         networkRef.current.on("edit-node", ({ node, callback }: any) => {
-          nodeFnRef.current = callback;
+          //when coming from a labelNode click, we are editing the parent node, but callback is undefined
+          if (callback != undefined) {
+            nodeFnRef.current = callback;
+          }
+          
           nodeRef.current = node;
 
           setNodeDialogTitle("Edit Node");
