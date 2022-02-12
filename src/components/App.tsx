@@ -323,6 +323,7 @@ function App() {
             graphs={graphs}
             onGraphSelected={handleGraphSelected}
             onGraphDelete={handleGraphDelete}
+            searchQuery={searchQuery}
           />
           {graph && (
             <Card variant="outlined">
