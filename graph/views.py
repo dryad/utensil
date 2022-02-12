@@ -23,10 +23,21 @@ def graphs(request):
     elif request.method == 'POST':
         json_data = json.loads(request.body)
         try:
+            try:
+                id = json_data['id']
+            except KeyError:
+                id = None
             name = json_data['name']
             note = json_data['note']
             data = json_data['data']
-            Graph.objects.create(name=name, note=note, data=data)
+            if id is not None:
+                graph = Graph.objects.get(id=id)
+                graph.name = name
+                graph.note = note
+                graph.data = data
+                graph.save()
+            else:
+                Graph.objects.create(name=name, note=note, data=data)
             return HttpResponse(status=201)
         except KeyError:
             return HttpResponse(status=400) 
