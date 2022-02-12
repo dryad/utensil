@@ -19,7 +19,7 @@ type IGraphListProps = {
 
 const GraphList: React.FC<IGraphListProps> = (props) => {
   return (
-    <Paper>
+    <Paper style={{height: '340px', overflow:'scroll'}}>
       <List>
         {props.graphs.length === 0 && props.searchQuery == ""  && (
           <ListItem>No graphs yet.</ListItem>

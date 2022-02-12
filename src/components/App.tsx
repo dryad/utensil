@@ -290,19 +290,6 @@ function App() {
                 fullWidth
               />
             </Box>
-            <Box m={1}>
-              <TextField
-                id="outlined-basic"
-                label="Note"
-                multiline
-                rows={4}
-                variant="outlined"
-                size="small"
-                value={graphNote}
-                onChange={(e: any) => setGraphNote(e.target.value)}
-                fullWidth
-              />
-            </Box>
             <Box>
               <Button variant="outlined" color="primary" onClick={handleSave}>
                 Save
@@ -340,12 +327,17 @@ function App() {
           {graph && (
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" component="h2">
-                  Note
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {graph.note}
-                </Typography>
+                <TextField
+                  id="outlined-basic"
+                  label="Note"
+                  multiline
+                  rows={4}
+                  variant="outlined"
+                  size="small"
+                  value={graphNote}
+                  onChange={(e: any) => setGraphNote(e.target.value)}
+                  fullWidth
+                />
               </CardContent>
             </Card>
           )}
