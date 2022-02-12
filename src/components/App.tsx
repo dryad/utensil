@@ -119,6 +119,8 @@ function App() {
     const graph = graphs?.find((g: any) => g.id === id);
     if (graph !== null) {
       setGraph(graph);
+      setGraphName(graph.name);
+      setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
       networkRef.current?.setData(data);
       
@@ -214,24 +216,34 @@ function App() {
   
   };
 
-  const handleSave = async () => {
-    // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
-    //   return x;
-    // });
-    // const edges = clone.body.data.edges.get();
-    // const nodes = clone.body.data.nodes.get();
+  async function saveGraphToDatabase(isNew: boolean = false) {
+    
     const data = stringifyGraph();
-    await axios.post("/api/graphs/", {
-      name: graphName,
-      note: graphNote,
-      data: data,
-    });
+    if (isNew) {
+      await axios.post("/api/graphs/", {
+        name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
+        note: graphNote,
+        data: data,
+      });
+    } else {
+      await axios.post("/api/graphs/", {
+        id: graph?.id, //id is saved along with graph, so we can update the graph in the database, rather than create new.
+        name: graphName,
+        note: graphNote,
+        data: data,
+      });
+    }  
 
     await refreshList();
+  
+  };
+
+  const handleSave = async () => {
+    saveGraphToDatabase();
   };
 
   const handleSaveAsNew = async () => {
-    handleSave();
+    saveGraphToDatabase(true);
   }
 
   useEffect(() => {
@@ -295,7 +307,7 @@ function App() {
               <Button variant="outlined" color="primary" onClick={handleSave}>
                 Save
               </Button>
-              <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
+              <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
                 Save As New
               </Button>
             </Box>
