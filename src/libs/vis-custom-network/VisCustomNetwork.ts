@@ -19,7 +19,7 @@ export default class VisCustomNetwork extends EventTarget {
     this.edges = new DataSet();
     this.options = {
       manipulation: {
-        enabled: true,
+        enabled: false,
         addNode: this.addNode,
         editNode: this.editNode,
         deleteNode: this.deleteNode,
