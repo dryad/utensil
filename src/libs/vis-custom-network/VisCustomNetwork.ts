@@ -39,6 +39,7 @@ export default class VisCustomNetwork extends EventTarget {
       nodes: {
         shape: 'dot',
         size: 10,
+        opacity: 1.0,
       },
       physics: {
         enabled: false,
@@ -167,7 +168,7 @@ export default class VisCustomNetwork extends EventTarget {
           label: "",
           level,
           color: NODE_COLORS[level],
-          opacity: 0.5,
+          opacity: 1.0,
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
         };
@@ -185,7 +186,7 @@ export default class VisCustomNetwork extends EventTarget {
           label: "",
           level,
           color: NODE_COLORS[level],
-          opacity: 0.5,
+          opacity: 1.0,
           x: from.x + 50,
           y: from.y - 50,
         }

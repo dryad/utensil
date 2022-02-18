@@ -30,7 +30,10 @@ function App() {
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
   const [buttonMode, setButtonMode] = React.useState('pan');
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const clearSearch = () => {
+    setSearchQuery('');
+  }
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
@@ -79,8 +82,12 @@ function App() {
     // console.log('new historyListForward', historyListForward);
   }, [historyListForward]);
 
+  useEffect(() => {
+    refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
+  }, [searchQuery]);
+
   const refreshList = async () => {
-    const { data } = await axios.get("/api/graphs/");
+    const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
     setGraphs(data);
   };
 
@@ -112,6 +119,8 @@ function App() {
     const graph = graphs?.find((g: any) => g.id === id);
     if (graph !== null) {
       setGraph(graph);
+      setGraphName(graph.name);
+      setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
       networkRef.current?.setData(data);
       
@@ -207,21 +216,35 @@ function App() {
   
   };
 
-  const handleSave = async () => {
-    // const clone = _.cloneDeepWith(networkRef.current?.network, (x: any) => {
-    //   return x;
-    // });
-    // const edges = clone.body.data.edges.get();
-    // const nodes = clone.body.data.nodes.get();
+  async function saveGraphToDatabase(isNew: boolean = false) {
+    
     const data = stringifyGraph();
-    await axios.post("/api/graphs/", {
-      name: graphName,
-      note: graphNote,
-      data: data,
-    });
+    if (isNew) {
+      await axios.post("/api/graphs/", {
+        name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
+        note: graphNote,
+        data: data,
+      });
+    } else {
+      await axios.post("/api/graphs/", {
+        id: graph?.id, //id is saved along with graph, so we can update the graph in the database, rather than create new.
+        name: graphName,
+        note: graphNote,
+        data: data,
+      });
+    }  
 
     await refreshList();
+  
   };
+
+  const handleSave = async () => {
+    saveGraphToDatabase();
+  };
+
+  const handleSaveAsNew = async () => {
+    saveGraphToDatabase(true);
+  }
 
   useEffect(() => {
     refreshList();
@@ -267,41 +290,54 @@ function App() {
                 fullWidth
               />
             </Box>
-            <Box m={1}>
-              <TextField
-                id="outlined-basic"
-                label="Note"
-                multiline
-                rows={4}
-                variant="outlined"
-                size="small"
-                value={graphNote}
-                onChange={(e: any) => setGraphNote(e.target.value)}
-                fullWidth
-              />
-            </Box>
             <Box>
               <Button variant="outlined" color="primary" onClick={handleSave}>
                 Save
+              </Button>
+              <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
+                Save As New
               </Button>
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={3}>
+          <Paper>
+          <Box m={1}>
+            <TextField
+              margin="normal"
+              id="outlined-basic"
+              label="Search"
+              rows={1}
+              variant="outlined"
+              size="small"
+              value={searchQuery}
+              onChange={(e: any) => setSearchQuery(e.target.value)}
+              fullWidth
+              InputProps={{disableUnderline: true , endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button>}}
+            />
+
+          </Box>
+          </Paper>
           <GraphList
             graphs={graphs}
             onGraphSelected={handleGraphSelected}
             onGraphDelete={handleGraphDelete}
+            searchQuery={searchQuery}
           />
           {graph && (
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="h6" component="h2">
-                  Note
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {graph.note}
-                </Typography>
+                <TextField
+                  id="outlined-basic"
+                  label="Note"
+                  multiline
+                  rows={4}
+                  variant="outlined"
+                  size="small"
+                  value={graphNote}
+                  onChange={(e: any) => setGraphNote(e.target.value)}
+                  fullWidth
+                />
               </CardContent>
             </Card>
           )}

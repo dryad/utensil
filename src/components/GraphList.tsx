@@ -14,15 +14,20 @@ type IGraphListProps = {
   graphs: Graph[];
   onGraphSelected: React.MouseEventHandler<HTMLDivElement>;
   onGraphDelete: React.MouseEventHandler<HTMLDivElement>;
+  searchQuery: string;
 };
 
 const GraphList: React.FC<IGraphListProps> = (props) => {
   return (
-    <Paper>
+    <Paper style={{height: '340px', overflow:'scroll'}}>
       <List>
-        {props.graphs.length === 0 ? (
+        {props.graphs.length === 0 && props.searchQuery == ""  && (
           <ListItem>No graphs yet.</ListItem>
-        ) : (
+        )}
+        {props.graphs.length === 0 && props.searchQuery !== "" && (
+          <ListItem>No results for {props.searchQuery}.</ListItem>
+        )}
+        {props.graphs.length > 0 && (
           props.graphs.map((g: Graph) => (
             <ListItem
               onClick={(e: any) => {

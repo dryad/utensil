@@ -46,15 +46,15 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       if (!node.level) {
         node.level = 0;
         node.color = NODE_COLORS[node.level];
+        
         node.font = { color: "#fff" };
       }
-
       networkRef.current?.triggerEvent("node-added", {
         callback: nodeFnRef.current,
         node,
       });
       toggleNodeDialog();
-      if (nodeDialogTitle != "Edit Node") {
+      if (nodeDialogTitle !== "Edit Node") {
         addNodeComplete(); // allows nodes to be added until button is turned off
       }
       
@@ -63,7 +63,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const handleNodeDialogClose = () => {
       //nodeFnRef.current(nodeRef.current); // with this disabled, it will not create a blank node when the dialog is closed
       toggleNodeDialog();
-      if (nodeDialogTitle != "Edit Node") {
+      if (nodeDialogTitle !== "Edit Node") {
         addNodeComplete(); // allows nodes to be added until button is turned off
       }
     };
@@ -75,7 +75,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       //pass directed property to edge (coming from a number from previous developer since it was a pull-down box)
       //This will later be set by whether the directed or undirected edge tool was used
-      edge.directed = directed == 1 ? true : false;
+      edge.directed = directed === 1 ? true : false;
 
       networkRef.current?.triggerEvent("edge-added", {
         callback: edgeFnRef.current,
@@ -102,17 +102,37 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         });
 
         networkRef.current.on("add-node", ({ node, callback }: any) => {
+          // old code here would open the dialog box, where the handleNodeDialogOk function would eventually be called
+          // but we want to be able to add nodes without opening the dialog box
+          // nodeFnRef.current = callback;
+          // nodeRef.current = node;
+
+          // setNodeDialogTitle("Add Node");
+          // setNodeDialogLabel("");
+          // setNodeDialogOpen(true);
+          //const node = nodeRef.current;
+          //node.label = label;
+          
+          // new code runs similar code to handleNodeDialogOk, but just creates a node with default parameters
           nodeFnRef.current = callback;
           nodeRef.current = node;
+          if (!node.level) {
+            node.level = 0;
+            node.color = NODE_COLORS[node.level];
+            node.font = { color: "#fff" };
+          }
+          node.label = "";          
+          networkRef.current?.triggerEvent("node-added", {
+            callback: nodeFnRef.current,
+            node,
+          });
 
-          setNodeDialogTitle("Add Node");
-          setNodeDialogLabel("");
-          setNodeDialogOpen(true);
+          addNodeComplete(); // allows nodes to be added until button is turned off
         });
 
         networkRef.current.on("edit-node", ({ node, callback }: any) => {
           //when coming from a labelNode click, we are editing the parent node, but callback is undefined
-          if (callback != undefined) {
+          if (callback !== undefined) {
             nodeFnRef.current = callback;
           }
           
@@ -140,9 +160,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         <NodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}
-          label={nodeDialogLabel}
+          nodeLabel={nodeDialogLabel}
           onClose={handleNodeDialogClose}
           onOk={handleNodeDialogOk}
+          setNodeLabel={setNodeDialogLabel}
         />
         <EdgeDialog
           open={edgeDialogOpen}
