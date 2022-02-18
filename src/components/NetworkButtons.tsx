@@ -87,7 +87,7 @@ export default function NetworkButtons(props) {
                     </ToggleButton>
                     <ToggleButton value="delete" aria-label="delete" classes={{ selected: classes.selected }}>
                         <IconButton aria-label="Delete">
-                            <HighlightOff/>
+                            <HighlightOff color="error"/>
                         </IconButton>
                     </ToggleButton>
                 </ToggleButtonGroup>
