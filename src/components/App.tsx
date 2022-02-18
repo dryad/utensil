@@ -59,7 +59,6 @@ function App() {
             }
           }
           await processHistory();
-          console.log('Undo timer is saving new graph to setHistoryListBack')
           let newHistoryObject = JSON.parse(newHistory);
           newHistoryObject.isUndoStep = true; // this is where we classify graph history as an undo step, for above comparison.
           setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state]);         
@@ -192,6 +191,7 @@ function App() {
           networkRef.current?.network.addEdgeMode();
           break;
         case "edge":
+          networkRef.current?.network.addEdgeMode();
           break;
         case "delete":
           networkRef.current?.network.disableEditMode();  // disable any of the other modes, node edge, etc.

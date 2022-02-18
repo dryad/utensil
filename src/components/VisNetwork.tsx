@@ -94,11 +94,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         //events received from VisCustomNetwork.ts when user starts or stops dragging
         //updates React state so we can disable undo/redo timer functionality during drag.
         networkRef.current.on("drag-start", (event: any) => {
-          console.log('drag on');
           setIsUserDragging(true);
         });
         networkRef.current.on("drag-end", (event: any) => {
-          console.log('drag off');
           setIsUserDragging(false);
         });
 
