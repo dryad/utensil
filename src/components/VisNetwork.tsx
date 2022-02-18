@@ -19,9 +19,10 @@ type INetworkProps = {
   historyListBackRef: any;
   stringifyGraph: Function;
   setIsUserDragging: Function;
+  deleteIfDeleteMode: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -152,6 +153,11 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           setEdgeDialogOpen(true);
         });
       }
+      networkRef.current.on("click-node", node => {
+        if (!node.isLabelNode) {
+          deleteIfDeleteMode(); // run callback function to App.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
+        }
+      })
     }, [networkRef]);
 
     return (

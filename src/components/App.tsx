@@ -29,8 +29,9 @@ function App() {
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
-  const [buttonMode, setButtonMode] = React.useState('pan');
+  const [buttonMode, setButtonMode] = useState('pan');
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -171,9 +172,15 @@ function App() {
     }
 
   }
-  
+  const deleteIfDeleteMode = () => { // this is a callback function for VisNetwork.tsx. When a node is clicked, this is run and the node is deleted if deleteMode is true.
+    if (deleteModeRef.current) {
+      networkRef.current?.network.deleteSelected();
+    }
+  }
+
   const onButton = (nextMode: string) => {
       setButtonMode(nextMode); // update buttonMode state so that the proper button will become selected.
+      setDeleteMode(false); //default state for deleteMode. If the user selects any other button, deleteMode will be set to false.
       switch(nextMode) {  // update vis-network mode
         case "pan":
           networkRef.current?.network.disableEditMode();
@@ -185,6 +192,10 @@ function App() {
           networkRef.current?.network.addEdgeMode();
           break;
         case "edge":
+          break;
+        case "delete":
+          networkRef.current?.network.disableEditMode();  // disable any of the other modes, node edge, etc.
+          setDeleteMode(true);
           break;
       }
       
@@ -278,6 +289,7 @@ function App() {
               historyListBackRef={historyListBackRef}
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
+              deleteIfDeleteMode={deleteIfDeleteMode}
             />
             <Box m={1}>
               <TextField

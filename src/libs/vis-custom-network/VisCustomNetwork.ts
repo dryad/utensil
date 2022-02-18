@@ -69,6 +69,9 @@ export default class VisCustomNetwork extends EventTarget {
             const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
             this.editNode(labelOfNode, undefined); //pop up the edit box for that node
           }
+          if (node && !node.isLabelNode) {
+            this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
+          }
         }
       }
     })
