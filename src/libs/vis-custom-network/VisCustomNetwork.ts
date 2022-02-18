@@ -65,7 +65,7 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("click", params => {
       var d = new Date();
       var t = d.getTime();
-      if(t - lastClick < 100) {
+      if(t - lastClick > 200) {
         if (params.nodes.length > 0) {  //if we clicked on any node
           for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
             const node = this.nodes.get(nodeId); //get the node by ID from the network
@@ -130,9 +130,11 @@ export default class VisCustomNetwork extends EventTarget {
     }
 
     this.on("node-added", ({ callback, node }: any) => {
-      //handle create or update node before create or update labelNode
-      callback(node);
-
+      //handle crash when double clicking in add node mode - only add node if it doesn't already exist
+      if (this.nodes.get().find((n: any) => n.id === node.id) === undefined) {
+        //handle create or update node before create or update labelNode
+        callback(node);
+      }
       //create labelNode if it doesn't exist - otherwise update it
       const existingLabelNode = this.nodes.get().find((n: any) => n.labelOfNode === node.id)
       if (existingLabelNode) {
