@@ -60,26 +60,32 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("controlNodeDragEnd", ({params}) => { // This extra vis event is needed because dragging an "add edge" control point did not trigger the dragEnd event
       this.triggerEvent("drag-end", {});
     });
-
+    
+    var lastClick = 0;
     this.network.on("click", params => {
-      if (params.nodes.length > 0) {  //if we clicked on any node
-        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
-          const node = this.nodes.get(nodeId); //get the node by ID from the network
-          if (node && node.isLabelNode) { //if the node exists and is a labelNode
-            const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
-            this.editNode(labelOfNode, undefined); //pop up the edit box for that node
-          }
-          if (node && !node.isLabelNode) {
-            this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
+      var d = new Date();
+      var t = d.getTime();
+      if(t - lastClick < 100) {
+        if (params.nodes.length > 0) {  //if we clicked on any node
+          for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+            const node = this.nodes.get(nodeId); //get the node by ID from the network
+            if (node && node.isLabelNode) { //if the node exists and is a labelNode
+              const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
+              this.editNode(labelOfNode, undefined); //pop up the edit box for that node
+            }
+            if (node && !node.isLabelNode) {
+              this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
+            }
           }
         }
       }
+      lastClick = t;
     })
     this.network.on("doubleClick", params => {
       if (params.nodes.length > 0) {  //if we double clicked on any node
         for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
           const node = this.nodes.get(nodeId); //get the node by ID from the network
-          if (node && !node.isLabelNode) { //if the node exists and is a labelNode
+          if (node && !node.isLabelNode) { //if the node exists and is not a labelNode
             this.editNode(node, undefined); //pop up the edit box for that node
           }
         }
