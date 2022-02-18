@@ -20,9 +20,10 @@ type INetworkProps = {
   stringifyGraph: Function;
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
+  addEdgeDirectedOrNot: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, addEdgeDirectedOrNot }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -69,21 +70,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       }
     };
 
-    const toggleEdgeDialog = () => setEdgeDialogOpen(!edgeDialogOpen);
-
-    const handleEdgeDialog = (directed: number) => () => {
+    const handleEdgeCreated = () => {
       const edge = edgeRef.current;
+      addEdgeDirectedOrNot(edge, edgeFnRef);
 
-      //pass directed property to edge (coming from a number from previous developer since it was a pull-down box)
-      //This will later be set by whether the directed or undirected edge tool was used
-      edge.directed = directed === 1 ? true : false;
-
-      networkRef.current?.triggerEvent("edge-added", {
-        callback: edgeFnRef.current,
-        edge,
-      });
-
-      toggleEdgeDialog();
       addEdgeComplete(); // allows edges to be added until button is turned off
     };
 
@@ -146,9 +136,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           edgeFnRef.current = callback;
           edgeRef.current = edge;
 
-          setEdgeDialogTitle("Add Edge");
-          setEdgeDialogDirected(1);
-          setEdgeDialogOpen(true);
+          handleEdgeCreated();
         });
       }
       networkRef.current.on("click-node", node => {
@@ -168,13 +156,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           onClose={handleNodeDialogClose}
           onOk={handleNodeDialogOk}
           setNodeLabel={setNodeDialogLabel}
-        />
-        <EdgeDialog
-          open={edgeDialogOpen}
-          title={edgeDialogTitle}
-          directed={edgeDialogDirected}
-          onClose={toggleEdgeDialog}
-          onOk={handleEdgeDialog}
         />
       </>
     );

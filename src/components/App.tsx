@@ -32,6 +32,7 @@ function App() {
   const [buttonMode, setButtonMode] = useState('pan');
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
+  const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -177,6 +178,13 @@ function App() {
     }
   }
 
+  const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
+    edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
+    networkRef.current?.triggerEvent("edge-added", {
+      callback: edgeFnRef.current,
+      edge,
+    });
+  }
   const onButton = (nextMode: string) => {
       setButtonMode(nextMode); // update buttonMode state so that the proper button will become selected.
       setDeleteMode(false); //default state for deleteMode. If the user selects any other button, deleteMode will be set to false.
@@ -189,9 +197,11 @@ function App() {
           break;
         case "directed-edge":
           networkRef.current?.network.addEdgeMode();
+          setAddEdgeType("directed");
           break;
         case "edge":
           networkRef.current?.network.addEdgeMode();
+          setAddEdgeType("undirected");
           break;
         case "delete":
           networkRef.current?.network.disableEditMode();  // disable any of the other modes, node edge, etc.
@@ -290,6 +300,7 @@ function App() {
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
+              addEdgeDirectedOrNot={addEdgeDirectedOrNot}
             />
             <Box m={1}>
               <TextField
