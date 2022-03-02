@@ -33,6 +33,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
+  const [treeText, setTreeText] = useState("test");
+
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -302,6 +304,17 @@ function App() {
               deleteIfDeleteMode={deleteIfDeleteMode}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
             />
+            <Box m={5} marginTop={'-5px'}>
+              <TextField
+                id="outlined-basic"
+                label=""
+                variant="outlined"
+                size="medium"
+                value={treeText}
+                fullWidth
+                inputProps={{readOnly: true, min: 0, style: { textAlign: 'center' }}} //center the text
+              />
+            </Box>
             <Box m={1}>
               <TextField
                 id="outlined-basic"
