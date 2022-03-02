@@ -38,6 +38,7 @@ function App() {
   const clearSearch = () => {
     setSearchQuery('');
   }
+
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
     let repeat: any;
@@ -79,6 +80,7 @@ function App() {
 
   useEffect(() => {
     console.log('new historyListBack', historyListBack);
+    treeTraveral(); // run treeTraveral every time an Undo step is added.
   }, [historyListBack]);
 
   useEffect(() => {
@@ -92,6 +94,38 @@ function App() {
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
     setGraphs(data);
+  };
+
+  const treeTraveral = async () => {
+
+    let treeText = "";
+    let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
+    const edges = networkRef.current?.edges.get(); // get all edges from the network.
+    const positions = networkRef.current?.network.getPositions();
+
+    //example of edge object:
+    //  {
+    //   "from":"cfd64feb-f544-48b8-87cd-e86af5f58c49",
+    //   "to":"998f6fae-bf1b-467c-a509-5012c0b38d73",
+    //   "eventual":"55fddde2-6fd9-47ac-a265-dd5372527819",
+    //   "directed":true,
+    //   "id":"1342b303-759c-4172-914f-e478e593718a"
+    //  } 
+    
+    nodes.sort(function(a, b) { // sort nodes by x position, left first
+      return positions[a.id].x - positions[b.id].x;
+    });
+
+    for (const node of nodes) {
+      if (node.isLabelNode) { //skip labelNodes
+        continue;
+      } 
+    
+      treeText += node.label + " "; // add node label to treeText
+    };
+
+    setTreeText(treeText); //update the string to be displayed in the text box
+
   };
 
   const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
