@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { IconButton, Box } from "@mui/material";
-import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize } from "@mui/icons-material";
+import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff } from "@mui/icons-material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
@@ -66,7 +66,7 @@ export default function NetworkButtons(props) {
                     
                     >
                     <ToggleButton value="pan" aria-label="pan" classes={{ selected: classes.selected }}>
-                        <IconButton aria-label="Node">
+                        <IconButton aria-label="Pan">
                             <PanTool/>
                         </IconButton>
                     </ToggleButton>
@@ -83,6 +83,11 @@ export default function NetworkButtons(props) {
                     <ToggleButton value="edge" aria-label="edge" classes={{ selected: classes.selected }}>
                         <IconButton aria-label="Undirected Edge">
                             <Minimize style={{'transform': 'translate(-7px, -5px) rotate(-45deg)'}}/>
+                        </IconButton>
+                    </ToggleButton>
+                    <ToggleButton value="delete" aria-label="delete" classes={{ selected: classes.selected }}>
+                        <IconButton aria-label="Delete">
+                            <HighlightOff color="error"/>
                         </IconButton>
                     </ToggleButton>
                 </ToggleButtonGroup>

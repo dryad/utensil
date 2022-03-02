@@ -29,8 +29,10 @@ function App() {
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
-  const [buttonMode, setButtonMode] = React.useState('pan');
+  const [buttonMode, setButtonMode] = useState('pan');
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
+  const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -58,7 +60,6 @@ function App() {
             }
           }
           await processHistory();
-          console.log('Undo timer is saving new graph to setHistoryListBack')
           let newHistoryObject = JSON.parse(newHistory);
           newHistoryObject.isUndoStep = true; // this is where we classify graph history as an undo step, for above comparison.
           setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state]);         
@@ -171,9 +172,22 @@ function App() {
     }
 
   }
-  
+  const deleteIfDeleteMode = () => { // this is a callback function for VisNetwork.tsx. When a node is clicked, this is run and the node is deleted if deleteMode is true.
+    if (deleteModeRef.current) {
+      networkRef.current?.network.deleteSelected();
+    }
+  }
+
+  const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
+    edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
+    networkRef.current?.triggerEvent("edge-added", {
+      callback: edgeFnRef.current,
+      edge,
+    });
+  }
   const onButton = (nextMode: string) => {
       setButtonMode(nextMode); // update buttonMode state so that the proper button will become selected.
+      setDeleteMode(false); //default state for deleteMode. If the user selects any other button, deleteMode will be set to false.
       switch(nextMode) {  // update vis-network mode
         case "pan":
           networkRef.current?.network.disableEditMode();
@@ -183,8 +197,15 @@ function App() {
           break;
         case "directed-edge":
           networkRef.current?.network.addEdgeMode();
+          setAddEdgeType("directed");
           break;
         case "edge":
+          networkRef.current?.network.addEdgeMode();
+          setAddEdgeType("undirected");
+          break;
+        case "delete":
+          networkRef.current?.network.disableEditMode();  // disable any of the other modes, node edge, etc.
+          setDeleteMode(true);
           break;
       }
       
@@ -278,6 +299,8 @@ function App() {
               historyListBackRef={historyListBackRef}
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
+              deleteIfDeleteMode={deleteIfDeleteMode}
+              addEdgeDirectedOrNot={addEdgeDirectedOrNot}
             />
             <Box m={1}>
               <TextField
