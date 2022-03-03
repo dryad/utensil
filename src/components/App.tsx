@@ -120,8 +120,12 @@ function App() {
       if (node.isLabelNode) { //skip labelNodes
         continue;
       } 
-    
-      treeText += node.label + " "; // add node label to treeText
+      
+      let label = "___" ;
+      if (node.label != "") {
+          label = node.label ;
+      }
+      treeText += label + " "; // add node label to treeText
     };
 
     setTreeText(treeText); //update the string to be displayed in the text box
