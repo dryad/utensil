@@ -111,7 +111,8 @@ function App() {
     //   "directed":true,
     //   "id":"1342b303-759c-4172-914f-e478e593718a"
     //  } 
-    
+
+
     nodes.sort(function(a, b) { // sort nodes by x position, left first
       return positions[a.id].x - positions[b.id].x;
     });
@@ -121,6 +122,9 @@ function App() {
         continue;
       } 
       
+      console.log(node) ;
+      console.log(edges) ;
+
       let label = "___" ;
       if (node.label != "") {
           label = node.label ;
