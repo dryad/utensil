@@ -19,11 +19,14 @@ import VisNetwork from "./VisNetwork";
 import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
+import ConfirmDialog from "./ConfirmDialog";
+
 function App() {
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
   const [graphs, setGraphs] = useState<Graph[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
+  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null);
   const [graphName, setGraphName] = useState("");
   const [graphNote, setGraphNote] = useState("");
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
@@ -34,7 +37,7 @@ function App() {
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const [treeText, setTreeText] = useState("test");
-
+  const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -156,21 +159,27 @@ function App() {
     }
   };
 
-  const handleGraphSelected = (id: any) => {
-    const graph = graphs?.find((g: any) => g.id === id);
-    if (graph !== null) {
+  const confirmLoadGraph = () => {
+      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
       setGraphName(graph.name);
       setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
       networkRef.current?.setData(data);
-      
+        
       //clear Undo/Redo history
       setHistoryListBack([]);
       setHistoryListForward([]);
 
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
       onButton('pan');
+  }
+  
+  const handleGraphSelected = (id: any) => {
+    const graph = graphs?.find((g: any) => g.id === id);
+    if (graph !== null) {
+      setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
+      setConfirmGraphLoadOpen(true);
     }
   };
 
@@ -329,6 +338,14 @@ function App() {
         </Grid>
         <Grid item xs={7}>
           <Paper>
+            <ConfirmDialog
+              title="Load Graph"
+              open={confirmGraphLoadOpen}
+              setOpen={setConfirmGraphLoadOpen}
+              onConfirm={confirmLoadGraph}
+            >
+              Are you sure you want to load a new graph?
+            </ConfirmDialog>
             <VisNetwork 
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
