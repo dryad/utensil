@@ -22,6 +22,8 @@ import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
 
 function App() {
+  const UNDO_STEPS_LIMIT = 5;
+
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
   const [graphs, setGraphs] = useState<Graph[]>([]);
@@ -68,7 +70,7 @@ function App() {
           await processHistory();
           let newHistoryObject = JSON.parse(newHistory);
           newHistoryObject.isUndoStep = true; // this is where we classify graph history as an undo step, for above comparison.
-          setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state]);         
+          setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state.slice(0, UNDO_STEPS_LIMIT - 1)]); // appends new undo step, but only keeps the last X steps.
         }
       }
       repeat = setTimeout(detectChange, 500);
