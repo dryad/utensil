@@ -168,7 +168,7 @@ function App() {
       networkRef.current?.setData(data);
         
       //clear Undo/Redo history
-      setHistoryListBack([]);
+      // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
       setHistoryListForward([]);
 
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
