@@ -133,6 +133,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         });
       }
       const editNodeFromEvent = (node, callback) => {
+        if (buttonModeRef.current !== "pan") { //only allow editing nodes when in pan mode
+          return;
+        }
 
         if (node.node) {
           node = node.node;
@@ -157,10 +160,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       networkRef.current.on("double-click-node", node => {
         if (!node.isLabelNode) {
-          console.log('double click event from VisNetwork.ts', buttonModeRef.current);
-          if (buttonModeRef.current == "pan") {
-            editNodeFromEvent(node, undefined);
-          }          
+          editNodeFromEvent(node, undefined);  
         }
       })
     }, [networkRef]);
