@@ -21,9 +21,10 @@ type INetworkProps = {
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
   addEdgeDirectedOrNot: Function;
+  buttonModeRef: any;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, addEdgeDirectedOrNot }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -119,17 +120,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           addNodeComplete(); // allows nodes to be added until button is turned off
         });
 
-        networkRef.current.on("edit-node", ({ node, callback }: any) => {
-          //when coming from a labelNode click, we are editing the parent node, but callback is undefined
-          if (callback !== undefined) {
-            nodeFnRef.current = callback;
-          }
-          
-          nodeRef.current = node;
 
-          setNodeDialogTitle("Edit Node");
-          setNodeDialogLabel(node.label);
-          setNodeDialogOpen(true);
+        networkRef.current.on("edit-node", ({ node, callback }: any) => {
+          editNodeFromEvent(node, callback);
         });
 
         networkRef.current.on("add-edge", ({ edge, callback }: any) => {
@@ -139,9 +132,35 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           handleEdgeCreated();
         });
       }
+      const editNodeFromEvent = (node, callback) => {
+
+        if (node.node) {
+          node = node.node;
+        }
+        //when coming from a labelNode click, we are editing the parent node, but callback is undefined
+        if (callback !== undefined) {
+          nodeFnRef.current = callback;
+        }
+          
+        nodeRef.current = node;
+
+        setNodeDialogTitle("Edit Node");
+        setNodeDialogLabel(node.label);
+        setNodeDialogOpen(true);
+      }
+
       networkRef.current.on("click-node", node => {
         if (!node.isLabelNode) {
           deleteIfDeleteMode(); // run callback function to App.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
+        }
+      })
+
+      networkRef.current.on("double-click-node", node => {
+        if (!node.isLabelNode) {
+          console.log('double click event from VisNetwork.ts', buttonModeRef.current);
+          if (buttonModeRef.current == "pan") {
+            editNodeFromEvent(node, undefined);
+          }          
         }
       })
     }, [networkRef]);

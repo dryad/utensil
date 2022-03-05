@@ -29,7 +29,7 @@ function App() {
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
-  const [buttonMode, setButtonMode] = useState('pan');
+  const [buttonMode, setButtonMode, buttonModeRef] = useState('pan');
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
@@ -90,6 +90,10 @@ function App() {
   useEffect(() => {
     refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
   }, [searchQuery]);
+
+  useEffect(() => {
+    console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
+  }, [buttonMode]);
 
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
@@ -213,7 +217,6 @@ function App() {
       networkRef.current?.network.deleteSelected();
     }
   }
-
   const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
     edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
     networkRef.current?.triggerEvent("edge-added", {
@@ -337,6 +340,7 @@ function App() {
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+              buttonModeRef={buttonModeRef}
             />
             <Box m={5} marginTop={'-5px'}>
               <TextField
