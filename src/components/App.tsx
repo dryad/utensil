@@ -22,7 +22,7 @@ import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
 
 function App() {
-  const UNDO_STEPS_LIMIT = 5;
+  const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
