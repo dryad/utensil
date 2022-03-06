@@ -86,7 +86,7 @@ export default class VisCustomNetwork extends EventTarget {
         for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
           const node = this.nodes.get(nodeId); //get the node by ID from the network
           if (node && !node.isLabelNode) { //if the node exists and is not a labelNode
-            this.editNode(node, undefined); //pop up the edit box for that node
+            this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
           }
         }
       }

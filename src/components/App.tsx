@@ -19,22 +19,27 @@ import VisNetwork from "./VisNetwork";
 import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
+import ConfirmDialog from "./ConfirmDialog";
+
 function App() {
+  const UNDO_STEPS_LIMIT = 250;
+
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
   const [graphs, setGraphs] = useState<Graph[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
+  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null);
   const [graphName, setGraphName] = useState("");
   const [graphNote, setGraphNote] = useState("");
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
-  const [buttonMode, setButtonMode] = useState('pan');
+  const [buttonMode, setButtonMode, buttonModeRef] = useState('pan');
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const [treeText, setTreeText] = useState("test");
-
+  const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -65,7 +70,7 @@ function App() {
           await processHistory();
           let newHistoryObject = JSON.parse(newHistory);
           newHistoryObject.isUndoStep = true; // this is where we classify graph history as an undo step, for above comparison.
-          setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state]);         
+          setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state.slice(0, UNDO_STEPS_LIMIT - 1)]); // appends new undo step, but only keeps the last X steps.
         }
       }
       repeat = setTimeout(detectChange, 500);
@@ -90,6 +95,10 @@ function App() {
   useEffect(() => {
     refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
   }, [searchQuery]);
+
+  useEffect(() => {
+    console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
+  }, [buttonMode]);
 
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
@@ -160,21 +169,27 @@ function App() {
     }
   };
 
-  const handleGraphSelected = (id: any) => {
-    const graph = graphs?.find((g: any) => g.id === id);
-    if (graph !== null) {
+  const confirmLoadGraph = () => {
+      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
       setGraphName(graph.name);
       setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
       networkRef.current?.setData(data);
-      
+        
       //clear Undo/Redo history
-      setHistoryListBack([]);
+      // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
       setHistoryListForward([]);
 
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
       onButton('pan');
+  }
+  
+  const handleGraphSelected = (id: any) => {
+    const graph = graphs?.find((g: any) => g.id === id);
+    if (graph !== null) {
+      setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
+      setConfirmGraphLoadOpen(true);
     }
   };
 
@@ -221,7 +236,6 @@ function App() {
       networkRef.current?.network.deleteSelected();
     }
   }
-
   const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
     edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
     networkRef.current?.triggerEvent("edge-added", {
@@ -334,6 +348,14 @@ function App() {
         </Grid>
         <Grid item xs={7}>
           <Paper>
+            <ConfirmDialog
+              title="Load Graph"
+              open={confirmGraphLoadOpen}
+              setOpen={setConfirmGraphLoadOpen}
+              onConfirm={confirmLoadGraph}
+            >
+              Are you sure you want to load a new graph?
+            </ConfirmDialog>
             <VisNetwork 
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
@@ -345,6 +367,7 @@ function App() {
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+              buttonModeRef={buttonModeRef}
             />
             <Box m={5} marginTop={'-5px'}>
               <TextField
