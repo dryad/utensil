@@ -127,27 +127,30 @@ function App() {
     
     console.log('networkRef', networkRef) ;
 
-    const node_by_id = {};
+    const to_traverse = [] ;
+
     const covered = [];
-    var maxLevel = 0; 
-    var maxID = ''; 
 
+    // gather nodes and skip labelNodes
     for (const node of nodes) {
-      if  (node.isLabelNode != true) { //skip labelNodes
-          node_by_id[node.id] = [node.label, node.level];
-	  if (node.level > maxLevel) {
-		  maxID = node.id ;
-		  maxLevel = node.level ;
-	  }
-      } 
-    };     
-
+      if  (node.isLabelNode != true) {
+      	  to_traverse.push(node)
+      }};     
+    // sort by level highest first
+    to_traverse.sort((a, b) => {
+        return b.level - a.level;
+    });
+    // we now do an inorder tree traversal: 
+    // sketch of algorithm: 
+    // start at root, this is the TO node of some node (the FROM node)
+    // go to FROM node, if this is not level 0 then do it again
+    // 
     // while (covered.length != nodes.length) {
 
     // };
     
-    console.log( 'maxIDS', maxID) ;
-    console.log( 'node_by_id', node_by_id.length) ;
+    console.log( 'DISP', to_traverse) ;
+    // console.log( 'vals_by_id', vals_by_id) ;
     // console.log('edges', edges) ;
     // console.log('nodes', nodes) ;
 
