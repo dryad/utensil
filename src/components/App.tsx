@@ -20,6 +20,7 @@ import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
+import TreeText from "./TreeText";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -151,12 +152,27 @@ function App() {
     // console.log('edges', edges) ;
     // console.log('nodes', nodes) ;
 
-    // nodes.sort(function(a) { // sort nodes by x position, left first
-    //   return positions[a.id][1]; // - positions[b.id].x;
-    // });
+    // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
+    nodes.sort(function(a) { // sort nodes by x position, left first
+      return positions[a.id][1]; // - positions[b.id].x;
+    });
+    for (const node of nodes) {
+      if (node.isLabelNode) { //skip labelNodes
+        continue;
+      } 
+      let label = "___" ;
+      if (node.label != "") {
+        label = node.label ;
+      }
+      treeText += node.label + " "; // add node label to treeText
+    };
+    // end temp code
 
 
-   // console.log('math', Math.max(node_by_id.values)) ;
+
+
+
+    // console.log('math', Math.max(node_by_id.values)) ;
    // console.log('X', positions) ;
 //       let label = "___" ;
 //       if (node.label != "") {
@@ -395,16 +411,7 @@ function App() {
               buttonModeRef={buttonModeRef}
             />
             <Box m={5} marginTop={'-5px'}>
-              <TextField
-                id="outlined-basic"
-                label=""
-                variant="outlined"
-                size="medium"
-                value={treeText}
-                fullWidth
-                multiline
-                inputProps={{readOnly: true, min: 0, style: { textAlign: 'center' }}} //center the text
-              />
+              <TreeText treeText={treeText} />
             </Box>
             <Box m={1}>
               <TextField
