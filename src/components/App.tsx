@@ -121,27 +121,52 @@ function App() {
     //   "id":"1342b303-759c-4172-914f-e478e593718a"
     //  } 
 
+    //
+    // TODO delete
+    //
+    
+    console.log('networkRef', networkRef) ;
 
-    nodes.sort(function(a, b) { // sort nodes by x position, left first
-      return positions[a.id].x - positions[b.id].x;
-    });
+    const node_by_id = {};
+    const covered = [];
+    var maxLevel = 0; 
+    var maxID = ''; 
 
     for (const node of nodes) {
-      if (node.isLabelNode) { //skip labelNodes
-        continue;
+      if  (node.isLabelNode != true) { //skip labelNodes
+          node_by_id[node.id] = [node.label, node.level];
+	  if (node.level > maxLevel) {
+		  maxID = node.id ;
+		  maxLevel = node.level ;
+	  }
       } 
-      
-      console.log(node) ;
-      console.log(edges) ;
+    };     
 
-      let label = "___" ;
-      if (node.label != "") {
-          label = node.label ;
-      }
-      treeText += label + " "; // add node label to treeText
-    };
+    // while (covered.length != nodes.length) {
+
+    // };
+    
+    console.log( 'maxIDS', maxID) ;
+    console.log( 'node_by_id', node_by_id.length) ;
+    // console.log('edges', edges) ;
+    // console.log('nodes', nodes) ;
+
+    // nodes.sort(function(a) { // sort nodes by x position, left first
+    //   return positions[a.id][1]; // - positions[b.id].x;
+    // });
+
+
+   // console.log('math', Math.max(node_by_id.values)) ;
+   // console.log('X', positions) ;
+//       let label = "___" ;
+//       if (node.label != "") {
+//           label = node.label ;
+//       }
+//       treeText += label + " "; // add node label to treeText
+//     };
 
     setTreeText(treeText); //update the string to be displayed in the text box
+
 
   };
 
