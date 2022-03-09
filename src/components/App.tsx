@@ -85,7 +85,7 @@ function App() {
 
   useEffect(() => {
     console.log('new historyListBack', historyListBack);
-    treeTraveral(); // run treeTraveral every time an Undo step is added.
+    treeTraversal(); // run treeTraversal every time an Undo step is added.
   }, [historyListBack]);
 
   useEffect(() => {
@@ -105,7 +105,7 @@ function App() {
     setGraphs(data);
   };
 
-  const treeTraveral = async () => {
+  const treeTraversal = async () => {
 
     let treeText = "";
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
