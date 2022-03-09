@@ -105,6 +105,27 @@ function App() {
     setGraphs(data);
   };
 
+  function leftChild(currentNode, ) {
+
+  }
+
+
+  function rightChild(currentNode, treeList) {
+  }
+
+  function inOrderTraversal(currentNode, treeList) {
+   //if the currentNode IS NOT EQUAL to null
+    if (currentNode.level !== 0) {
+       
+        //make recursive call to the left subtree
+        this.inOrderTraversal(currentNode.leftChild);
+       //print the value of the currentNode
+        console.log(currentNode.val);
+         //make recursive call to the right subtree
+        this.inOrderTraversal(currentNode.rightChild);
+
+  };
+
   const treeTraveral = async () => {
 
     let treeText = "";
@@ -128,14 +149,24 @@ function App() {
     console.log('networkRef', networkRef) ;
 
     const to_traverse = [] ;
+    const id_to_edge = {} ;
 
-    const covered = [];
+    const covered = [] ;
 
     // gather nodes and skip labelNodes
     for (const node of nodes) {
       if  (node.isLabelNode != true) {
-      	  to_traverse.push(node)
-      }};     
+      	  to_traverse.push(node) ;
+	  id_to_node[node.id] = node ;
+
+	  for (const edge in edges) {
+	      if (node.id == edge.to) { 
+	      	id_to_edge[node.id] = edge ;
+	      }
+	  }
+
+       }
+    };     
     // sort by level highest first
     to_traverse.sort((a, b) => {
         return b.level - a.level;
