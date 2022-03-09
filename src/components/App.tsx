@@ -377,6 +377,7 @@ function App() {
                 size="medium"
                 value={treeText}
                 fullWidth
+                multiline
                 inputProps={{readOnly: true, min: 0, style: { textAlign: 'center' }}} //center the text
               />
             </Box>
