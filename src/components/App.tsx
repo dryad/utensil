@@ -20,6 +20,7 @@ import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
+import TreeText from "./TreeText";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -85,7 +86,7 @@ function App() {
 
   useEffect(() => {
     console.log('new historyListBack', historyListBack);
-    treeTraveral(); // run treeTraveral every time an Undo step is added.
+    treeTraversal(); // run treeTraversal every time an Undo step is added.
   }, [historyListBack]);
 
   useEffect(() => {
@@ -105,12 +106,13 @@ function App() {
     setGraphs(data);
   };
 
+
   function leftChild(currentNode, ) {
 
   }
 
-
   function rightChild(currentNode, treeList) {
+  
   }
 
   function inOrderTraversal(currentNode, treeList) {
@@ -119,14 +121,17 @@ function App() {
        
         //make recursive call to the left subtree
         this.inOrderTraversal(currentNode.leftChild);
-       //print the value of the currentNode
+        //push currentNode to treeList
         console.log(currentNode.val);
          //make recursive call to the right subtree
         this.inOrderTraversal(currentNode.rightChild);
 
-  };
+  	}
 
-  const treeTraveral = async () => {
+     return treeList
+     };
+
+  const treeTraversal = async () => {
 
     let treeText = "";
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
@@ -142,14 +147,11 @@ function App() {
     //   "id":"1342b303-759c-4172-914f-e478e593718a"
     //  } 
 
-    //
-    // TODO delete
-    //
-    
-    console.log('networkRef', networkRef) ;
+    // console.log('networkRef', networkRef) ;
 
     const to_traverse = [] ;
     const id_to_edge = {} ;
+    const id_to_node = {} ;
 
     const covered = [] ;
 
@@ -185,12 +187,28 @@ function App() {
     // console.log('edges', edges) ;
     // console.log('nodes', nodes) ;
 
-    // nodes.sort(function(a) { // sort nodes by x position, left first
-    //   return positions[a.id][1]; // - positions[b.id].x;
-    // });
+    // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
+    nodes.sort(function(a) { // sort nodes by x position, left first
+      return positions[a.id][1]; // - positions[b.id].x;
+    });
+
+    for (const node of nodes) {
+      if (node.isLabelNode) { //skip labelNodes
+        continue;
+      } 
+      let label = "___" ;
+      if (node.label != "") {
+        label = node.label ;
+      }
+      treeText += node.label + " "; // add node label to treeText
+    };
+    // end temp code
 
 
-   // console.log('math', Math.max(node_by_id.values)) ;
+
+
+
+    // console.log('math', Math.max(node_by_id.values)) ;
    // console.log('X', positions) ;
 //       let label = "___" ;
 //       if (node.label != "") {
@@ -429,15 +447,7 @@ function App() {
               buttonModeRef={buttonModeRef}
             />
             <Box m={5} marginTop={'-5px'}>
-              <TextField
-                id="outlined-basic"
-                label=""
-                variant="outlined"
-                size="medium"
-                value={treeText}
-                fullWidth
-                inputProps={{readOnly: true, min: 0, style: { textAlign: 'center' }}} //center the text
-              />
+              <TreeText treeText={treeText} />
             </Box>
             <Box m={1}>
               <TextField

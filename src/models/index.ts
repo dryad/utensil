@@ -17,3 +17,8 @@ export type Edge = {
   eventual: string;
   directed: boolean;
 };
+
+export type Tree = {
+  nodes: Node[];
+  edges: Edge[];
+}
