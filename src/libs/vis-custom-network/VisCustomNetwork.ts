@@ -91,6 +91,9 @@ export default class VisCustomNetwork extends EventTarget {
         }
       }
     })
+
+    // NOTE: Anything added here should also be added to the setData function below, so that it will work after a graph is loaded or undo/redo is performed.
+
     const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
     }
 
@@ -262,6 +265,18 @@ export default class VisCustomNetwork extends EventTarget {
         }
       }
       lastClick = t;
+    })
+
+    //this is also duplicated code from the constructor, but it's necessary to make double clicking a node work after a graph is loaded
+    this.network.on("doubleClick", params => {
+      if (params.nodes.length > 0) {  //if we double clicked on any node
+        for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
+          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && !node.isLabelNode) { //if the node exists and is not a labelNode
+            this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
+          }
+        }
+      }
     })
   };
 
