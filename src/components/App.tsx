@@ -159,6 +159,7 @@ const treeTraversal = async () => {
         return treeList
         };
 
+    //selects the highest edge that has not yet been parsed
     function getStartNode(traversedSet) {
         let difference = new Set(
             [...toTraverseSet].filter(x => !traversedSet.has(x))
@@ -187,11 +188,11 @@ const treeTraversal = async () => {
 	    if (traversedSet.size == to_traverse.length) {
 	        break
 		};
-	    // console.log('i', i+1); // the number of individual trees
+	    // console.log('i', i+1); // the number of roots / highest edges
 	    }
         };
 
-        // console.log('result', parseList) ;
+        console.log('result', parseList) ;
 
 
     // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
