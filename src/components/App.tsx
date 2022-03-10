@@ -116,45 +116,28 @@ const treeTraversal = async () => {
     const edges = networkRef.current?.edges.get(); // get all edges from the network.
     const positions = networkRef.current?.network.getPositions();
 
-    //example of edge object:
-    //  {
-    //   "from":"cfd64feb-f544-48b8-87cd-e86af5f58c49",
-    //   "to":"998f6fae-bf1b-467c-a509-5012c0b38d73",
-    //   "eventual":"55fddde2-6fd9-47ac-a265-dd5372527819",
-    //   "directed":true,
-    //   "id":"1342b303-759c-4172-914f-e478e593718a"
-    //  } 
-
-    // console.log('networkRef', networkRef) ;
-
     const to_traverse = [] ;
     const id_to_edge = {} ;
     const id_to_node = {} ;
 
-    // XXX This should maybe be a set, and maybe
-    // we have a set of nodes, to handle when multiple trees 
-    // must be parsed
-    const covered = [] ; 
-
     // gather nodes and skip labelNodes
     for (const node of nodes) {
-      if  (node.isLabelNode != true) {
-      	  to_traverse.push(node) ;
-	  id_to_node[node.id] = node ;
+       if  (node.isLabelNode != true) {
+      	   to_traverse.push(node) ;
+	   id_to_node[node.id] = node ;
 
-	  for (const edge of edges) {
-	      if (node.id == edge.to) { 
-	      	id_to_edge[node.id] = edge ;
-	      }
-	  }
-
-       }
+	   for (const edge of edges) {
+	       if (node.id == edge.to) { 
+	       	id_to_edge[node.id] = edge ;
+	       }
+	   }
+        }
      };     
-
-    // sort by level highest first
+    
+    //this sort is strictly for convenience in analyzing console data
     to_traverse.sort((a, b) => {
         return b.level - a.level;
-    });
+        });
 
     function getLeftChild(node) {
            return id_to_node[id_to_edge[node.id].from] ;
@@ -163,33 +146,53 @@ const treeTraversal = async () => {
            return id_to_node[id_to_edge[node.id].eventual] ;
     }
 
+    // this algorithm is well known 
     function inOrderTraversal(currentNode, treeList) {
-    //if the currentNode IS NOT EQUAL to null
-    if (currentNode.level > 0) {
-        //make recursive call to the left subtree
-        treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
-        //push currentNode to treeList
-        treeList.push(currentNode);
-	console.log('B', currentNode.label);
-        //make recursive call to the right subtree
-        treeList = inOrderTraversal(getRightChild(currentNode), treeList);
-  	}
-    else {
-      treeList.push(currentNode);
-	console.log('C', currentNode.label);
-	console.log('D', currentNode.level);
-     }
-     return treeList
-     };
+        if (currentNode.level > 0) {
+            treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
+            treeList.push(currentNode);
+            treeList = inOrderTraversal(getRightChild(currentNode), treeList);
+            }
+        else {
+            treeList.push(currentNode);
+            }
+        return treeList
+        };
 
-    var treeList = []; 
-    // if (to_traverse.length > 0) {
-	    // const startNode = to_traverse[0];
-	    // const res = inOrderTraversal(startNode, treeList);
-    //         console.log('result', res) ;
-    // };
+    function getStartNode(traversedSet) {
+        let difference = new Set(
+            [...toTraverseSet].filter(x => !traversedSet.has(x))
+	    );
+        let tmp = Array.from(difference); 
+	tmp.sort((a, b) => {
+            return b.level - a.level;
+            });
+	return tmp[0];
+    };
+ 
+    const toTraverseSet = new Set(to_traverse);
+    // if (false) {
+    if (to_traverse.length > 0) {
+        var parseList = [];
+	var traversedSet = new Set();
 
-    // console.log('to_traverse', to_traverse) ;
+	for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
+            var treeList = []; 
+            const startNode = getStartNode(traversedSet);
+
+            const res = inOrderTraversal(startNode, treeList);
+	    parseList.push(res); 
+	    res.forEach(item => traversedSet.add(item))
+
+	    if (traversedSet.size == to_traverse.length) {
+	        break
+		};
+	    // console.log('i', i+1); // the number of individual trees
+	    }
+        };
+
+        // console.log('result', parseList) ;
+
 
     // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
     nodes.sort(function(a) { // sort nodes by x position, left first
@@ -208,12 +211,6 @@ const treeTraversal = async () => {
     };
     // end temp code
 
-
-
-
-
-    // console.log('math', Math.max(node_by_id.values)) ;
-   // console.log('X', positions) ;
 //       let label = "___" ;
 //       if (node.label != "") {
 //           label = node.label ;
@@ -223,8 +220,8 @@ const treeTraversal = async () => {
 
     setTreeText(treeText); //update the string to be displayed in the text box
 
-
   };
+
 
   const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
     if (graph !== null) {
