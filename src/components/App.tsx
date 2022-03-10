@@ -107,31 +107,9 @@ function App() {
   };
 
 
-  function leftChild(currentNode, ) {
 
-  }
 
-  function rightChild(currentNode, treeList) {
-  
-  }
-
-  function inOrderTraversal(currentNode, treeList) {
-   //if the currentNode IS NOT EQUAL to null
-    if (currentNode.level !== 0) {
-       
-        //make recursive call to the left subtree
-        this.inOrderTraversal(currentNode.leftChild);
-        //push currentNode to treeList
-        console.log(currentNode.val);
-         //make recursive call to the right subtree
-        this.inOrderTraversal(currentNode.rightChild);
-
-  	}
-
-     return treeList
-     };
-
-  const treeTraversal = async () => {
+const treeTraversal = async () => {
 
     let treeText = "";
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
@@ -153,7 +131,10 @@ function App() {
     const id_to_edge = {} ;
     const id_to_node = {} ;
 
-    const covered = [] ;
+    // XXX This should maybe be a set, and maybe
+    // we have a set of nodes, to handle when multiple trees 
+    // must be parsed
+    const covered = [] ; 
 
     // gather nodes and skip labelNodes
     for (const node of nodes) {
@@ -161,31 +142,54 @@ function App() {
       	  to_traverse.push(node) ;
 	  id_to_node[node.id] = node ;
 
-	  for (const edge in edges) {
+	  for (const edge of edges) {
 	      if (node.id == edge.to) { 
 	      	id_to_edge[node.id] = edge ;
 	      }
 	  }
 
        }
-    };     
+     };     
+
     // sort by level highest first
     to_traverse.sort((a, b) => {
         return b.level - a.level;
     });
-    // we now do an inorder tree traversal: 
-    // sketch of algorithm: 
-    // start at root, this is the TO node of some node (the FROM node)
-    // go to FROM node, if this is not level 0 then do it again
-    // 
-    // while (covered.length != nodes.length) {
 
+    function getLeftChild(node) {
+           return id_to_node[id_to_edge[node.id].from] ;
+    }
+    function getRightChild(node) {
+           return id_to_node[id_to_edge[node.id].eventual] ;
+    }
+
+    function inOrderTraversal(currentNode, treeList) {
+    //if the currentNode IS NOT EQUAL to null
+    if (currentNode.level > 0) {
+        //make recursive call to the left subtree
+        treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
+        //push currentNode to treeList
+        treeList.push(currentNode);
+	console.log('B', currentNode.label);
+        //make recursive call to the right subtree
+        treeList = inOrderTraversal(getRightChild(currentNode), treeList);
+  	}
+    else {
+      treeList.push(currentNode);
+	console.log('C', currentNode.label);
+	console.log('D', currentNode.level);
+     }
+     return treeList
+     };
+
+    var treeList = []; 
+    // if (to_traverse.length > 0) {
+	    // const startNode = to_traverse[0];
+	    // const res = inOrderTraversal(startNode, treeList);
+    //         console.log('result', res) ;
     // };
-    
-    console.log( 'DISP', to_traverse) ;
-    // console.log( 'vals_by_id', vals_by_id) ;
-    // console.log('edges', edges) ;
-    // console.log('nodes', nodes) ;
+
+    // console.log('to_traverse', to_traverse) ;
 
     // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
     nodes.sort(function(a) { // sort nodes by x position, left first
