@@ -193,22 +193,23 @@ export default class VisCustomNetwork extends EventTarget {
           { from: from.id, to: id, eventual: to.id, directed: edge.directed},
         ]);
       }
-      else {
-        const level = from.level + 1;
-        const unary = {
-          id,
-          label: "",
-          level,
-          color: NODE_COLORS[level],
-          opacity: 1.0,
-          x: from.x + 50,
-          y: from.y - 50,
-        }
-        this.nodes.add(unary);
-        this.edges.add([
-          { from: unary.id, to: to.id, arrows },
-        ]);
-      }
+      // Unary edges are disabled, uncomment below to enable
+      // else {
+      //   const level = from.level + 1;
+      //   const unary = {
+      //     id,
+      //     label: "",
+      //     level,
+      //     color: NODE_COLORS[level],
+      //     opacity: 1.0,
+      //     x: from.x + 50,
+      //     y: from.y - 50,
+      //   }
+      //   this.nodes.add(unary);
+      //   this.edges.add([
+      //     { from: unary.id, to: to.id, arrows },
+      //   ]);
+      // }
     });
     this.network.enableEditMode(); // enable edit mode on new network;
   }
