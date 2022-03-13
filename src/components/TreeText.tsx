@@ -17,6 +17,15 @@ type IGraphListProps = {
 const TreeText: React.FC<IGraphListProps> = (props) => {
   const trees = props.Trees;
 
+  const onClick = (node) => {
+    // console.log('Clicked', node);
+  }
+  const onHover = (node) => {
+    // console.log('Hover', node);
+  }
+  const onLeave = (node) => {
+    // console.log('Left', node);
+  }
   return (
     <Box sx={{ p: 2, border: '1px solid grey', borderRadius: '16px' }}>
       <Stack
@@ -37,6 +46,16 @@ const TreeText: React.FC<IGraphListProps> = (props) => {
                 return <Chip
                   key={nodeIndex}
                   label={node.label}
+                  onClick={() => {
+                    onClick(node);
+                  }}
+                  onMouseEnter={() => {
+                    onHover(node);
+                  }}
+                  onMouseLeave={() => {
+                    onLeave(node);
+                  }}
+
                 />
               })}
 
