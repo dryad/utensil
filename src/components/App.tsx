@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   Typography,
+  ButtonGroup,
 } from "@mui/material";
 
 import { Graph } from "models";
@@ -414,7 +415,7 @@ const treeTraversal = async () => {
       <Grid container spacing={0}>
         <Grid item>
           <Paper>
-            <NetworkButtons 
+            <NetworkButtons
               networkRef={networkRef}
               onButton={onButton} // The function to handle button presses lives in App.tsx and is passed down here. This lets us set the button mode programmatically within App.tsx
               undoDisabled={historyListBack.length <= 1}
@@ -423,6 +424,23 @@ const treeTraversal = async () => {
               onRedo={onRedo}
               buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
             />
+            <Box
+              sx={{
+                display: 'flex',
+                '& > *': {
+                  m: 0,
+                },
+              }}
+            >
+              <ButtonGroup orientation="vertical">
+                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }}>
+                  Save
+                </Button>
+                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
+                  Save As New
+                </Button>
+              </ButtonGroup>
+            </Box>
           </Paper>
         </Grid>
         <Grid item xs={7}>
@@ -435,7 +453,7 @@ const treeTraversal = async () => {
             >
               Are you sure you want to load a new graph?
             </ConfirmDialog>
-            <VisNetwork 
+            <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
               addEdgeComplete={addEdgeComplete}
@@ -451,44 +469,25 @@ const treeTraversal = async () => {
             <Box m={5} marginTop={'-5px'}>
               <TreeText treeText={treeText} />
             </Box>
-            <Box m={1}>
-              <TextField
-                id="outlined-basic"
-                label="Graph Name"
-                variant="outlined"
-                size="small"
-                value={graphName}
-                onChange={(e: any) => setGraphName(e.target.value)}
-                fullWidth
-              />
-            </Box>
-            <Box>
-              <Button variant="outlined" color="primary" onClick={handleSave}>
-                Save
-              </Button>
-              <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
-                Save As New
-              </Button>
-            </Box>
           </Paper>
         </Grid>
         <Grid item xs={3}>
           <Paper>
-          <Box m={1}>
-            <TextField
-              margin="normal"
-              id="outlined-basic"
-              label="Search"
-              rows={1}
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={(e: any) => setSearchQuery(e.target.value)}
-              fullWidth
-              InputProps={{disableUnderline: true , endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button>}}
-            />
+            <Box m={1}>
+              <TextField
+                margin="normal"
+                id="outlined-basic"
+                label="Search"
+                rows={1}
+                variant="outlined"
+                size="small"
+                value={searchQuery}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
+                fullWidth
+                InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
+              />
 
-          </Box>
+            </Box>
           </Paper>
           <GraphList
             graphs={graphs}
@@ -496,9 +495,21 @@ const treeTraversal = async () => {
             onGraphDelete={handleGraphDelete}
             searchQuery={searchQuery}
           />
-          {graph && (
-            <Card variant="outlined">
-              <CardContent>
+          <Card variant="outlined">
+            <CardContent>
+              <Box m={1}>
+                <TextField
+                  id="outlined-basic"
+                  label="Graph Name"
+                  variant="outlined"
+                  size="small"
+                  value={graphName}
+                  onChange={(e: any) => setGraphName(e.target.value)}
+                  fullWidth
+                />
+              </Box>
+              {graph && (
+
                 <TextField
                   id="outlined-basic"
                   label="Note"
@@ -510,9 +521,10 @@ const treeTraversal = async () => {
                   onChange={(e: any) => setGraphNote(e.target.value)}
                   fullWidth
                 />
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
+
         </Grid>
       </Grid>
     </Container>
