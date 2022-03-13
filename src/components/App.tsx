@@ -436,7 +436,7 @@ const treeTraversal = async () => {
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />
-            <Box m={5} marginTop={'-5px'}>
+            <Box m={5}>
               <TreeText Trees={trees} />
             </Box>
           </Paper>
