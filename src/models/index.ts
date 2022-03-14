@@ -18,7 +18,16 @@ export type Edge = {
   directed: boolean;
 };
 
+export type TreeNode = {
+  id: string;
+  color: string;
+  label: string;
+  isLabelNode: boolean;
+  x: number;
+  y: number;
+  level: number;
+};
+
 export type Tree = {
-  nodes: Node[];
-  edges: Edge[];
+  nodes: TreeNode[];
 }

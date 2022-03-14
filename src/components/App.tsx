@@ -10,6 +10,7 @@ import {
   Card,
   CardContent,
   Typography,
+  ButtonGroup,
 } from "@mui/material";
 
 import { Graph } from "models";
@@ -21,7 +22,7 @@ import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
 import TreeText from "./TreeText";
-
+import { Tree } from "models";
 function App() {
   const UNDO_STEPS_LIMIT = 250;
 
@@ -39,7 +40,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
-  const [treeText, setTreeText] = useState("test");
+  const [trees, setTrees] = useState<Tree[]>([]);
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
   const clearSearch = () => {
     setSearchQuery('');
@@ -106,121 +107,91 @@ function App() {
     setGraphs(data);
   };
 
-
-
-
 const treeTraversal = async () => {
 
-    let treeText = "";
-    let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
-    const edges = networkRef.current?.edges.get(); // get all edges from the network.
-    const positions = networkRef.current?.network.getPositions();
+  let treeText = "";
+  let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
+  const edges = networkRef.current?.edges.get(); // get all edges from the network.
+  const positions = networkRef.current?.network.getPositions();
 
-    const to_traverse = [] ;
-    const id_to_edge = {} ;
-    const id_to_node = {} ;
+  const to_traverse = [];
+  const id_to_edge = {};
+  const id_to_node = {};
 
-    // gather nodes and skip labelNodes
-    for (const node of nodes) {
-       if  (node.isLabelNode != true) {
-      	   to_traverse.push(node) ;
-	   id_to_node[node.id] = node ;
+  // gather nodes and skip labelNodes
+  for (const node of nodes) {
+    if (node.isLabelNode != true) {
+      to_traverse.push(node);
+      id_to_node[node.id] = node;
 
-	   for (const edge of edges) {
-	       if (node.id == edge.to) { 
-	       	id_to_edge[node.id] = edge ;
-	       }
-	   }
+      for (const edge of edges) {
+        if (node.id == edge.to) {
+          id_to_edge[node.id] = edge;
         }
-     };     
-    
-    //this sort is strictly for convenience in analyzing console data
-    to_traverse.sort((a, b) => {
-        return b.level - a.level;
-        });
-
-    function getLeftChild(node) {
-           return id_to_node[id_to_edge[node.id].from] ;
-    }
-    function getRightChild(node) {
-           return id_to_node[id_to_edge[node.id].eventual] ;
-    }
-
-    // this algorithm is well known 
-    function inOrderTraversal(currentNode, treeList) {
-        if (currentNode.level > 0) {
-            treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
-            treeList.push(currentNode);
-            treeList = inOrderTraversal(getRightChild(currentNode), treeList);
-            }
-        else {
-            treeList.push(currentNode);
-            }
-        return treeList
-        };
-
-    //selects the highest edge that has not yet been parsed
-    function getStartNode(traversedSet) {
-        let difference = new Set(
-            [...toTraverseSet].filter(x => !traversedSet.has(x))
-	    );
-        let tmp = Array.from(difference); 
-	tmp.sort((a, b) => {
-            return b.level - a.level;
-            });
-	return tmp[0];
-    };
- 
-    const toTraverseSet = new Set(to_traverse);
-    // if (false) {
-    if (to_traverse.length > 0) {
-        var parseList = [];
-	var traversedSet = new Set();
-
-	for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
-            var treeList = []; 
-            const startNode = getStartNode(traversedSet);
-
-            const res = inOrderTraversal(startNode, treeList);
-	    parseList.push(res); 
-	    res.forEach(item => traversedSet.add(item))
-
-	    if (traversedSet.size == to_traverse.length) {
-	        break
-		};
-	    // console.log('i', i+1); // the number of roots / highest edges
-	    }
-        };
-
-        console.log('result', parseList) ;
-
-
-    // Michael temp re-enabled this to work on Tree traversal output as objects instead of text
-    nodes.sort(function(a) { // sort nodes by x position, left first
-      return positions[a.id][1]; // - positions[b.id].x;
-    });
-
-    for (const node of nodes) {
-      if (node.isLabelNode) { //skip labelNodes
-        continue;
-      } 
-      let label = "___" ;
-      if (node.label != "") {
-        label = node.label ;
       }
-      treeText += node.label + " "; // add node label to treeText
-    };
-    // end temp code
+    }
+  };
 
-//       let label = "___" ;
-//       if (node.label != "") {
-//           label = node.label ;
-//       }
-//       treeText += label + " "; // add node label to treeText
-//     };
+  //this sort is strictly for convenience in analyzing console data
+  to_traverse.sort((a, b) => {
+    return b.level - a.level;
+  });
 
-    setTreeText(treeText); //update the string to be displayed in the text box
+  function getLeftChild(node) {
+    return id_to_node[id_to_edge[node.id].from];
+  }
+  function getRightChild(node) {
+    return id_to_node[id_to_edge[node.id].eventual];
+  }
 
+  // this algorithm is well known 
+  function inOrderTraversal(currentNode, treeList) {
+    if (currentNode.level > 0) {
+      treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
+      treeList.push(currentNode);
+      treeList = inOrderTraversal(getRightChild(currentNode), treeList);
+    }
+    else {
+      treeList.push(currentNode);
+    }
+    return treeList
+  };
+
+  //selects the highest edge that has not yet been parsed
+  function getStartNode(traversedSet) {
+    let difference = new Set(
+      [...toTraverseSet].filter(x => !traversedSet.has(x))
+    );
+    let tmp = Array.from(difference);
+    tmp.sort((a, b) => {
+      return b.level - a.level;
+    });
+    return tmp[0];
+  };
+
+  const toTraverseSet = new Set(to_traverse);
+  // if (false) {
+  var parseList = [];
+  if (to_traverse.length > 0) {
+    var traversedSet = new Set();
+
+    for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
+      var treeList = [];
+      const startNode = getStartNode(traversedSet);
+
+      const res = inOrderTraversal(startNode, treeList);
+      parseList.push({ 'nodes': res });
+      res.forEach(item => traversedSet.add(item))
+
+      if (traversedSet.size == to_traverse.length) {
+        break
+      };
+      // console.log('i', i+1); // the number of roots / highest edges
+    }
+  };
+
+  console.log('result', parseList) ;
+  setTrees(parseList);
   };
 
 
@@ -414,7 +385,7 @@ const treeTraversal = async () => {
       <Grid container spacing={0}>
         <Grid item>
           <Paper>
-            <NetworkButtons 
+            <NetworkButtons
               networkRef={networkRef}
               onButton={onButton} // The function to handle button presses lives in App.tsx and is passed down here. This lets us set the button mode programmatically within App.tsx
               undoDisabled={historyListBack.length <= 1}
@@ -423,6 +394,23 @@ const treeTraversal = async () => {
               onRedo={onRedo}
               buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
             />
+            <Box
+              sx={{
+                display: 'flex',
+                '& > *': {
+                  m: 0,
+                },
+              }}
+            >
+              <ButtonGroup orientation="vertical">
+                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }}>
+                  Save
+                </Button>
+                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
+                  Save As New
+                </Button>
+              </ButtonGroup>
+            </Box>
           </Paper>
         </Grid>
         <Grid item xs={7}>
@@ -435,7 +423,7 @@ const treeTraversal = async () => {
             >
               Are you sure you want to load a new graph?
             </ConfirmDialog>
-            <VisNetwork 
+            <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
               addEdgeComplete={addEdgeComplete}
@@ -448,47 +436,28 @@ const treeTraversal = async () => {
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />
-            <Box m={5} marginTop={'-5px'}>
-              <TreeText treeText={treeText} />
-            </Box>
-            <Box m={1}>
-              <TextField
-                id="outlined-basic"
-                label="Graph Name"
-                variant="outlined"
-                size="small"
-                value={graphName}
-                onChange={(e: any) => setGraphName(e.target.value)}
-                fullWidth
-              />
-            </Box>
-            <Box>
-              <Button variant="outlined" color="primary" onClick={handleSave}>
-                Save
-              </Button>
-              <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
-                Save As New
-              </Button>
+            <Box m={5}>
+              <TreeText Trees={trees} />
             </Box>
           </Paper>
         </Grid>
         <Grid item xs={3}>
           <Paper>
-          <Box m={1}>
-            <TextField
-              margin="normal"
-              id="outlined-basic"
-              label="Search"
-              rows={1}
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={(e: any) => setSearchQuery(e.target.value)}
-              fullWidth
-              InputProps={{disableUnderline: true , endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button>}}
-            />
+            <Box m={1}>
+              <TextField
+                margin="normal"
+                id="outlined-basic"
+                label="Search"
+                rows={1}
+                variant="outlined"
+                size="small"
+                value={searchQuery}
+                onChange={(e: any) => setSearchQuery(e.target.value)}
+                fullWidth
+                InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
+              />
 
-          </Box>
+            </Box>
           </Paper>
           <GraphList
             graphs={graphs}
@@ -496,9 +465,21 @@ const treeTraversal = async () => {
             onGraphDelete={handleGraphDelete}
             searchQuery={searchQuery}
           />
-          {graph && (
-            <Card variant="outlined">
-              <CardContent>
+          <Card variant="outlined">
+            <CardContent>
+              <Box m={1}>
+                <TextField
+                  id="outlined-basic"
+                  label="Graph Name"
+                  variant="outlined"
+                  size="small"
+                  value={graphName}
+                  onChange={(e: any) => setGraphName(e.target.value)}
+                  fullWidth
+                />
+              </Box>
+              {graph && (
+
                 <TextField
                   id="outlined-basic"
                   label="Note"
@@ -510,9 +491,10 @@ const treeTraversal = async () => {
                   onChange={(e: any) => setGraphNote(e.target.value)}
                   fullWidth
                 />
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
+
         </Grid>
       </Grid>
     </Container>
