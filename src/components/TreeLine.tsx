@@ -20,13 +20,13 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
   const line = props.line;
 
   const onClick = (node) => {
-    // console.log('Clicked', node);
+    console.log('Clicked', node);
   }
   const onHover = (node) => {
-    // console.log('Hover', node);
+    console.log('Hover', node);
   }
   const onLeave = (node) => {
-    // console.log('Left', node);
+    console.log('Left', node);
   }
 
   let borderTopLeftRadius = 0;
@@ -34,11 +34,16 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
   let borderBottomLeftRadius = 0;
   let borderBottomRightRadius = 0;
 
+  let marginRight = "0px";
+  let marginLeft = "0px";
 //   let firstLine = false;
   if (props.lineIndex === 0) {
     // firstLine = true;
     borderTopLeftRadius = 16;
     borderBottomLeftRadius = 16;
+  }
+  else {
+      marginLeft = "10px";
   }
   
 //   let lastLine = false;
@@ -46,11 +51,25 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
     // lastLine = true;
     borderTopRightRadius = 16;
     borderBottomRightRadius = 16;
+    marginRight = "0px";
+  }
+  else {
+      marginRight = "10px";
   }
   return (
-    <Box sx={{ p: 1, borderTopLeftRadius: borderTopLeftRadius, borderBottomLeftRadius: borderBottomLeftRadius, borderTopRightRadius: borderTopRightRadius, borderBottomRightRadius: borderBottomRightRadius, backgroundColor: '#BBB' }}>
+    <Box sx={{ 
+            p: 1, 
+            borderTopLeftRadius: borderTopLeftRadius, 
+            borderBottomLeftRadius: borderBottomLeftRadius, 
+            borderTopRightRadius: borderTopRightRadius, 
+            borderBottomRightRadius: borderBottomRightRadius, 
+            marginLeft: marginLeft,
+            marginRight: marginRight,
+            backgroundColor: 'rgba(0, 0, 0, 0.1)' 
+        }}>
     {line.map((node, nodeIndex) => {
         return <Chip
+        sx={{backgroundColor: 'rgba(0, 0, 0, 0)'}}
         key={nodeIndex}
         label={node.label}
         onClick={() => {

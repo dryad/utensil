@@ -33,7 +33,7 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
   let treeLine = [];
   for (let i = 0; i < tree.nodes.length; i++) {
     treeLine.push(tree.nodes[i]);
-    if (treeLine.length === 3) {
+    if (treeLine.length === 8) {
       treeLines.push(treeLine);
       treeLine = [];
     }
@@ -48,7 +48,7 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
     <Stack spacing={0} justifyContent="center">
     {treeLines !== undefined && treeLines.map((line, lineIndex) => {
       return (
-          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length}/>
+          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length} />
       )
       
     })}
