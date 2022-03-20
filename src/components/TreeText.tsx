@@ -40,8 +40,8 @@ const TreeText: React.FC<IGraphListProps> = (props) => {
           return (
             <>
             
-            <Stack key={index} direction="row" spacing={1} justifyContent="center" flexWrap="wrap">
-            <Typography>{index+1}.</Typography>  
+            <Stack key={index} direction="row" spacing={1} justifyContent="center">
+              <Box sx={{ p: 2, borderRadius: '16px', backgroundColor: '#BBB',}}>
               {tree.nodes.map((node, nodeIndex) => {
                 return <Chip
                   key={nodeIndex}
@@ -58,7 +58,7 @@ const TreeText: React.FC<IGraphListProps> = (props) => {
 
                 />
               })}
-
+              </Box>
               {/* {index + 1 !== trees.length && (
           )} */}
             </Stack>
