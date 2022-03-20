@@ -4,6 +4,7 @@ import {
   TextField,
   Chip,
   Stack,
+  StackItem,
   Typography,
   Divider,
   Box
@@ -44,11 +45,14 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
 
   return (
     <>
+    <Stack spacing={0} justifyContent="center">
     {treeLines !== undefined && treeLines.map((line, lineIndex) => {
       return (
-        <TreeLine key={lineIndex} line={line} />
+          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length}/>
       )
+      
     })}
+    </Stack>
     </>
   );
 };

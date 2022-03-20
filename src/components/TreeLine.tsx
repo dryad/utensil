@@ -12,6 +12,8 @@ import { Node, TreeNode } from "models";
 
 type IGraphListProps = {
     line: TreeNode[];
+    lineIndex: number;
+    lineLength: number;
 };
 
 const TreeLine: React.FC<IGraphListProps> = (props) => {
@@ -27,8 +29,26 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
     // console.log('Left', node);
   }
 
+  let borderTopLeftRadius = 0;
+  let borderTopRightRadius = 0;
+  let borderBottomLeftRadius = 0;
+  let borderBottomRightRadius = 0;
+
+//   let firstLine = false;
+  if (props.lineIndex === 0) {
+    // firstLine = true;
+    borderTopLeftRadius = 16;
+    borderBottomLeftRadius = 16;
+  }
+  
+//   let lastLine = false;
+  if (props.lineIndex === props.lineLength -1)  {
+    // lastLine = true;
+    borderTopRightRadius = 16;
+    borderBottomRightRadius = 16;
+  }
   return (
-    <Box sx={{ p: 2, borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px', backgroundColor: '#BBB',}}>
+    <Box sx={{ p: 1, borderTopLeftRadius: borderTopLeftRadius, borderBottomLeftRadius: borderBottomLeftRadius, borderTopRightRadius: borderTopRightRadius, borderBottomRightRadius: borderBottomRightRadius, backgroundColor: '#BBB' }}>
     {line.map((node, nodeIndex) => {
         return <Chip
         key={nodeIndex}

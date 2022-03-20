@@ -32,10 +32,6 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
       <Stack
         direction="column"
         spacing={1}
-        divider={
-          <Divider
-            orientation="horizontal"
-            flexItem />}
       >
         {trees.map((tree, index) => {
           return (
