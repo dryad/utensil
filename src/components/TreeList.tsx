@@ -9,12 +9,13 @@ import {
   Box
 } from "@mui/material";
 import { Tree } from "models";
+import TreeItem from "./TreeItem";
 
 type IGraphListProps = {
     Trees: Tree[];
 };
 
-const TreeText: React.FC<IGraphListProps> = (props) => {
+const TreeList: React.FC<IGraphListProps> = (props) => {
   const trees = props.Trees;
 
   const onClick = (node) => {
@@ -38,31 +39,9 @@ const TreeText: React.FC<IGraphListProps> = (props) => {
       >
         {trees.map((tree, index) => {
           return (
-            <>
-            
             <Stack key={index} direction="row" spacing={1} justifyContent="center">
-              <Box sx={{ p: 2, borderRadius: '16px', backgroundColor: '#BBB',}}>
-              {tree.nodes.map((node, nodeIndex) => {
-                return <Chip
-                  key={nodeIndex}
-                  label={node.label}
-                  onClick={() => {
-                    onClick(node);
-                  }}
-                  onMouseEnter={() => {
-                    onHover(node);
-                  }}
-                  onMouseLeave={() => {
-                    onLeave(node);
-                  }}
-
-                />
-              })}
-              </Box>
-              {/* {index + 1 !== trees.length && (
-          )} */}
+              <TreeItem tree={tree} />
             </Stack>
-            </>
           )
 
         })}
@@ -71,4 +50,4 @@ const TreeText: React.FC<IGraphListProps> = (props) => {
   );
 };
 
-export default TreeText;
+export default TreeList;

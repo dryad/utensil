@@ -21,7 +21,7 @@ import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
-import TreeText from "./TreeText";
+import TreeList from "./TreeList";
 import { Tree } from "models";
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -437,7 +437,7 @@ const treeTraversal = async () => {
               buttonModeRef={buttonModeRef}
             />
             <Box m={5}>
-              <TreeText Trees={trees} />
+              <TreeList Trees={trees} />
             </Box>
           </Paper>
         </Grid>
