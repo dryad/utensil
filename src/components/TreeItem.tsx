@@ -9,7 +9,7 @@ import {
   Box
 } from "@mui/material";
 import { Tree } from "models";
-
+import TreeLine from "./TreeLine";
 type IGraphListProps = {
     tree: Tree;
 };
@@ -26,25 +26,30 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
   const onLeave = (node) => {
     // console.log('Left', node);
   }
-  return (
-    <Box sx={{ p: 2, borderTopLeftRadius: '16px', borderBottomLeftRadius: '16px', backgroundColor: '#BBB',}}>
-    {tree.nodes.map((node, nodeIndex) => {
-    return <Chip
-        key={nodeIndex}
-        label={node.label}
-        onClick={() => {
-        onClick(node);
-        }}
-        onMouseEnter={() => {
-        onHover(node);
-        }}
-        onMouseLeave={() => {
-        onLeave(node);
-        }}
 
-    />
+  //split tree into arrays of three nodes each
+  const treeLines = [];
+  let treeLine = [];
+  for (let i = 0; i < tree.nodes.length; i++) {
+    treeLine.push(tree.nodes[i]);
+    if (treeLine.length === 3) {
+      treeLines.push(treeLine);
+      treeLine = [];
+    }
+  }
+  if (treeLine.length > 0) {
+    treeLines.push(treeLine);
+  }
+
+
+  return (
+    <>
+    {treeLines !== undefined && treeLines.map((line, lineIndex) => {
+      return (
+        <TreeLine key={lineIndex} line={line} />
+      )
     })}
-    </Box>
+    </>
   );
 };
 
