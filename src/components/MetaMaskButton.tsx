@@ -8,21 +8,21 @@ import makeStyles from '@mui/styles/makeStyles';
 export default function MetaMaskButton(props) {
 
 
-    async function getAccount() {
-        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        props.setMetaMaskAccount(account);
-      }
+
 
     return (
         <>
-            {!ethereum.selectedAddress && (
+            {window.ethereum && ethereum.isMetaMask && !ethereum.selectedAddress && (
                 <Button 
-                    onClick={getAccount}
+                    onClick={props.getMetaMaskAccount}
                 >Connect with MetaMask</Button>
             )}
-            {ethereum.selectedAddress && (
+            {window.ethereum && ethereum.isMetaMask && ethereum.selectedAddress && (
                 <Typography>{ethereum.selectedAddress}</Typography>
+            )}
+            {!window.ethereum && (
+            <a href="https://metamask.io/" target="_blank">Get MetaMask to Connect</a>
+
             )}
         </>
         

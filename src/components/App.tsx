@@ -369,6 +369,13 @@ const treeTraversal = async () => {
     await refreshList();
   
   };
+  
+  async function getMetaMaskAccount() {
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    console.log('set metaMaskAccount', account);
+    setMetaMaskAccount(account);
+  };
 
   const handleSave = async () => {
     saveGraphToDatabase();
@@ -445,7 +452,7 @@ const treeTraversal = async () => {
           </Paper>
         </Grid>
         <Grid item xs={3}>
-          <MetaMaskButton setMetaMaskAccount={setMetaMaskAccount} />
+          <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
           <Paper>
             <Box m={1}>
               <TextField

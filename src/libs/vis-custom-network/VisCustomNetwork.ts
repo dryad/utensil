@@ -136,6 +136,10 @@ export default class VisCustomNetwork extends EventTarget {
       //handle crash when double clicking in add node mode - only add node if it doesn't already exist
       if (this.nodes.get().find((n: any) => n.id === node.id) === undefined) {
         //handle create or update node before create or update labelNode
+        if (window.ethereum && window.ethereum.selectedAddress) {
+          console.log('creating node, assigning address', ethereum.selectedAddress);
+          node.address = ethereum.selectedAddress;
+        };
         callback(node);
       }
       //create labelNode if it doesn't exist - otherwise update it
@@ -162,6 +166,10 @@ export default class VisCustomNetwork extends EventTarget {
           labelOfNode: node.id,
           level: node.level,
         };
+        if (window.ethereum && window.ethereum.selectedAddress) {
+          console.log('creating label node, assigning address', ethereum.selectedAddress);
+          labelNode.address = ethereum.selectedAddress;
+        };
         this.nodes.add(labelNode);
 
       }
@@ -185,6 +193,10 @@ export default class VisCustomNetwork extends EventTarget {
           opacity: 1.0,
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
+        };
+        if (window.ethereum && window.ethereum.selectedAddress) {
+          console.log('creating middle node, assigning address', ethereum.selectedAddress);
+          middle.address = ethereum.selectedAddress;
         };
         this.nodes.add(middle);
         this.edges.add([
