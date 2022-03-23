@@ -23,6 +23,8 @@ import useState from 'react-usestateref';
 import ConfirmDialog from "./ConfirmDialog";
 import TreeList from "./TreeList";
 import { Tree } from "models";
+import MetaMaskButton from "./MetaMaskButton";
+
 function App() {
   const UNDO_STEPS_LIMIT = 250;
 
@@ -42,6 +44,7 @@ function App() {
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const [trees, setTrees] = useState<Tree[]>([]);
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
+  const [metaMaskAccount, setMetaMaskAccount] = useState("");
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -442,6 +445,7 @@ const treeTraversal = async () => {
           </Paper>
         </Grid>
         <Grid item xs={3}>
+          <MetaMaskButton setMetaMaskAccount={setMetaMaskAccount} />
           <Paper>
             <Box m={1}>
               <TextField
