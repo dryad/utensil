@@ -238,6 +238,11 @@ const treeTraversal = async () => {
       onButton('pan');
   }
 
+  const canImportGraph = () =>{
+    const existingGraph = JSON.parse(stringifyGraph());
+    return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
+  }
+
   function mergeGraphs(graph1: Graph, graph2: Graph) {
     const newNodes = [...graph1.nodes, ...graph2.nodes];
     const newEdges = [...graph1.edges, ...graph2.edges];
@@ -372,9 +377,12 @@ const treeTraversal = async () => {
     //console.log('nodes', nodes);
     const positions = networkRef.current?.network.getPositions();
 
-    for (const node of nodes) {
-      node.x = positions[node.id].x;
-      node.y = positions[node.id].y;
+    if (nodes) {
+      for (const node of nodes) {
+        node.x = positions[node.id].x;
+        node.y = positions[node.id].y;
+      }
+
     }
 
     //create viewPosition using the getViewPosition function of vis-network
@@ -467,6 +475,7 @@ const treeTraversal = async () => {
               setOpen={setConfirmGraphLoadOpen}
               onConfirmReplace={confirmReplaceGraph}
               onConfirmImport={confirmImportGraph}
+              canImportGraph={canImportGraph}
             >
             </ConfirmDialog>
             <VisNetwork
