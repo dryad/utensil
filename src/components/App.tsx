@@ -222,7 +222,7 @@ const treeTraversal = async () => {
     }
   };
 
-  const confirmLoadGraph = () => {
+  const confirmReplaceGraph = () => {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
       setGraphName(graph.name);
@@ -236,6 +236,8 @@ const treeTraversal = async () => {
 
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
       onButton('pan');
+  }
+  const confirmImportGraph = () => {
   }
   
   const handleGraphSelected = (id: any) => {
@@ -426,12 +428,12 @@ const treeTraversal = async () => {
         <Grid item xs={7}>
           <Paper>
             <ConfirmDialog
-              title="Load Graph"
+              title={graphToLoad && graphToLoad.name}
               open={confirmGraphLoadOpen}
               setOpen={setConfirmGraphLoadOpen}
-              onConfirm={confirmLoadGraph}
+              onConfirmReplace={confirmReplaceGraph}
+              onConfirmImport={confirmImportGraph}
             >
-              Are you sure you want to load a new graph?
             </ConfirmDialog>
             <VisNetwork
               networkRef={networkRef}

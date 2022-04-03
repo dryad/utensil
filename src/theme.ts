@@ -10,11 +10,11 @@ const theme = createTheme(adaptV4Theme({
     //   light: "#61dafb",
     //   dark: "#21a1c4",
     // },
-    // secondary: {
-    //   main: "#b5ecfb",
-    //   light: "#61dafb",
-    //   dark: "#21a1c4",
-    // },
+    secondary: {
+      main: "#A7A9DA",
+      light: "#61dafb",
+      dark: "#B1B1B1",
+    },
     // error: {
     //   main: red.A400,
     // },
