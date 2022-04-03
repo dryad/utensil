@@ -24,7 +24,10 @@ const ConfirmDialog = (props) => {
         </Button>
         <Button
           variant="contained"
-
+          onClick={() => {
+            setOpen(false);
+            onConfirmImport();
+          }}
         >
           Import this graph
         </Button>

@@ -237,7 +237,41 @@ const treeTraversal = async () => {
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
       onButton('pan');
   }
+
+  function mergeGraphs(graph1: Graph, graph2: Graph) {
+    const newNodes = [...graph1.nodes, ...graph2.nodes];
+    const newEdges = [...graph1.edges, ...graph2.edges];
+    const newViewPosition = {
+      x: graph1.viewPosition.x,
+      y: graph1.viewPosition.y,
+    };
+    const newName = graph1.name;
+    const newNote = graph1.note;
+    const newData = JSON.stringify(newNodes) + JSON.stringify(newEdges);
+    const newGraph : Graph = {
+      nodes: newNodes,
+      edges: newEdges,
+      viewPosition: newViewPosition,
+      name: newName,
+      note: newNote,
+      data: newData,
+    };
+    return newGraph;
+  };
+
   const confirmImportGraph = () => {
+    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    const data = JSON.parse(graph?.data);
+    let existingGraph = JSON.parse(stringifyGraph());
+    console.log('existing graph', existingGraph);
+    console.log('graph to load', JSON.parse(graphToLoad?.data));
+
+    //merge the two graphs
+    const newGraph = mergeGraphs(existingGraph, data);
+
+    setGraph(newGraph);
+    networkRef.current?.setData(newGraph);
+      
   }
   
   const handleGraphSelected = (id: any) => {
