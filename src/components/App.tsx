@@ -215,7 +215,7 @@ const treeTraversal = async () => {
         //move vis-network to the viewport position of the loaded graph.
         networkRef.current?.network.moveTo({
           position: { x: newGraph.viewPosition.x, y: newGraph.viewPosition.y },
-          scale: 1,
+          scale: newGraph.scale || 1,
           animation: false,
         });
       }
@@ -249,6 +249,7 @@ const treeTraversal = async () => {
     const newViewPosition = {
       x: graph1.viewPosition.x,
       y: graph1.viewPosition.y,
+      // scale: graph1.viewPosition.scale,
     };
     const newName = graph1.name;
     const newNote = graph1.note;
@@ -387,8 +388,8 @@ const treeTraversal = async () => {
 
     //create viewPosition using the getViewPosition function of vis-network
     const viewPosition = networkRef.current?.network.getViewPosition();
-
-    return JSON.stringify({ edges, nodes, viewPosition });
+    const scale = networkRef.current?.network.getScale();
+    return JSON.stringify({ edges, nodes, viewPosition, scale });
   
   };
 
