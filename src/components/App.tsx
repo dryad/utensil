@@ -110,6 +110,10 @@ function App() {
     setGraphs(data);
   };
 
+  const testButton = () => {
+    console.log(stringifyGraph());
+  };
+
 const treeTraversal = async () => {
 
   let treeText = "";
@@ -418,6 +422,9 @@ const treeTraversal = async () => {
                 </Button>
                 <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
                   Save As New
+                </Button>
+                <Button variant="outlined" color="primary" onClick={testButton}>
+                  Test
                 </Button>
               </ButtonGroup>
             </Box>
