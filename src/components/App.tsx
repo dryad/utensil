@@ -12,7 +12,6 @@ import {
   Typography,
   ButtonGroup,
 } from "@mui/material";
-
 import { Graph } from "models";
 import axios from "libs/axios";
 import VisCustomNetwork from "libs/vis-custom-network";
@@ -24,6 +23,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -248,6 +248,41 @@ const treeTraversal = async () => {
   }
 
   function mergeGraphs(graph1: Graph, graph2: Graph) {
+
+    let renamed_nodes = {}; // old_id: new id
+
+    // To prevent duplicate node IDs from the incoming graph, give each node a new id
+    // first pass is non-labelNodes because we need a complete map of all nodes before labelNodes are processed, so we can update labelOfNode field of labelNodes.
+    // alternative is to sort the nodes by isLabelNode, so it will process non-labelNodes first, then labelNodes second
+    for (const node of graph2.nodes) {
+      if (!node.isLabelNode) {
+        const new_id = uuidv4();
+        renamed_nodes[node.id] = new_id;
+        node.id = new_id;
+      }
+    }
+
+    // second pass is labelNodes, because renamed_nodes will be updated for all non-labelNodes
+    for (const node of graph2.nodes) {
+      if (node.isLabelNode) {
+        const new_id = uuidv4();
+        // renamed_nodes[node.id] = new_id; // we don't need to save labelNodes as renamed, they are not referred to in edge data
+        node.id = new_id;
+        node.labelOfNode = renamed_nodes[node.labelOfNode]; // update labelOfNode to point to the new id
+      }
+    }
+
+    // To prevent duplicate edge IDs from the incoming graph, give each edge a new id
+    for (const edge of graph2.edges) {
+        const new_id = uuidv4();
+        edge.id = new_id;
+
+        //update from, to and eventual fields to point to the new node ids
+        edge.from = renamed_nodes[edge.from];
+        edge.to = renamed_nodes[edge.to];
+        edge.eventual = renamed_nodes[edge.eventual];
+    }
+
     const newNodes = [...graph1.nodes, ...graph2.nodes];
     const newEdges = [...graph1.edges, ...graph2.edges];
     const newViewPosition = {
