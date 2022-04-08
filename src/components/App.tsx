@@ -249,6 +249,27 @@ const treeTraversal = async () => {
 
   function mergeGraphs(graph1: Graph, graph2: Graph) {
 
+    //calculate min(x), min(y), max(x), max(y) of graph1
+    //quick and dirty calculation
+    let x_values = [];
+    let y_values = [];
+    for (const node of graph1.nodes) {
+      x_values.push(node.x);
+      y_values.push(node.y);
+    }
+    const min_x = Math.min(...x_values);
+    const min_y = Math.min(...y_values);
+    const max_x = Math.max(...x_values);
+    const max_y = Math.max(...y_values);
+
+    console.log('min_x', min_x);
+    console.log('min_y', min_y);
+    console.log('max_x', max_x);
+    console.log('max_y', max_y);
+
+    const fullWidth = (max_x - min_x);
+    const halfGraphWidth = fullWidth / 2;
+
     let renamed_nodes = {}; // old_id: new id
 
     // To prevent duplicate node IDs from the incoming graph, give each node a new id
@@ -259,6 +280,7 @@ const treeTraversal = async () => {
         const new_id = uuidv4();
         renamed_nodes[node.id] = new_id;
         node.id = new_id;
+        node.x += fullWidth + 20; // apply offset calculated above
       }
     }
 
