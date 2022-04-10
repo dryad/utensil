@@ -20,13 +20,12 @@ type INetworkProps = {
   stringifyGraph: Function;
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
-  deleteWithoutDeleteMode: Function;
-  setEdges: Function;
+  setSnappedNodesAndEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, deleteWithoutDeleteMode, setEdges, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setSnappedNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -123,11 +122,12 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                   console.log('node 2 label: ', mergeNode2.label);
 
                   if (mergeNode1.label === mergeNode2.label) {
-                    console.log('Merging nodes: ', mergeNode1.label, mergeNode2.label);
+                    console.log('Merging nodes: ', mergeNode1.id, mergeNode2.id);
                     
-                    // get all edges
+                    // get all nodes & edges
+                    const nodes = networkRef.current?.network.body.data.nodes.get();
                     const edges = networkRef.current?.network.body.data.edges.get();
-                    console.log('edges before merge', edges);
+                    
                     for (const edge of edges) {
                       //update from, to and eventual fields to point to the new node ids
 
@@ -141,9 +141,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         edge.eventual = mergeNode2.id;
                       }
                     }
-
-                    setEdges(edges);
-                    deleteWithoutDeleteMode();
+                    // Filter the list of nodes to not include the merged node and its labelNode
+                    const newNodes = Object.values(nodes).filter((node: any) => node.id !== mergeNode1.id && node.labelOfNode !== mergeNode1.id);
+                    setSnappedNodesAndEdges(newNodes, edges);
                   }
                 }
               }  

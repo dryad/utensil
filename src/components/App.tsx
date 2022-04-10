@@ -111,7 +111,8 @@ function App() {
   };
 
   const testButton = () => {
-    console.log(stringifyGraph());
+    console.log('nodes', JSON.parse(stringifyGraph()).nodes);
+    console.log('edges', JSON.parse(stringifyGraph()).edges);
   };
 
 const treeTraversal = async () => {
@@ -341,9 +342,10 @@ const treeTraversal = async () => {
       
   }
   
-  const setEdges = (edges) => {
-    
+  const setSnappedNodesAndEdges = async (nodes, edges) => { // receives new arrays of nodes and edges, as the result of snapping two nodes together
+    // console.log('Setting snapped nodes and edges:', nodes, edges);
     const existingGraph = JSON.parse(stringifyGraph());
+    existingGraph.nodes = nodes;
     existingGraph.edges = edges;
     setGraph(existingGraph);
     networkRef.current?.setData(existingGraph);
@@ -400,9 +402,7 @@ const treeTraversal = async () => {
       networkRef.current?.network.deleteSelected();
     }
   }
-  const deleteWithoutDeleteMode = () => { // this is a callback function for VisNetwork.tsx. When a node is clicked, this is run and the node is deleted if deleteMode is true.
-      networkRef.current?.network.deleteSelected();
-  }
+
   const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
     edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
     networkRef.current?.triggerEvent("edge-added", {
@@ -564,8 +564,7 @@ const treeTraversal = async () => {
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
-              deleteWithoutDeleteMode={deleteWithoutDeleteMode}
-              setEdges={setEdges}
+              setSnappedNodesAndEdges={setSnappedNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />
