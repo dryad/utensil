@@ -392,6 +392,9 @@ const treeTraversal = async () => {
       networkRef.current?.network.deleteSelected();
     }
   }
+  const deleteWithoutDeleteMode = () => { // this is a callback function for VisNetwork.tsx. When a node is clicked, this is run and the node is deleted if deleteMode is true.
+      networkRef.current?.network.deleteSelected();
+  }
   const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
     edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
     networkRef.current?.triggerEvent("edge-added", {
@@ -553,6 +556,7 @@ const treeTraversal = async () => {
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
+              deleteWithoutDeleteMode={deleteWithoutDeleteMode}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />
