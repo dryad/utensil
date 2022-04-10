@@ -342,7 +342,7 @@ const treeTraversal = async () => {
       
   }
   
-  const setSnappedNodesAndEdges = async (nodes, edges) => { // receives new arrays of nodes and edges, as the result of snapping two nodes together
+  const setSnappedNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, as the result of snapping two nodes together
     // console.log('Setting snapped nodes and edges:', nodes, edges);
     const existingGraph = JSON.parse(stringifyGraph());
     existingGraph.nodes = nodes;
