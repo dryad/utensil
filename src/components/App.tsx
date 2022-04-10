@@ -341,6 +341,14 @@ const treeTraversal = async () => {
       
   }
   
+  const setEdges = (edges) => {
+    
+    const existingGraph = JSON.parse(stringifyGraph());
+    existingGraph.edges = edges;
+    setGraph(existingGraph);
+    networkRef.current?.setData(existingGraph);
+  };
+
   const handleGraphSelected = (id: any) => {
     const graph = graphs?.find((g: any) => g.id === id);
     if (graph !== null) {
@@ -557,6 +565,7 @@ const treeTraversal = async () => {
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
               deleteWithoutDeleteMode={deleteWithoutDeleteMode}
+              setEdges={setEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />

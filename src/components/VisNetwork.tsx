@@ -21,11 +21,12 @@ type INetworkProps = {
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
   deleteWithoutDeleteMode: Function;
+  setEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, deleteWithoutDeleteMode, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, deleteWithoutDeleteMode, setEdges, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -124,17 +125,25 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                   if (mergeNode1.label === mergeNode2.label) {
                     console.log('Merging nodes: ', mergeNode1.label, mergeNode2.label);
                     
-                    // find the edges that need to be connected.
-                    // const edgesToMerge = networkRef.current?.network.body.data.edges.get({
-                    //   filter: (edge: any) => {
-                    //     return edge.to === mergeNode2.id || edge.from === mergeNode2.id || edge.eventual === mergeNode2.id;
-                    //   }
-                    // });
-                    // console.log('edgesToMerge', edgesToMerge);
-                   
-                    //delete the original selected/dragged node.
+                    // get all edges
+                    const edges = networkRef.current?.network.body.data.edges.get();
+                    console.log('edges before merge', edges);
+                    for (const edge of edges) {
+                      //update from, to and eventual fields to point to the new node ids
+
+                      if (edge.from === mergeNode1.id) {
+                        edge.from = mergeNode2.id;
+                      }
+                      if (edge.to === mergeNode1.id) {
+                        edge.to = mergeNode2.id;
+                      }
+                      if (edge.eventual === mergeNode1.id) {
+                        edge.eventual = mergeNode2.id;
+                      }
+                    }
+
+                    setEdges(edges);
                     deleteWithoutDeleteMode();
-                    
                   }
                 }
               }  
