@@ -12,7 +12,6 @@ import {
   Typography,
   ButtonGroup,
 } from "@mui/material";
-
 import { Graph } from "models";
 import axios from "libs/axios";
 import VisCustomNetwork from "libs/vis-custom-network";
@@ -24,6 +23,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -111,7 +111,8 @@ function App() {
   };
 
   const testButton = () => {
-    console.log(stringifyGraph());
+    console.log('nodes', JSON.parse(stringifyGraph()).nodes);
+    console.log('edges', JSON.parse(stringifyGraph()).edges);
   };
 
 const treeTraversal = async () => {
@@ -219,14 +220,14 @@ const treeTraversal = async () => {
         //move vis-network to the viewport position of the loaded graph.
         networkRef.current?.network.moveTo({
           position: { x: newGraph.viewPosition.x, y: newGraph.viewPosition.y },
-          scale: 1,
+          scale: newGraph.scale || 1,
           animation: false,
         });
       }
     }
   };
 
-  const confirmLoadGraph = () => {
+  const confirmReplaceGraph = () => {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
       setGraphName(graph.name);
@@ -241,7 +242,115 @@ const treeTraversal = async () => {
       //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
       onButton('pan');
   }
+
+  const canImportGraph = () =>{
+    const existingGraph = JSON.parse(stringifyGraph());
+    return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
+  }
+
+  function mergeGraphs(graph1: Graph, graph2: Graph) {
+
+    //calculate min(x), min(y), max(x), max(y) of graph1
+    //quick and dirty calculation
+    let x_values = [];
+    let y_values = [];
+    for (const node of graph1.nodes) {
+      x_values.push(node.x);
+      y_values.push(node.y);
+    }
+    const min_x = Math.min(...x_values);
+    const min_y = Math.min(...y_values);
+    const max_x = Math.max(...x_values);
+    const max_y = Math.max(...y_values);
+
+    console.log('min_x', min_x);
+    console.log('min_y', min_y);
+    console.log('max_x', max_x);
+    console.log('max_y', max_y);
+
+    const fullWidth = (max_x - min_x);
+    const halfGraphWidth = fullWidth / 2;
+
+    let renamed_nodes = {}; // old_id: new id
+
+    // To prevent duplicate node IDs from the incoming graph, give each node a new id
+    // first pass is non-labelNodes because we need a complete map of all nodes before labelNodes are processed, so we can update labelOfNode field of labelNodes.
+    // alternative is to sort the nodes by isLabelNode, so it will process non-labelNodes first, then labelNodes second
+    for (const node of graph2.nodes) {
+      if (!node.isLabelNode) {
+        const new_id = uuidv4();
+        renamed_nodes[node.id] = new_id;
+        node.id = new_id;
+        node.x += fullWidth + 20; // apply offset calculated above
+      }
+    }
+
+    // second pass is labelNodes, because renamed_nodes will be updated for all non-labelNodes
+    for (const node of graph2.nodes) {
+      if (node.isLabelNode) {
+        const new_id = uuidv4();
+        // renamed_nodes[node.id] = new_id; // we don't need to save labelNodes as renamed, they are not referred to in edge data
+        node.id = new_id;
+        node.labelOfNode = renamed_nodes[node.labelOfNode]; // update labelOfNode to point to the new id
+      }
+    }
+
+    // To prevent duplicate edge IDs from the incoming graph, give each edge a new id
+    for (const edge of graph2.edges) {
+        const new_id = uuidv4();
+        edge.id = new_id;
+
+        //update from, to and eventual fields to point to the new node ids
+        edge.from = renamed_nodes[edge.from];
+        edge.to = renamed_nodes[edge.to];
+        edge.eventual = renamed_nodes[edge.eventual];
+    }
+
+    const newNodes = [...graph1.nodes, ...graph2.nodes];
+    const newEdges = [...graph1.edges, ...graph2.edges];
+    const newViewPosition = {
+      x: graph1.viewPosition.x,
+      y: graph1.viewPosition.y,
+      // scale: graph1.viewPosition.scale,
+    };
+    const newName = graph1.name;
+    const newNote = graph1.note;
+    const newData = JSON.stringify(newNodes) + JSON.stringify(newEdges);
+    const newGraph : Graph = {
+      nodes: newNodes,
+      edges: newEdges,
+      viewPosition: newViewPosition,
+      name: newName,
+      note: newNote,
+      data: newData,
+    };
+    return newGraph;
+  };
+
+  const confirmImportGraph = () => {
+    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    const data = JSON.parse(graph?.data);
+    let existingGraph = JSON.parse(stringifyGraph());
+    console.log('existing graph', existingGraph);
+    console.log('graph to load', JSON.parse(graphToLoad?.data));
+
+    //merge the two graphs
+    const newGraph = mergeGraphs(existingGraph, data);
+
+    setGraph(newGraph);
+    networkRef.current?.setData(newGraph);
+      
+  }
   
+  const setSnappedNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, as the result of snapping two nodes together
+    // console.log('Setting snapped nodes and edges:', nodes, edges);
+    const existingGraph = JSON.parse(stringifyGraph());
+    existingGraph.nodes = nodes;
+    existingGraph.edges = edges;
+    setGraph(existingGraph);
+    networkRef.current?.setData(existingGraph);
+  };
+
   const handleGraphSelected = (id: any) => {
     const graph = graphs?.find((g: any) => g.id === id);
     if (graph !== null) {
@@ -293,6 +402,7 @@ const treeTraversal = async () => {
       networkRef.current?.network.deleteSelected();
     }
   }
+
   const addEdgeDirectedOrNot = (edge: any, edgeFnRef: any) => {
     edge.directed = addEdgeTypeRef.current === 'directed' ? true : false;
     networkRef.current?.triggerEvent("edge-added", {
@@ -340,15 +450,18 @@ const treeTraversal = async () => {
     //console.log('nodes', nodes);
     const positions = networkRef.current?.network.getPositions();
 
-    for (const node of nodes) {
-      node.x = positions[node.id].x;
-      node.y = positions[node.id].y;
+    if (nodes) {
+      for (const node of nodes) {
+        node.x = positions[node.id].x;
+        node.y = positions[node.id].y;
+      }
+
     }
 
     //create viewPosition using the getViewPosition function of vis-network
     const viewPosition = networkRef.current?.network.getViewPosition();
-
-    return JSON.stringify({ edges, nodes, viewPosition });
+    const scale = networkRef.current?.network.getScale();
+    return JSON.stringify({ edges, nodes, viewPosition, scale });
   
   };
 
@@ -433,12 +546,13 @@ const treeTraversal = async () => {
         <Grid item xs={7}>
           <Paper>
             <ConfirmDialog
-              title="Load Graph"
+              title={graphToLoad && graphToLoad.name}
               open={confirmGraphLoadOpen}
               setOpen={setConfirmGraphLoadOpen}
-              onConfirm={confirmLoadGraph}
+              onConfirmReplace={confirmReplaceGraph}
+              onConfirmImport={confirmImportGraph}
+              canImportGraph={canImportGraph}
             >
-              Are you sure you want to load a new graph?
             </ConfirmDialog>
             <VisNetwork
               networkRef={networkRef}
@@ -450,6 +564,7 @@ const treeTraversal = async () => {
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
+              setSnappedNodesAndEdges={setSnappedNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />
