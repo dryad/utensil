@@ -34,10 +34,10 @@ Git checkout remote branch `production` from `utensil-prod` repo if it's not alr
 git checkout -b production production/production
 ```
 
-Merge main branch into production branch
+Merge main branch into production branch, push to production remote
 ```Shell
 git merge main
-git push -u utensil-prod production
+git push -u production production
 ``` 
 
 
@@ -54,7 +54,7 @@ npm run build
 ```
 
 ## Pull changes from server - `utensil`
-SSH with ssh key as ‘django’ user to the server and run:
+SSH with ssh key as ‘django’ user to the server and run:    
 
 ```Shell
 
