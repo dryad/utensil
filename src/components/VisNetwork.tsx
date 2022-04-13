@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, forwardRef } from "react";
-
 import { Node, Edge } from "models";
 import { NODE_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
 import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
+import { v4 as uuidv4 } from "uuid";
 
 type INetworkProps = {
   networkRef: any;
@@ -121,7 +121,20 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                   console.log('node 1 label: ', mergeNode1.label);
                   console.log('node 2 label: ', mergeNode2.label);
 
+                  // determine if the labels can be merged based on the following rules:
+                  // 1. if the labels are the same, merge them
+                  // 2. if one or both of the labels are empty, merge them
+                  let mergeable = false;
                   if (mergeNode1.label === mergeNode2.label) {
+                    mergeable = true;
+                  }
+                  else {                  
+                    if (mergeNode1.label === "" || mergeNode2.label === "") {
+                      mergeable = true;
+                    }
+                  }
+
+                  if (mergeable) {
                     console.log('Merging nodes: ', mergeNode1.id, mergeNode2.id);
                     
                     // get all nodes & edges
@@ -155,6 +168,37 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     
                     // Set the color based on the level
                     mergeNode2.color = NODE_COLORS[mergeNode2.level];
+
+                    // if the label of mergeNode2 is empty, set it to the label of the mergeNode1
+                    if (mergeNode2.label === "") {
+                      mergeNode2.label = mergeNode1.label;
+                    }
+
+                    // find the labelNode of mergeNode2 and if it exists, update it as well
+                    const labelNode = nodes.find((node: any) => node.labelOfNode === mergeNode2.id);
+                    if (labelNode) {
+                      labelNode.label = mergeNode2.label;
+                      newNodes.splice(newNodes.findIndex((node: any) => node.id === labelNode.id), 1, labelNode);
+                    }
+                    else {  // if the labelNode doesn't exist
+                      if (mergeNode2.label !== "") { // and if the label is not empty, create a new labelNode
+                        const labelNode = {
+                          id: uuidv4(),
+                          label: mergeNode2.label,
+                          font: {
+                            size: 14,
+                            color: "#000000",
+                          },
+                          shape: "ellipse",
+                          x: -20, //labelNode position is an offset from node
+                          y: -20,
+                          isLabelNode: true,
+                          labelOfNode: mergeNode2.id,
+                          level: mergeNode2.level,
+                        };
+                        newNodes.push(labelNode);
+                      }
+                    }
 
                     // in the output of the new nodes data, update the second node by id, because we possibly changed its level and color
                     newNodes.splice(newNodes.findIndex((node: any) => node.id === mergeNode2.id), 1, mergeNode2);
