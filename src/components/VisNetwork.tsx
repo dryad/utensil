@@ -141,14 +141,22 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         edge.eventual = mergeNode2.id;
                       }
                     }
-
-                    // Filter the list of nodes to not include the first node and its labelNode
-                    let newNodes = Object.values(nodes).filter((node: any) => node.id !== mergeNode1.id && node.labelOfNode !== mergeNode1.id);
                     
+                    // Filter the list of nodes to not include the first node and its labelNode
+                    let newNodes = [];
+                    for (const node of nodes) {
+                      if (node.id !== mergeNode1.id && node.labelOfNode !== mergeNode1.id) {
+                          newNodes.push(node);
+                      }                      
+                    }
+
                     // Set the second node's level to be the max of the two nodes' levels
                     mergeNode2.level = Math.max(mergeNode1.level, mergeNode2.level);
+                    
+                    // Set the color based on the level
+                    mergeNode2.color = NODE_COLORS[mergeNode2.level];
 
-                    // in the output of the new nodes data, update the second node by id, because we possibly changed its level
+                    // in the output of the new nodes data, update the second node by id, because we possibly changed its level and color
                     newNodes.splice(newNodes.findIndex((node: any) => node.id === mergeNode2.id), 1, mergeNode2);
                     
                     // tell App.jsx to update the nodes and edges
