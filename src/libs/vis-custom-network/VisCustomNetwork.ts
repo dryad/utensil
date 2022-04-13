@@ -93,45 +93,6 @@ export default class VisCustomNetwork extends EventTarget {
     })
 
     // NOTE: Anything added here should also be added to the setData function below, so that it will work after a graph is loaded or undo/redo is performed.
-
-    const labelNodeShape = function({ ctx, x, y, state: { selected, hover }, style }) {
-    }
-
-    function labelNodeRenderer({ ctx, id, x, y, state: { selected, hover }, style, label }) {
-      // do some math here
-      return {
-        // bellow arrows
-        // primarily meant for nodes and the labels inside of their boundaries
-        drawNode() {
-          const r = style.size;
-          ctx.beginPath();
-          const sides = 6;
-          const a = (Math.PI * 2) / sides;
-          ctx.moveTo(x , y + r);
-          for (let i = 1; i < sides; i++) {
-              ctx.lineTo(x + r * Math.sin(a * i), y + r * Math.cos(a * i));
-          }
-          ctx.closePath();
-          ctx.save();
-          ctx.fillStyle = 'red';
-          ctx.fill(); 
-          ctx.stroke();
-          ctx.restore();
-
-          ctx.font = "normal 12px sans-serif";
-          ctx.fillStyle = 'black';
-          
-        },
-        // above arrows
-        // primarily meant for labels outside of the node
-        drawExternalLabel() {
-          //ctx.drawSomeTextOutsideOfTheNode();
-        },
-        // node dimensions defined by node drawing
-        nodeDimensions: { width: 50, height: 50 },
-      };
-    }
-
     this.on("node-added", ({ callback, node }: any) => {
       //handle crash when double clicking in add node mode - only add node if it doesn't already exist
       if (this.nodes.get().find((n: any) => n.id === node.id) === undefined) {
@@ -158,8 +119,7 @@ export default class VisCustomNetwork extends EventTarget {
             size: 14,
             color: "#000000",
           },
-          shape: "ellipse",
-          ctxRenderer: labelNodeRenderer,
+          shape: "ellipse",        
           x: -20, //labelNode position is an offset from node
           y: -20,
           isLabelNode: true,
