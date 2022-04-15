@@ -31,23 +31,25 @@ function App() {
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
-  const [graphs, setGraphs] = useState<Graph[]>([]);
-  const [graph, setGraph] = useState<Graph | null>(null);
-  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null);
-  const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null);
-  const [graphName, setGraphName] = useState("");
-  const [graphNote, setGraphNote] = useState("");
-  const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
-  const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]);
-  const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false);
-  const [buttonMode, setButtonMode, buttonModeRef] = useState('pan');
-  const [searchQuery, setSearchQuery] = useState("");
-  const [deleteMode, setDeleteMode, deleteModeRef] = useState(false);
-  const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
-  const [trees, setTrees] = useState<Tree[]>([]);
-  const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
-  const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false);
-  const [metaMaskAccount, setMetaMaskAccount] = useState("");
+  const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
+  const [graph, setGraph] = useState<Graph | null>(null); // The currently loaded graph object.
+  const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
+  const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
+  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
+  const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
+  const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
+  const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
+  const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
+  const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]); // The list of redo steps, for Redo.
+  const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false); // Whether the user is currently dragging the node or the network. This temporarily disables the undo timer from saving steps.
+  const [buttonMode, setButtonMode, buttonModeRef] = useState('pan'); // The button that is selected in the toolbar.
+  const [searchQuery, setSearchQuery] = useState(""); // The search query, used by the text box for Search
+  const [deleteMode, setDeleteMode, deleteModeRef] = useState(false); // Whether the user is currently in delete mode. This allows clicks to perform delete the action.
+  const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed"); // The two add edge buttons enable "edge mode" in vis, but we store whether a directed or undirected edge should be created when the mouse is released.
+  const [trees, setTrees] = useState<Tree[]>([]); // The list of trees shown on the bottom of the app.
+  const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
+  const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
+  const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -234,6 +236,8 @@ const treeTraversal = async () => {
   const confirmReplaceGraph = () => {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
+      setGraphId(graphToIdToLoad);
+
       setGraphName(graph.name);
       setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
@@ -367,6 +371,7 @@ const treeTraversal = async () => {
     const graph = graphs?.find((g: any) => g.id === id);
     if (graph !== null) {
       setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
+      setGraphIdToLoad(id);
       setConfirmGraphLoadOpen(true);
     }
   };
@@ -493,15 +498,12 @@ const treeTraversal = async () => {
           //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
           if (response.data.id) {
             console.log('Saved graph to the database with this id: ', response.data.id);
-            const newGraph = JSON.parse(data); // graph is already serialized when it was prepared to be saved to the database, reusing that serialized string here.
-            newGraph.id = parseInt(response.data.id);
-            setGraph(newGraph);
-            networkRef.current?.setData(newGraph);
+            setGraphId(parseInt(response.data.id));
           }
         });
     } else {
       await axios.post("/api/graphs/", {
-        id: graph?.id, //id is sent along with the graph, so we can update the graph in the database, rather than create new.
+        id: graphId, //id is sent along with the graph, so we can update the graph in the database, rather than create new.
         name: graphName,
         note: graphNote,
         data: data,
@@ -555,7 +557,7 @@ const treeTraversal = async () => {
               }}
             >
               <ButtonGroup orientation="vertical">
-                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graph.id == null}>
+                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
                   Save
                 </Button>
                 <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
@@ -564,6 +566,7 @@ const treeTraversal = async () => {
                 <Button variant="outlined" color="primary" onClick={testButton}>
                   Test
                 </Button>
+                Graph ID: {graphId}
               </ButtonGroup>
             </Box>
           </Paper>
