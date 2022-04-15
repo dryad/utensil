@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 @csrf_exempt
-def graphs(request):
+def graphs(request, graphId=None):
     if request.method == 'GET':
         search_query = request.GET.get('q', None)
         if search_query is not None:
@@ -41,3 +41,12 @@ def graphs(request):
             return HttpResponse(status=201)
         except KeyError:
             return HttpResponse(status=400) 
+    elif request.method == 'DELETE':
+        if graphId is not None:
+            graph = Graph.objects.get(id=graphId)
+            graph.delete()
+            return HttpResponse(status=204)
+        else:
+            return HttpResponse(status=400)
+    else:
+        return HttpResponse(status=405)

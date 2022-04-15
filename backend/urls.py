@@ -21,5 +21,6 @@ from graph import views
 urlpatterns = [
     path('admin/', admin.site.urls),         
     path('api/graphs/', views.graphs),
+    path('api/graphs/<int:graphId>/', views.graphs),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]
