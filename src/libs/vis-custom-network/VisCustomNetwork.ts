@@ -70,8 +70,9 @@ export default class VisCustomNetwork extends EventTarget {
           for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
             const node = this.nodes.get(nodeId); //get the node by ID from the network
             if (node && node.isLabelNode) { //if the node exists and is a labelNode
-              const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
-              this.editNode(labelOfNode, undefined); //pop up the edit box for that node
+              //disabled editing labelNode on click, so it wont edit on click & hold, only on double click below.
+              // const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
+              // this.editNode(labelOfNode, undefined); //pop up the edit box for that node
             }
             if (node && !node.isLabelNode) {
               this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
@@ -84,8 +85,12 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("doubleClick", params => {
       if (params.nodes.length > 0) {  //if we double clicked on any node
         for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
-          const node = this.nodes.get(nodeId); //get the node by ID from the network
+          let node = this.nodes.get(nodeId); //get the node by ID from the network
           if (node && !node.isLabelNode) { //if the node exists and is not a labelNode
+            this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
+          }
+          if (node && node.isLabelNode) { //if the node exists and is a labelNode, act like we double clicked the node itself. (this is to edit the label)
+            node = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
             this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
           }
         }
@@ -220,6 +225,7 @@ export default class VisCustomNetwork extends EventTarget {
     
     //this is also duplicated code from the constructor, but it's necessary to make the delete tool work after a graph is loaded
     var lastClick = 0;
+    
     this.network.on("click", params => {
       var d = new Date();
       var t = d.getTime();
@@ -228,9 +234,8 @@ export default class VisCustomNetwork extends EventTarget {
           for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
             const node = this.nodes.get(nodeId); //get the node by ID from the network
             if (node && node.isLabelNode) { //if the node exists and is a labelNode
-              const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
-
               //disabled editing labelNode on click, so it wont edit on click & hold, only on double click below.
+              // const labelOfNode = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
               // this.editNode(labelOfNode, undefined); //pop up the edit box for that node
             }
             if (node && !node.isLabelNode) {
@@ -246,8 +251,12 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("doubleClick", params => {
       if (params.nodes.length > 0) {  //if we double clicked on any node
         for (const nodeId of params.nodes) {  //loop through all nodes that were clicked
-          const node = this.nodes.get(nodeId); //get the node by ID from the network
-          if (node) { //if the node exists
+          let node = this.nodes.get(nodeId); //get the node by ID from the network
+          if (node && !node.isLabelNode) { //if the node exists and is not a labelNode
+            this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
+          }
+          if (node && node.isLabelNode) { //if the node exists and is a labelNode, act like we double clicked the node itself. (this is to edit the label)
+            node = this.nodes.get(node.labelOfNode); //get the node that this labelNode is a label of
             this.triggerEvent("double-click-node", { node }); // send an event to VisNetwork, to open the node's edit box if "pan" mode is active (hand tool)
           }
         }
