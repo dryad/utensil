@@ -8,9 +8,9 @@ const ConfirmLoadDialog = (props) => {
     <Dialog
       open={open}
       onClose={() => setOpen(false)}
-      aria-labelledby="confirm-dialog"
+      aria-labelledby="confirm-load-dialog"
     >
-      <DialogTitle id="confirm-dialog">Loading: <b>{title}</b></DialogTitle>
+      <DialogTitle id="confirm-load-dialog">Loading: <b>{title}</b></DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
         {canImportGraph() && (

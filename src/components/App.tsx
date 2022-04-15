@@ -20,6 +20,7 @@ import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -33,6 +34,7 @@ function App() {
   const [graphs, setGraphs] = useState<Graph[]>([]);
   const [graph, setGraph] = useState<Graph | null>(null);
   const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null);
+  const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null);
   const [graphName, setGraphName] = useState("");
   const [graphNote, setGraphNote] = useState("");
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]);
@@ -44,6 +46,7 @@ function App() {
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed");
   const [trees, setTrees] = useState<Tree[]>([]);
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false);
+  const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false);
   const [metaMaskAccount, setMetaMaskAccount] = useState("");
   const clearSearch = () => {
     setSearchQuery('');
@@ -243,6 +246,14 @@ const treeTraversal = async () => {
       onButton('pan');
   }
 
+  const confirmDeleteGraph = async () => {
+    // this is run when the user confirms they want to delete a graph.
+    console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
+    await axios.delete(`/api/graphs/${graphToDelete.id}/`);
+    await refreshList();
+
+  }
+
   const canImportGraph = () =>{
     const existingGraph = JSON.parse(stringifyGraph());
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
@@ -359,9 +370,13 @@ const treeTraversal = async () => {
     }
   };
 
-  const handleGraphDelete = async (id: any) => {
-    await axios.delete(`/api/graphs/${id}/`);
-    await refreshList();
+  const handleGraphDelete = (id: any) => {
+    //set the graph to be potentially deleted
+    const graph = graphs?.find((g: any) => g.id === id);
+    if (graph !== null) {
+      setGraphToDelete(graph); // after confirming 'yes', the confirmDeleteGraph function will be called, and will delete this graph from the database.
+      setConfirmGraphDeleteOpen(true);
+    } 
   };
 
 
@@ -554,6 +569,13 @@ const treeTraversal = async () => {
               canImportGraph={canImportGraph}
             >
             </ConfirmLoadDialog>
+            <ConfirmDeleteDialog
+              title={graphToDelete && graphToDelete.name}
+              open={confirmGraphDeleteOpen}
+              setOpen={setConfirmGraphDeleteOpen}
+              onConfirmDelete={confirmDeleteGraph}
+            >
+            </ConfirmDeleteDialog>
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
