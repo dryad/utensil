@@ -563,6 +563,9 @@ const treeTraversal = async () => {
                 <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
                   Save As New
                 </Button>
+                {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
+                  Clear Graph
+                </Button> */}
                 <Button variant="outlined" color="primary" onClick={testButton}>
                   Test
                 </Button>
