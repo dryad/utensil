@@ -91,14 +91,12 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         networkRef.current.on("drag-end", (event: any) => {
           setIsUserDragging(false);
           const selectedNodes = networkRef.current?.network.getSelectedNodes();
-          console.log('selectedNodes on drag-end', selectedNodes);
           
           // if only one node was dragged, check if it is close to another node, ignoring labelnodes
           if (selectedNodes.length === 1) {
             const selectedNode = networkRef.current?.network.body.nodes[selectedNodes[0]];
             if (selectedNode) {
               if (selectedNode.isLabelNode) { return; }
-              console.log('x/y of dropped node:', selectedNode.x, selectedNode.y);
 
               // find other nodes that are within a certain distance of the dropped node
               const nodesWithinDistance = Object.values(networkRef.current?.network.body.nodes).filter((node: any) => {
@@ -106,20 +104,17 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                 const distance = Math.sqrt(Math.pow(node.x - selectedNode.x, 2) + Math.pow(node.y - selectedNode.y, 2));
                 return distance < 5;
               });
-              console.log('nodesWithinDistance', nodesWithinDistance);
 
               // If there are only two nodes within distance, we can merge them
               // also we will check if the labels are the same
               if (nodesWithinDistance.length === 2) {  
-                console.log('distance between the two nodes: ', Math.sqrt(Math.pow(nodesWithinDistance[0].x - nodesWithinDistance[1].x, 2) + Math.pow(nodesWithinDistance[0].y - nodesWithinDistance[1].y, 2)));
+                // console.log('distance between the two nodes: ', Math.sqrt(Math.pow(nodesWithinDistance[0].x - nodesWithinDistance[1].x, 2) + Math.pow(nodesWithinDistance[0].y - nodesWithinDistance[1].y, 2)));
                 
                 //get node by id from networkRef.current?.network.body.data.nodes.get()
                 const mergeNode1 = networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[0].id);
                 const mergeNode2 = networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[1].id);
 
                 if (mergeNode1 && mergeNode2) {
-                  console.log('node 1 label: ', mergeNode1.label);
-                  console.log('node 2 label: ', mergeNode2.label);
 
                   // ---------------------- RULES FOR MERGING ----------------------
                   // determine if the labels can be merged based on the following rules:
