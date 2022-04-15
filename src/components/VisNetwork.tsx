@@ -121,20 +121,25 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                   console.log('node 1 label: ', mergeNode1.label);
                   console.log('node 2 label: ', mergeNode2.label);
 
+                  // ---------------------- RULES FOR MERGING ----------------------
                   // determine if the labels can be merged based on the following rules:
-                  // 1. if the labels are the same, merge them
-                  // 2. if one or both of the labels are empty, merge them
-                  let mergeable = false;
-                  if (mergeNode1.label === mergeNode2.label) {
-                    mergeable = true;
-                  }
-                  else {                  
-                    if (mergeNode1.label === "" || mergeNode2.label === "") {
-                      mergeable = true;
+                  // 1. if neither of the nodes have level 0, stop the merge
+                  // 2. if the labels are not the same, and neither one is blank, stop the merge
+                
+                  const mergeNodeRulesPassed = function (): boolean {
+                    if (mergeNode1.level !== 0 && mergeNode2.level !== 0) {
+                      return false;
                     }
-                  }
 
-                  if (mergeable) {
+                    if (mergeNode1.label !== mergeNode2.label) {
+                      if (mergeNode1.label !== "" && mergeNode2.label !== "") {
+                        return false;
+                      }
+                    }
+                    return true;
+                  }
+                  
+                  if (mergeNodeRulesPassed()) {
                     console.log('Merging nodes: ', mergeNode1.id, mergeNode2.id);
                     
                     // get all nodes & edges
