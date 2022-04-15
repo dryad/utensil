@@ -19,7 +19,7 @@ import VisNetwork from "./VisNetwork";
 import GraphList from "./GraphList";
 import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
-import ConfirmDialog from "./ConfirmDialog";
+import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -545,7 +545,7 @@ const treeTraversal = async () => {
         </Grid>
         <Grid item xs={7}>
           <Paper>
-            <ConfirmDialog
+            <ConfirmLoadDialog
               title={graphToLoad && graphToLoad.name}
               open={confirmGraphLoadOpen}
               setOpen={setConfirmGraphLoadOpen}
@@ -553,7 +553,7 @@ const treeTraversal = async () => {
               onConfirmImport={confirmImportGraph}
               canImportGraph={canImportGraph}
             >
-            </ConfirmDialog>
+            </ConfirmLoadDialog>
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}

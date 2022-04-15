@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dialog, TextField } from "@mui/material";
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 
-const ConfirmDialog = (props) => {
+const ConfirmLoadDialog = (props) => {
   const { title, children, open, setOpen, onConfirmReplace, onConfirmImport, canImportGraph } = props;
   return (
     <Dialog
@@ -59,4 +59,4 @@ const ConfirmDialog = (props) => {
     </Dialog>
   );
 };
-export default ConfirmDialog;
+export default ConfirmLoadDialog;
