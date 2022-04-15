@@ -116,6 +116,7 @@ function App() {
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
+    console.log('graph ID:' , graph.id);
   };
 
 const treeTraversal = async () => {
@@ -488,10 +489,19 @@ const treeTraversal = async () => {
         name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
         note: graphNote,
         data: data,
-      });
+      }).then(response => {
+          //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
+          if (response.data.id) {
+            console.log('Saved graph to the database with this id: ', response.data.id);
+            const newGraph = JSON.parse(data); // graph is already serialized when it was prepared to be saved to the database, reusing that serialized string here.
+            newGraph.id = parseInt(response.data.id);
+            setGraph(newGraph);
+            networkRef.current?.setData(newGraph);
+          }
+        });
     } else {
       await axios.post("/api/graphs/", {
-        id: graph?.id, //id is saved along with graph, so we can update the graph in the database, rather than create new.
+        id: graph?.id, //id is sent along with the graph, so we can update the graph in the database, rather than create new.
         name: graphName,
         note: graphNote,
         data: data,
@@ -545,10 +555,10 @@ const treeTraversal = async () => {
               }}
             >
               <ButtonGroup orientation="vertical">
-                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }}>
+                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graph.id == null}>
                   Save
                 </Button>
-                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} disabled={graph == null}>
+                <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
                   Save As New
                 </Button>
                 <Button variant="outlined" color="primary" onClick={testButton}>

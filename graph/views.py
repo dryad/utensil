@@ -37,8 +37,8 @@ def graphs(request, graphId=None):
                 graph.data = data
                 graph.save()
             else:
-                Graph.objects.create(name=name, note=note, data=data)
-            return HttpResponse(status=201)
+                graph = Graph.objects.create(name=name, note=note, data=data)
+            return HttpResponse(json.dumps({'id': graph.id}) ,status=201)
         except KeyError:
             return HttpResponse(status=400) 
     elif request.method == 'DELETE':
