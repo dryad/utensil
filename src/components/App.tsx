@@ -240,6 +240,16 @@ const treeTraversal = async () => {
       setGraphName(graph.name);
       setGraphNote(graph.note);
       const data = JSON.parse(graph?.data);
+
+      for (let node of data.nodes) {
+        if (node.label && node.label.length > 0) {
+          node.opacity = 1;
+        }
+        else {
+          node.opacity = 0.5;
+        }
+      }
+
       networkRef.current?.setData(data);
         
       //clear Undo/Redo history
@@ -345,6 +355,15 @@ const treeTraversal = async () => {
   const confirmImportGraph = () => {
     const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
     const data = JSON.parse(graph?.data);
+    for (let node of data.nodes) {
+      if (node.label && node.label.length > 0) {
+        node.opacity = 1;
+      }
+      else {
+        node.opacity = 0.5;
+      }
+    }
+
     let existingGraph = JSON.parse(stringifyGraph());
     console.log('existing graph', existingGraph);
     console.log('graph to load', JSON.parse(graphToLoad?.data));
