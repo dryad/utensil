@@ -118,7 +118,6 @@ function App() {
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
-    console.log('graph ID:' , graph.id);
   };
 
 const treeTraversal = async () => {
@@ -358,7 +357,7 @@ const treeTraversal = async () => {
       
   }
   
-  const setSnappedNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, as the result of snapping two nodes together
+  const setGraphFromNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
     // console.log('Setting snapped nodes and edges:', nodes, edges);
     const existingGraph = JSON.parse(stringifyGraph());
     existingGraph.nodes = nodes;
@@ -602,7 +601,7 @@ const treeTraversal = async () => {
               setIsUserDragging={setIsUserDragging}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
-              setSnappedNodesAndEdges={setSnappedNodesAndEdges}
+              setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
             />

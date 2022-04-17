@@ -155,7 +155,7 @@ export default class VisCustomNetwork extends EventTarget {
           label: "",
           level,
           color: NODE_COLORS[level],
-          opacity: 1.0,
+          opacity: 0.5,
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
         };

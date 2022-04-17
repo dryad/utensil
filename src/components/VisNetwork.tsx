@@ -20,12 +20,12 @@ type INetworkProps = {
   stringifyGraph: Function;
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
-  setSnappedNodesAndEdges: Function;
+  setGraphFromNodesAndEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setSnappedNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -47,6 +47,13 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
       node.label = label;
+      
+      if (node.label && node.label.length > 0) {
+        node.opacity = 1.0;
+      }
+      else {
+        node.opacity = 0.5;
+      }
       if (!node.level) {
         node.level = 0;
         node.color = NODE_COLORS[node.level];
@@ -61,7 +68,12 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       if (nodeDialogTitle !== "Edit Node") {
         addNodeComplete(); // allows nodes to be added until button is turned off
       }
-      
+
+      //set graph from nodes and edges, this is needed to update the opacity of the nodes
+      const existingGraph = JSON.parse(stringifyGraph());
+      setGraphFromNodesAndEdges(existingGraph.nodes, existingGraph.edges);
+      networkRef.current?.setData(existingGraph);
+
     };
 
     const handleNodeDialogClose = () => {
@@ -213,9 +225,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                       }                      
                     }
 
-                    // Set the second node's level to be the max of the two nodes' levels
+                    // Set the second node's level and opacity to be the max of the two nodes' levels and opacity
                     mergeNode2.level = Math.max(mergeNode1.level, mergeNode2.level);
-                    
+                    mergeNode2.opacity = Math.max(mergeNode1.opacity, mergeNode2.opacity);
                     // Set the color based on the level
                     mergeNode2.color = NODE_COLORS[mergeNode2.level];
 
@@ -254,7 +266,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     newNodes.splice(newNodes.findIndex((node: any) => node.id === mergeNode2.id), 1, mergeNode2);
                     
                     // tell App.jsx to update the nodes and edges
-                    setSnappedNodesAndEdges(newNodes, edges);
+                    setGraphFromNodesAndEdges(newNodes, edges);
                   }
                 }
               }  
@@ -281,6 +293,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
             node.level = 0;
             node.color = NODE_COLORS[node.level];
             node.font = { color: "#fff" };
+            node.opacity = 0.5;
           }
           node.label = "";          
           networkRef.current?.triggerEvent("node-added", {
