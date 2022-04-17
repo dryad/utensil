@@ -122,52 +122,44 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                 console.log ('mergeNode1: ', mergeNode1.level, mergeNode1.id, mergeNode1.label);
                 console.log ('mergeNode2: ', mergeNode2.level, mergeNode2.id, mergeNode2.label);
                 if (mergeNode1 && mergeNode2) {
-                  let edges_walked: string[] = [];
+                  let loop_found = false;
                   const check_for_loop = (node1_id: string, node2_id: string) => {
-                    console.log('evaluating', node1_id);
+                    if (loop_found) { return; } // if we already found a loop, don't keep checking
+                    
+                    console.log('LOOP RULE: evaluating', node1_id);
                     //get all edges where node1_id is the 'from' or 'eventual'
                     const edges_from_eventual_node1 = networkRef.current?.network.body.data.edges.get({
                       filter: function (edge: any) {
                         return edge.from === node1_id || edge.eventual === node1_id;
                       }
                     });
-                    console.log('edges_from_eventual_node1: ', edges_from_eventual_node1);
+                    console.log('LOOP RULE: edges_from_eventual_node1: ', edges_from_eventual_node1);
 
                     // check if node2_id is in the 'to' for any of the edges
                     const was_node2_id_found = edges_from_eventual_node1.some((edge: any) => {
                       return edge.to === node2_id;
                     }
                     );
-                    console.log('was_node2_id_found: ', was_node2_id_found);
+
+                    console.log('LOOP RULE: was_node2_id_found: ', was_node2_id_found);
                     if (was_node2_id_found) {
-                      return true; // node2_id was found in the 'to' of any of the edges, stop recursion, and return true
-                    }
-                    
-                    //keep track of edges walked
-                    for (const edge of edges_from_eventual_node1) {
-                      edges_walked.push(edge.id);
+                      loop_found = true;
+                      return; // node2_id was found in the 'to' of any of the edges, stop recursing this thread
                     }
                     
                     //node 1 will be the 'to' of the previously walked edges
                     //node 2 will remain the same
                     //recurse
                     for (const edge of edges_from_eventual_node1) {
-                      if (!edges_walked.includes(edge.id)) {
-                        console.log('now evaluating edge', edge);
-                        node1_id = edge.to.id;
-                        console.log('checking from node: ', node1_id);
-                        check_for_loop(node1_id, node2_id);
-                      }
-                      else {
-                        console.log('SKIPPING edge because it was already walked: ', edge);
-                      }
+                      node1_id = edge.to;
+                      console.log('LOOP RULE: checking from node: ', node1_id);
+                      check_for_loop(node1_id, node2_id);
                     }
-
+                    return loop_found
                   };
 
                   //this needs to go into rules when done
-                  check_for_loop(mergeNode1.id, mergeNode2.id);
-
+                  console.log('output from recursion:', check_for_loop(mergeNode1.id, mergeNode2.id));
 
                   // ---------------------- RULES FOR MERGING ----------------------
                   // determine if the labels can be merged based on the following rules:
