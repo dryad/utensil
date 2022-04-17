@@ -88,7 +88,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         networkRef.current.on("drag-start", (event: any) => {
           setIsUserDragging(true);
         });
-        networkRef.current.on("drag-end", (event: any) => {
+        networkRef.current.on("drag-end", async (event: any) => {
           setIsUserDragging(false);
           const selectedNodes = networkRef.current?.network.getSelectedNodes();
           
@@ -118,22 +118,21 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                 const mergeNode1 = mergeNodes[0]; // the node with the lower level
                 const mergeNode2 = mergeNodes[1];
 
-                // console.log('LABELS 1:', mergeNode1.label, '2: ', mergeNode2.label);
-                console.log ('mergeNode1: ', mergeNode1.level, mergeNode1.id, mergeNode1.label);
-                console.log ('mergeNode2: ', mergeNode2.level, mergeNode2.id, mergeNode2.label);
                 if (mergeNode1 && mergeNode2) {
+
+                  //Recursively walk edges to determine if there would be a loop.
                   let loop_found = false;
-                  const check_for_loop = (node1_id: string, node2_id: string) => {
-                    if (loop_found) { return; } // if we already found a loop, don't keep checking
+                  const check_for_loop = (node1_id: string, node2_id: string) : boolean => {
+                    if (loop_found) { return true; } // if we already found a loop, don't keep checking
                     
-                    console.log('LOOP RULE: evaluating', node1_id);
+                    // console.log('LOOP RULE: evaluating', node1_id, '->', node2_id);
                     //get all edges where node1_id is the 'from' or 'eventual'
                     const edges_from_eventual_node1 = networkRef.current?.network.body.data.edges.get({
                       filter: function (edge: any) {
                         return edge.from === node1_id || edge.eventual === node1_id;
                       }
                     });
-                    console.log('LOOP RULE: edges_from_eventual_node1: ', edges_from_eventual_node1);
+                    // console.log('LOOP RULE: edges_from_eventual_node1: ', edges_from_eventual_node1);
 
                     // check if node2_id is in the 'to' for any of the edges
                     const was_node2_id_found = edges_from_eventual_node1.some((edge: any) => {
@@ -141,10 +140,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     }
                     );
 
-                    console.log('LOOP RULE: was_node2_id_found: ', was_node2_id_found);
+                    // console.log('LOOP RULE: was_node2_id_found: ', was_node2_id_found);
                     if (was_node2_id_found) {
                       loop_found = true;
-                      return; // node2_id was found in the 'to' of any of the edges, stop recursing this thread
+                      return true; // node2_id was found in the 'to' of any of the edges, stop recursing this thread
                     }
                     
                     //node 1 will be the 'to' of the previously walked edges
@@ -152,36 +151,40 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     //recurse
                     for (const edge of edges_from_eventual_node1) {
                       node1_id = edge.to;
-                      console.log('LOOP RULE: checking from node: ', node1_id);
+                      // console.log('LOOP RULE: checking from node: ', node1_id);
                       check_for_loop(node1_id, node2_id);
                     }
                     return loop_found
                   };
 
-                  //this needs to go into rules when done
-                  console.log('output from recursion:', check_for_loop(mergeNode1.id, mergeNode2.id));
-
                   // ---------------------- RULES FOR MERGING ----------------------
                   // determine if the labels can be merged based on the following rules:
                   // 1. if neither of the nodes have level 0, stop the merge
                   // 2. if the labels are not the same, and neither one is blank, stop the merge
-                
-                  const are_nodes_mergable = function (): boolean {
-                    return false; //temporarily disable merge
+                  // 3. if a loop is detected, stop the merge
+                  const are_nodes_mergable = async function () {
 
                     if (mergeNode1.level !== 0 && mergeNode2.level !== 0) {
+                      console.log('RULE 1 not passed: neither node has level 0');
                       return false;
                     }
 
                     if (mergeNode1.label !== mergeNode2.label) {
                       if (mergeNode1.label !== "" && mergeNode2.label !== "") {
+                        console.log('RULE 2 not passed: labels are not the same and neither is blank');
                         return false;
                       }
                     }
+                    
+                    if (await check_for_loop(mergeNode1.id, mergeNode2.id)) {
+                      console.log('RULE 3 not passed: loop detected');
+                      return false;
+                    }
+
                     return true;
                   }
                   
-                  if (are_nodes_mergable()) {
+                  if (await are_nodes_mergable()) {
                     console.log('Merging nodes: ', mergeNode1.id, mergeNode2.id);
                     
                     // get all nodes & edges
