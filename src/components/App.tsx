@@ -250,7 +250,7 @@ const treeTraversal = async () => {
           node.opacity = 1;
         }
         else {
-          node.opacity = 0.5;
+          node.opacity = 0;
         }
       }
 
@@ -364,7 +364,7 @@ const treeTraversal = async () => {
         node.opacity = 1;
       }
       else {
-        node.opacity = 0.5;
+        node.opacity = 0;
       }
     }
 

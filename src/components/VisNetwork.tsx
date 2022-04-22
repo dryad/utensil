@@ -52,7 +52,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         node.opacity = 1.0;
       }
       else {
-        node.opacity = 0.5;
+        node.opacity = 0;
       }
       if (!node.level) {
         node.level = 0;
@@ -293,7 +293,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
             node.level = 0;
             node.color = NODE_COLORS[node.level];
             node.font = { color: "#fff" };
-            node.opacity = 0.5;
+            node.opacity = 0;
           }
           node.label = "";          
           networkRef.current?.triggerEvent("node-added", {
