@@ -120,6 +120,10 @@ function App() {
     console.log('edges', JSON.parse(stringifyGraph()).edges);
   };
 
+  const getSelection = () => {
+    console.log(networkRef.current?.network.getSelection());
+  };
+
 const treeTraversal = async () => {
 
   let treeText = "";
@@ -586,6 +590,9 @@ const treeTraversal = async () => {
                 </Button> */}
                 <Button variant="outlined" color="primary" onClick={testButton}>
                   Test
+                </Button>
+                <Button variant="outlined" color="primary" onClick={getSelection}>
+                  Get Selection
                 </Button>
                 Graph ID: {graphId}
               </ButtonGroup>
