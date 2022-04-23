@@ -291,7 +291,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           nodeRef.current = node;
           if (!node.level) {
             node.level = 0;
-            node.color = NODE_COLORS[node.level];
+            node.color = { border: NODE_COLORS[node.level], background: NODE_COLORS[node.level], hover: { border: 'blue', 'background': 'blue'} };
             node.font = { color: "#fff" };
             node.opacity = 0;
           }
