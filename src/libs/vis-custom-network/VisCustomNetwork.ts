@@ -31,7 +31,7 @@ export default class VisCustomNetwork extends EventTarget {
         selectConnectedEdges: false,
         selectable: true,
         hover: true,
-        hoverConnectedEdges: true,
+        hoverConnectedEdges: false,
       },
       edges: {
         color: "#411811",
