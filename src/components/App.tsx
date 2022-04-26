@@ -212,6 +212,9 @@ const treeTraversal = async () => {
   setTrees(parseList);
   };
 
+  const setHoveredNodesFromNetwork = (hoveredNodes: string[]) => {
+    setHoveredNodes(hoveredNodes);
+  };
 
   const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
     if (graph !== null) {
@@ -632,14 +635,14 @@ const treeTraversal = async () => {
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
               hoveredNodes={hoveredNodes}
-              setHoveredNodes={setHoveredNodes}
+              setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
             />
             <Box m={5}>
               <TreeList Trees={trees} />
             </Box>
-            <Box m={5}>
+            {/* <Box m={5}>
               Hovered nodes: {hoveredNodes.length}
-            </Box>
+            </Box> */}
           </Paper>
         </Grid>
         <Grid item xs={3}>

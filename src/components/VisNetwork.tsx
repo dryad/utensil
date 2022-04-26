@@ -24,11 +24,11 @@ type INetworkProps = {
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
   hoveredNodes: string[];
-  setHoveredNodes: Function;
+  setHoveredNodesFromNetwork: Function;
 
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodes }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -343,23 +343,22 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         if (!node.isLabelNode) {
           deleteIfDeleteMode(); // run callback function to App.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
         }
-      })
+      });
 
       networkRef.current.on("double-click-node", node => {
         if (!node.isLabelNode) {
           editNodeFromEvent(node, undefined);  
         }
-      })
+      });
 
       networkRef.current.on("hovered-nodes", nodeIds => {
-        console.log("hovered nodes to be set:", nodeIds.length);
-        // setHoveredNodes(nodeIds); // run callback function to App.tsx, will save the hovered node IDs to state
-      })
+        // setHoveredNodesFromNetwork(nodeIds); // run callback function to App.tsx, will save the hovered node IDs to state
+      });
+
 
       networkRef.current.on("hold", params => {
-        console.log('hold2 received');
-        networkRef.current?.network.setSelection({ nodes: [hoveredNodes] });
-      })
+        // networkRef.current?.network.setSelection({ nodes: [hoveredNodes] });
+      });
 
     }, [networkRef]);
 
