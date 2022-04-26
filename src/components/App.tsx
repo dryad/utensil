@@ -50,6 +50,7 @@ function App() {
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
+  const [hoveredNodes, setHoveredNodes] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -630,9 +631,14 @@ const treeTraversal = async () => {
               setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
+              hoveredNodes={hoveredNodes}
+              setHoveredNodes={setHoveredNodes}
             />
             <Box m={5}>
               <TreeList Trees={trees} />
+            </Box>
+            <Box m={5}>
+              Hovered nodes: {hoveredNodes.length}
             </Box>
           </Paper>
         </Grid>
