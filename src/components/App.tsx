@@ -634,7 +634,7 @@ const treeTraversal = async () => {
               setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
-              hoveredNodes={hoveredNodes}
+              // hoveredNodes={hoveredNodes}
               setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
             />
             <Box m={5}>

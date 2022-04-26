@@ -23,12 +23,12 @@ type INetworkProps = {
   setGraphFromNodesAndEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
-  hoveredNodes: string[];
+  // hoveredNodes: string[];
   setHoveredNodesFromNetwork: Function;
 
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, setHoveredNodesFromNetwork }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -352,7 +352,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       });
 
       networkRef.current.on("hovered-nodes", nodeIds => {
-        // setHoveredNodesFromNetwork(nodeIds); // run callback function to App.tsx, will save the hovered node IDs to state
+        // console.log('hovered nodes received: ', nodeIds.length);
+        // console.log(Object.values(nodeIds));
+        // setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
       });
 
 
