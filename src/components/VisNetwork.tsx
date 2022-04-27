@@ -361,7 +361,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       networkRef.current.on("hold", params => {
         if (buttonModeRef.current === "pan") {
-          console.log('hold event received', hoveredNodes.current);
+          console.log('hold event received', params);
           networkRef.current?.network.setSelection({ nodes: hoveredNodes.current });
         }
       });
