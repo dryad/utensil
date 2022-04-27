@@ -6,6 +6,7 @@ import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
+import { memo } from "react";
 
 type INetworkProps = {
   networkRef: any;
@@ -23,12 +24,12 @@ type INetworkProps = {
   setGraphFromNodesAndEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
-  // hoveredNodes: string[];
+  hoveredNodes: any;
   setHoveredNodesFromNetwork: Function;
 
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, setHoveredNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -354,12 +355,15 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       networkRef.current.on("hovered-nodes", nodeIds => {
         // console.log('hovered nodes received: ', nodeIds.length);
         // console.log(Object.values(nodeIds));
-        // setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
+        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
       });
 
 
       networkRef.current.on("hold", params => {
-        // networkRef.current?.network.setSelection({ nodes: [hoveredNodes] });
+        if (buttonModeRef.current === "pan") {
+          console.log('hold event received', hoveredNodes.current);
+          networkRef.current?.network.setSelection({ nodes: hoveredNodes.current });
+        }
       });
 
     }, [networkRef]);
@@ -381,4 +385,5 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
   }
 // );
 
-export default VisNetwork;
+export default memo(VisNetwork);
+// export default VisNetwork;

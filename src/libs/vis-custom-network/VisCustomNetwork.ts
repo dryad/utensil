@@ -240,7 +240,11 @@ export default class VisCustomNetwork extends EventTarget {
     this.network.on("hoveredNodes", nodeIds => {
       this.triggerEvent("hovered-nodes", nodeIds);
     });
-
+    
+    this.network.on("hold", ({params}) => {
+      console.log('hold received: ', params);
+      this.triggerEvent("hold", {});
+    });
     //this is also duplicated code from the constructor, but it's necessary to make the delete tool work after a graph is loaded
     var lastClick = 0;
     
