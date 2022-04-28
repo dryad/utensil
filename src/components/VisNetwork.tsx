@@ -205,7 +205,8 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     // get all nodes & edges
                     const nodes = networkRef.current?.network.body.data.nodes.get();
                     const edges = networkRef.current?.network.body.data.edges.get();
-                    
+                    const oldEdges = edges; // for analyzing differences in edges when fixing levels after merging
+
                     for (const edge of edges) {
                       //update from, to and eventual fields to point to the new node ids
 
@@ -267,9 +268,97 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
                     // in the output of the new nodes data, update the second node by id, because we possibly changed its level and color
                     newNodes.splice(newNodes.findIndex((node: any) => node.id === mergeNode2.id), 1, mergeNode2);
-                    
+
+                    // ******** START FIX LEVEL WALK ********
+                    const is_fix_levels_needed = (node1_id: string, node2_id: string) : boolean => {
+
+                      if (mergeNode1.level === 0 && mergeNode2.level === 0) { return false; } // if both nodes are level 0, don't start walk
+                      // console.log('FIX LEVELS: evaluating', mergeNode1.id, '->', mergeNode2.id);
+
+                      // check if one of the nodes was a 'to' node in the old data.
+                      const was_node1_id_to= oldEdges.some(
+                        (edge: any) => {
+                          if (edge.to === node1_id) {
+                            // console.log('FIX LEVELS: found node1 in the \'to\' of old edge: ', edge.id);
+                            return true;
+                          }
+                          return false;
+                        }
+                      );
+                      const was_node2_id_to = oldEdges.some(
+                        (edge: any) => {
+                          if (edge.to === node2_id) {
+                            // console.log('FIX LEVELS: found node2 in the \'to\' of old edge: ', edge.id);
+                            return true;
+                          }
+                          return false;
+                        }
+                      );
+
+                      if (was_node1_id_to || was_node2_id_to) {
+                        // console.log('FIX LEVELS: one of the nodes was a \'to\' node in the old data, and is now a \'from\' or \'eventual\' in the new data');
+                        const is_node1_id_from_eventual = edges.some(
+                          (edge: any) => {
+                            if (edge.from === node1_id || edge.eventual === node1_id) {
+                              // console.log('FIX LEVELS: found node1 in the \'from\' or \'eventual\' of old edge: ', edge.id);
+                              return true;
+                            }
+                            return false;
+                          }
+                        );
+                        const is_node2_id_from_eventual = edges.some(
+                          (edge: any) => {
+                            if (edge.from === node2_id || edge.eventual === node2_id) {
+                              // console.log('FIX LEVELS: found node2 in the \'to\' or \'eventual\' of old edge: ', edge.id);
+                              return true;
+                            }
+                            return false;
+                          }
+                        );
+                        if (is_node1_id_from_eventual || is_node2_id_from_eventual) {
+                          // console.log('FIX LEVELS: at least one of the nodes is a \'from\' or \'eventual\' node in the new data, and was a \'to\' in the old data');
+                          // start walk
+                          return true;
+                        }
+                        return false;
+                      }
+                    };
+                    let edges_walked : string[] = [];
+                    // recursively fix levels
+                    const fix_levels = (node_id: string) : boolean => {
+                      const node = newNodes.find((node: any) => node.id === node_id);
+                      
+                      // find any edges containing this node as the 'from' or 'eventual' in the new data
+                      const edges_from_eventual_node = edges.filter(
+                        (edge: any) => {
+                          return edge.from === node_id || edge.eventual === node_id;
+                        }
+                      );
+                      // look at the 'to' of each edge found
+                      for (const edge of edges_from_eventual_node) {
+                        if (edges_walked.includes(edge.id)) { continue; } // don't check the same edge twice
+                        // get the node with the 'to' id
+                        const node_to = newNodes.find((node: any) => node.id === edge.to);
+                        // setting the level if wrong, and updating the color
+                        if (node_to.level !== node.level + 1) {
+                          // console.log('FIX LEVELS: node_to.level <= node.level: ', node_to.level, '<=', node.level);
+                          node_to.level = node.level + 1;
+                          node_to.color = NODE_COLORS[node_to.level];
+                          // console.log('FIX LEVELS: node_to.level: ', node_to.level);
+                        }
+                        edges_walked.push(edge.id); // add the edge to the walked edges
+                        // recurse
+                        fix_levels(node_to.id);
+                      }
+                    };
+                    // ******** END FIX LEVEL WALK ********
+                    if (is_fix_levels_needed(mergeNode1.id, mergeNode2.id)) {
+                      await fix_levels(mergeNode2.id);
+                    }
+
                     // tell App.jsx to update the nodes and edges
-                    setGraphFromNodesAndEdges(newNodes, edges);
+                    await setGraphFromNodesAndEdges(newNodes, edges);
+
                   }
                 }
               }  
