@@ -353,7 +353,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                     };
                     // ******** END FIX LEVEL WALK ********
                     if (is_fix_levels_needed(mergeNode1.id, mergeNode2.id)) {
-                      await fix_levels(mergeNode2.id);
+                      await fix_levels(mergeNode2.id); // mergeNode2.id is the correct starting point, because that is the ID that remains for two merged nodes.
                     }
 
                     // tell App.jsx to update the nodes and edges
