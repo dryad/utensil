@@ -50,6 +50,7 @@ function App() {
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
+  const [hoveredNodes, setHoveredNodes] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -94,7 +95,7 @@ function App() {
   }
 
   useEffect(() => {
-    console.log('new historyListBack', historyListBack);
+    // console.log('new historyListBack', historyListBack);
     treeTraversal(); // run treeTraversal every time an Undo step is added.
   }, [historyListBack]);
 
@@ -118,6 +119,10 @@ function App() {
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
+  };
+
+  const getSelection = () => {
+    console.log(networkRef.current?.network.getSelection());
   };
 
 const treeTraversal = async () => {
@@ -207,6 +212,9 @@ const treeTraversal = async () => {
   setTrees(parseList);
   };
 
+  const setHoveredNodesFromNetwork = (hoveredNodes: string[]) => {
+    setHoveredNodes(hoveredNodes);
+  };
 
   const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
     if (graph !== null) {
@@ -246,7 +254,7 @@ const treeTraversal = async () => {
           node.opacity = 1;
         }
         else {
-          node.opacity = 0.5;
+          node.opacity = 0;
         }
       }
 
@@ -360,7 +368,7 @@ const treeTraversal = async () => {
         node.opacity = 1;
       }
       else {
-        node.opacity = 0.5;
+        node.opacity = 0;
       }
     }
 
@@ -587,6 +595,9 @@ const treeTraversal = async () => {
                 <Button variant="outlined" color="primary" onClick={testButton}>
                   Test
                 </Button>
+                <Button variant="outlined" color="primary" onClick={getSelection}>
+                  Get Selection
+                </Button>
                 Graph ID: {graphId}
               </ButtonGroup>
             </Box>
@@ -623,10 +634,15 @@ const treeTraversal = async () => {
               setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
+              // hoveredNodes={hoveredNodes}
+              setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
             />
             <Box m={5}>
               <TreeList Trees={trees} />
             </Box>
+            {/* <Box m={5}>
+              Hovered nodes: {hoveredNodes.length}
+            </Box> */}
           </Paper>
         </Grid>
         <Grid item xs={3}>

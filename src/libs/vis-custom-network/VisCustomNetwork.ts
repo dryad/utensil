@@ -29,7 +29,9 @@ export default class VisCustomNetwork extends EventTarget {
       },
       interaction: {
         selectConnectedEdges: false,
-        // selectable: false,
+        selectable: true,
+        hover: true,
+        hoverConnectedEdges: false,
       },
       edges: {
         color: "#411811",
@@ -40,6 +42,8 @@ export default class VisCustomNetwork extends EventTarget {
         shape: 'dot',
         size: 10,
         opacity: 1.0,
+        borderWidth: 3,
+        borderWidthSelected: 5,
       },
       physics: {
         enabled: false,
@@ -61,6 +65,15 @@ export default class VisCustomNetwork extends EventTarget {
       this.triggerEvent("drag-end", {});
     });
     
+    this.network.on("hoveredNodes", nodeIds => {
+      this.triggerEvent("hovered-nodes", nodeIds);
+    });
+
+    this.network.on("hold", ({params}) => {
+      console.log('hold received: ', params);
+      this.triggerEvent("hold", {});
+    });
+
     var lastClick = 0;
     this.network.on("click", params => {
       var d = new Date();
@@ -155,7 +168,7 @@ export default class VisCustomNetwork extends EventTarget {
           label: "",
           level,
           color: NODE_COLORS[level],
-          opacity: 0.5,
+          opacity: 0,
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
         };
@@ -223,6 +236,11 @@ export default class VisCustomNetwork extends EventTarget {
     //or if Undo/Redo is used
     this.network.enableEditMode(); // enable edit mode on network that has just been loaded;
     
+    //this is also duplicated code from the constructor, but it's necessary to receive the list of hovered nodes
+    this.network.on("hoveredNodes", nodeIds => {
+      this.triggerEvent("hovered-nodes", nodeIds);
+    });
+
     //this is also duplicated code from the constructor, but it's necessary to make the delete tool work after a graph is loaded
     var lastClick = 0;
     
