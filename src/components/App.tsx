@@ -111,6 +111,11 @@ function App() {
     console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
   }, [buttonMode]);
 
+  const setIsUserDraggingGlobal = (isUserDragging: boolean) => {
+    setIsUserDragging(isUserDragging); // update the state, used by undo timer.
+    window.isUserDragging = isUserDragging; // update the global variable, used to disable highlighting subordinate nodes when dragging, for performance.
+    // console.log('set window.isUserDragging to: ', window.isUserDragging);
+  }
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
     setGraphs(data);
@@ -628,7 +633,7 @@ const treeTraversal = async () => {
               historyListBack={historyListBack}
               historyListForward={historyListForward}
               historyListBackRef={historyListBackRef}
-              setIsUserDragging={setIsUserDragging}
+              setIsUserDragging={setIsUserDraggingGlobal}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
               setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
