@@ -13,11 +13,11 @@ import TreeItem from "./TreeItem";
 
 type IGraphListProps = {
     Trees: Tree[];
+    hoveredNodes: string[];
 };
 
 const TreeList: React.FC<IGraphListProps> = (props) => {
   const trees = props.Trees;
-
   const onClick = (node) => {
     // console.log('Clicked', node);
   }
@@ -36,7 +36,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         {trees.map((tree, index) => {
           return (
             <Stack key={index} direction="row" spacing={1} justifyContent="center">
-              <TreeItem tree={tree} />
+              <TreeItem tree={tree} hoveredNodes={props.hoveredNodes} />
             </Stack>
           )
 

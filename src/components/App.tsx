@@ -600,9 +600,6 @@ const treeTraversal = async () => {
                 <Button variant="outlined" color="primary" onClick={testButton}>
                   Test
                 </Button>
-                <Button variant="outlined" color="primary" onClick={getSelection}>
-                  Get Selection
-                </Button>
                 Graph ID: {graphId}
               </ButtonGroup>
             </Box>
@@ -643,10 +640,7 @@ const treeTraversal = async () => {
               setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} />
-            </Box>
-            <Box m={5}>
-              Hovered nodes: {hoveredNodes.length}
+              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} />
             </Box>
           </Paper>
         </Grid>

@@ -13,6 +13,7 @@ import { Tree } from "models";
 import TreeLine from "./TreeLine";
 type IGraphListProps = {
     tree: Tree;
+    hoveredNodes: string[];
 };
 
 const TreeItem: React.FC<IGraphListProps> = (props) => {
@@ -48,7 +49,7 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
     <Stack spacing={0} justifyContent="center">
     {treeLines !== undefined && treeLines.map((line, lineIndex) => {
       return (
-          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length} />
+          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length} hoveredNodes={props.hoveredNodes} />
       )
       
     })}
