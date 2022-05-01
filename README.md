@@ -11,7 +11,7 @@ If vis-network has changed, push main branch
 git push -u origin main
 ```
 
-## Bring local utensil repo to current main
+## Pull the `main` branch of utensil on the local machine
 
 ```Shell
 git fetch –all
@@ -20,7 +20,7 @@ git pull
 ```
 
 ## Add `utensil-prod` remote
-If you have not already added the `utensil-prod` remote.
+You can skip this if you already added the `utensil-prod` remote (named `production`).
 
 ```Shell
 git remote add production git@github.com:dryad/utensil-prod.git
@@ -48,6 +48,8 @@ SSH with ssh key as ‘django’ user to the server and run:
 
 ```Shell
 cd vis-network
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/utensil-prod-github-digitalocean
 git pull
 export NODE_OPTIONS="--max-old-space-size=1024"
 npm run build
@@ -59,6 +61,8 @@ SSH with ssh key as ‘django’ user to the server and run:
 ```Shell
 
 cd utensil
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/utensil-prod-github-digitalocean
 git pull
 export NODE_OPTIONS="--max-old-space-size=1024"
 npm run build
