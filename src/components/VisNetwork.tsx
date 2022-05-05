@@ -341,6 +341,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         // get the node with the 'to' id
                         const node_to = newNodes.find((node: any) => node.id === edge.to);
                         // setting the level if wrong, and updating the color
+                        if (node_to == undefined) {
+                          console.log("BUG: node_to is undefined. There may be an extra edge in the graph. Missing node ID: ", edge.to);
+                        }
                         if (node_to.level !== node.level + 1) {
                           // console.log('FIX LEVELS: node_to.level <= node.level: ', node_to.level, '<=', node.level);
                           node_to.level = node.level + 1;
@@ -350,6 +353,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         edges_walked.push(edge.id); // add the edge to the walked edges
                         // recurse
                         fix_levels(node_to.id);
+                      
                       }
                     };
                     // ******** END FIX LEVEL WALK ********

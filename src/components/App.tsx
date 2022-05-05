@@ -124,6 +124,7 @@ function App() {
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
+    console.log('graph', stringifyGraph());
   };
 
   const getSelection = () => {
@@ -143,7 +144,7 @@ const treeTraversal = async () => {
 
   // gather nodes and skip labelNodes
   for (const node of nodes) {
-    if (node.isLabelNode != true) {
+    if (node.isLabelNode !== true) {
       to_traverse.push(node);
       id_to_node[node.id] = node;
 
