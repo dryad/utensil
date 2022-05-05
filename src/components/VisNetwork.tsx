@@ -344,7 +344,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         if (node_to == undefined) {
                           console.log("BUG: node_to is undefined. There may be an extra edge in the graph. Missing node ID: ", edge.to);
                         }
-                        if (node_to.level !== node.level + 1) {
+                        if (node_to.level < node.level + 1) { // will not allow setting the level lower. (node_to.level !== node.level + 1) was allowing a higher level to be decreased if connected to a lower level node on one side.
                           // console.log('FIX LEVELS: node_to.level <= node.level: ', node_to.level, '<=', node.level);
                           node_to.level = node.level + 1;
                           node_to.color = NODE_COLORS[node_to.level];
