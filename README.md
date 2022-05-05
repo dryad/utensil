@@ -6,7 +6,12 @@ If we run into merge conflicts or other issues, the objective is to bring the cu
 ## Prepare the `main` branch on utensil and vis-network repos.
 Merge changes to ```utensil:main```, and if necessary, ```vis-network:main```
 
-If vis-network has changed, push main branch
+If you just merged a branch into ```utensil:main```, push changes. From utensil dir:
+```Shell
+git push -u origin main
+```
+
+If vis-network has changed, push main branch. From vis-network dir:
 ```Shell
 git push -u origin main
 ```
