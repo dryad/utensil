@@ -553,10 +553,12 @@ const treeTraversal = async () => {
   };
   
   async function getMetaMaskAccount() {
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const account = accounts[0];
-    console.log('set metaMaskAccount', account);
-    setMetaMaskAccount(account);
+    if (typeof ethereum !== 'undefined') {
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      console.log('set metaMaskAccount', account);
+      setMetaMaskAccount(account);
+    }
   };
 
   const handleSave = async () => {
