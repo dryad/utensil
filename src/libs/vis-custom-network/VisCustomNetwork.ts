@@ -88,7 +88,7 @@ export default class VisCustomNetwork extends EventTarget {
               // this.editNode(labelOfNode, undefined); //pop up the edit box for that node
             }
             if (node && !node.isLabelNode) {
-              this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
+              this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to Utensil.tsx to delete the node if deleteMode is active.
             }
           }
         }
@@ -261,7 +261,7 @@ export default class VisCustomNetwork extends EventTarget {
               // this.editNode(labelOfNode, undefined); //pop up the edit box for that node
             }
             if (node && !node.isLabelNode) {
-              this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to App.tsx to delete the node if deleteMode is active.
+              this.triggerEvent("click-node", node); // send an event to VisNetwork, where we can pass it along up to Utensil.tsx to delete the node if deleteMode is active.
             }
           }
         }

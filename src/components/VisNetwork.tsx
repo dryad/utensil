@@ -435,7 +435,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       networkRef.current.on("click-node", node => {
         if (!node.isLabelNode) {
-          deleteIfDeleteMode(); // run callback function to App.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
+          deleteIfDeleteMode(); // run callback function to Utensil.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
         }
       });
 
@@ -448,7 +448,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       networkRef.current.on("hovered-nodes", nodeIds => {
         // console.log('hovered nodes received: ', nodeIds.length);
         // console.log(Object.values(nodeIds));
-        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
+        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to Utensil.tsx, will save the hovered node IDs to state  
       });
 
 

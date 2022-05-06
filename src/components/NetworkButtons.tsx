@@ -17,7 +17,7 @@ export default function NetworkButtons(props) {
     }
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
         if (nextMode !== null) { //disallow unselecting an item. 
-            props.onButton(nextMode); // Tell App.tsx to change the button mode
+            props.onButton(nextMode); // Tell Utensil.tsx to change the button mode
         }
     };
     const useStyles = makeStyles((theme) => ({
@@ -61,7 +61,7 @@ export default function NetworkButtons(props) {
                     <ToggleButtonGroup
                         style={{ 'marginBottom': 10 }}
                         orientation="vertical"
-                        value={props.buttonMode} // The value of the selected button comes from App.tsx as a React prop
+                        value={props.buttonMode} // The value of the selected button comes from Utensil.tsx as a React prop
                         exclusive
                         onChange={handleChange}
 
