@@ -25,6 +25,7 @@ import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
+import WhitelistedAddresses from "./WhitelistedAddresses";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -94,6 +95,10 @@ function App() {
     }
   }
 
+  const address_is_whitelisted = () => {
+    return WhitelistedAddresses.includes(metaMaskAccount);
+  }
+
   useEffect(() => {
     // console.log('new historyListBack', historyListBack);
     treeTraversal(); // run treeTraversal every time an Undo step is added.
@@ -125,6 +130,7 @@ function App() {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
     console.log('graph', stringifyGraph());
+    console.log('metaMask', metaMaskAccount);
   };
 
   const getSelection = () => {
@@ -564,6 +570,7 @@ const treeTraversal = async () => {
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
+    getMetaMaskAccount();
   }, []);
   
   return (
@@ -598,10 +605,16 @@ const treeTraversal = async () => {
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
                   Clear Graph
                 </Button> */}
-                <Button variant="outlined" color="primary" onClick={testButton}>
-                  Test
-                </Button>
-                Graph ID: {graphId}
+                { address_is_whitelisted() && (
+                  <>
+                  <Button variant="outlined" color="primary" onClick={testButton}>
+                    Test
+                  </Button>
+                  Graph ID: {graphId}
+                  </>
+                )}
+                
+                
               </ButtonGroup>
             </Box>
           </Paper>
@@ -669,6 +682,7 @@ const treeTraversal = async () => {
             onGraphSelected={handleGraphSelected}
             onGraphDelete={handleGraphDelete}
             searchQuery={searchQuery}
+            address_is_whitelisted={address_is_whitelisted}
           />
           <Card variant="outlined">
             <CardContent>

@@ -15,6 +15,7 @@ type IGraphListProps = {
   onGraphSelected: React.MouseEventHandler<HTMLDivElement>;
   onGraphDelete: React.MouseEventHandler<HTMLDivElement>;
   searchQuery: string;
+  address_is_whitelisted: () => boolean;
 };
 
 const GraphList: React.FC<IGraphListProps> = (props) => {
@@ -45,7 +46,9 @@ const GraphList: React.FC<IGraphListProps> = (props) => {
                     props.onGraphDelete(g.id);
                   }}
                   size="large">
-                  <Delete />
+                  {props.address_is_whitelisted() && (
+                    <Delete />
+                  )}
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
