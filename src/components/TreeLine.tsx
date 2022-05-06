@@ -14,21 +14,22 @@ type IGraphListProps = {
     line: TreeNode[];
     lineIndex: number;
     lineLength: number;
+    hoveredNodes: string[];
 };
 
 const TreeLine: React.FC<IGraphListProps> = (props) => {
   const line = props.line;
 
   const onClick = (node) => {
-    console.log('Clicked', node);
+    // console.log('Clicked', node);
   }
   const onHover = (node) => {
-    console.log('Hover', node);
+    // console.log('Hover', node);
   }
   const onLeave = (node) => {
-    console.log('Left', node);
+    // console.log('Left', node);
   }
-
+  // console.log('props.hoverNodes', props.hoveredNodes.current?.includes('a0e91e03-21bd-4413-b875-4c8cb801f335'));
   let borderTopLeftRadius = 0;
   let borderTopRightRadius = 0;
   let borderBottomLeftRadius = 0;
@@ -69,7 +70,7 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
         }}>
     {line.map((node, nodeIndex) => {
         return <Chip
-        sx={{backgroundColor: 'rgba(0, 0, 0, 0)'}}
+        sx={{backgroundColor: 'rgba(0, 0, 0, 0)', textDecoration: props.hoveredNodes.current?.includes(node.id) ? 'underline' : 'none'}}
         key={nodeIndex}
         label={node.label}
         onClick={() => {
@@ -80,8 +81,7 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
         }}
         onMouseLeave={() => {
         onLeave(node);
-        }}
-    
+        }}        
     />
     })}
     </Box>

@@ -25,6 +25,7 @@ import TreeList from "./TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
+import WhitelistedAddresses from "./WhitelistedAddresses";
 
 function App() {
   const UNDO_STEPS_LIMIT = 250;
@@ -50,7 +51,7 @@ function App() {
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
-  const [hoveredNodes, setHoveredNodes] = useState<string[]>([]); // The list of node IDs that are currently hovered.
+  const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -94,6 +95,10 @@ function App() {
     }
   }
 
+  const address_is_whitelisted = () => {
+    return WhitelistedAddresses.includes(metaMaskAccount);
+  }
+
   useEffect(() => {
     // console.log('new historyListBack', historyListBack);
     treeTraversal(); // run treeTraversal every time an Undo step is added.
@@ -111,6 +116,11 @@ function App() {
     console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
   }, [buttonMode]);
 
+  const setIsUserDraggingGlobal = (isUserDragging: boolean) => {
+    setIsUserDragging(isUserDragging); // update the state, used by undo timer.
+    window.isUserDragging = isUserDragging; // update the global variable, used to disable highlighting subordinate nodes when dragging, for performance.
+    // console.log('set window.isUserDragging to: ', window.isUserDragging);
+  }
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
     setGraphs(data);
@@ -119,6 +129,8 @@ function App() {
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
     console.log('edges', JSON.parse(stringifyGraph()).edges);
+    console.log('graph', stringifyGraph());
+    console.log('metaMask', metaMaskAccount);
   };
 
   const getSelection = () => {
@@ -138,7 +150,7 @@ const treeTraversal = async () => {
 
   // gather nodes and skip labelNodes
   for (const node of nodes) {
-    if (node.isLabelNode != true) {
+    if (node.isLabelNode !== true) {
       to_traverse.push(node);
       id_to_node[node.id] = node;
 
@@ -541,10 +553,12 @@ const treeTraversal = async () => {
   };
   
   async function getMetaMaskAccount() {
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const account = accounts[0];
-    console.log('set metaMaskAccount', account);
-    setMetaMaskAccount(account);
+    if (typeof ethereum !== 'undefined') {
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+      const account = accounts[0];
+      console.log('set metaMaskAccount', account);
+      setMetaMaskAccount(account);
+    }
   };
 
   const handleSave = async () => {
@@ -558,6 +572,7 @@ const treeTraversal = async () => {
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
+    getMetaMaskAccount();
   }, []);
   
   return (
@@ -592,13 +607,16 @@ const treeTraversal = async () => {
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
                   Clear Graph
                 </Button> */}
-                <Button variant="outlined" color="primary" onClick={testButton}>
-                  Test
-                </Button>
-                <Button variant="outlined" color="primary" onClick={getSelection}>
-                  Get Selection
-                </Button>
-                Graph ID: {graphId}
+                { address_is_whitelisted() && (
+                  <>
+                  <Button variant="outlined" color="primary" onClick={testButton}>
+                    Test
+                  </Button>
+                  Graph ID: {graphId}
+                  </>
+                )}
+                
+                
               </ButtonGroup>
             </Box>
           </Paper>
@@ -628,21 +646,18 @@ const treeTraversal = async () => {
               historyListBack={historyListBack}
               historyListForward={historyListForward}
               historyListBackRef={historyListBackRef}
-              setIsUserDragging={setIsUserDragging}
+              setIsUserDragging={setIsUserDraggingGlobal}
               stringifyGraph={stringifyGraph}
               deleteIfDeleteMode={deleteIfDeleteMode}
               setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
               addEdgeDirectedOrNot={addEdgeDirectedOrNot}
               buttonModeRef={buttonModeRef}
-              // hoveredNodes={hoveredNodes}
+              hoveredNodes={hoveredNodesRef}
               setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} />
+              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} />
             </Box>
-            {/* <Box m={5}>
-              Hovered nodes: {hoveredNodes.length}
-            </Box> */}
           </Paper>
         </Grid>
         <Grid item xs={3}>
@@ -669,6 +684,7 @@ const treeTraversal = async () => {
             onGraphSelected={handleGraphSelected}
             onGraphDelete={handleGraphDelete}
             searchQuery={searchQuery}
+            address_is_whitelisted={address_is_whitelisted}
           />
           <Card variant="outlined">
             <CardContent>

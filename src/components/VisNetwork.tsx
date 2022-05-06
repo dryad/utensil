@@ -6,6 +6,7 @@ import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
+import { memo } from "react";
 
 type INetworkProps = {
   networkRef: any;
@@ -23,12 +24,12 @@ type INetworkProps = {
   setGraphFromNodesAndEdges: Function;
   addEdgeDirectedOrNot: Function;
   buttonModeRef: any;
-  // hoveredNodes: string[];
+  hoveredNodes: any;
   setHoveredNodesFromNetwork: Function;
 
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, setHoveredNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -340,7 +341,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         // get the node with the 'to' id
                         const node_to = newNodes.find((node: any) => node.id === edge.to);
                         // setting the level if wrong, and updating the color
-                        if (node_to.level !== node.level + 1) {
+                        if (node_to == undefined) {
+                          console.log("BUG: node_to is undefined. There may be an extra edge in the graph. Missing node ID: ", edge.to);
+                        }
+                        if (node_to.level < node.level + 1) { // will not allow setting the level lower. (node_to.level !== node.level + 1) was allowing a higher level to be decreased if connected to a lower level node on one side.
                           // console.log('FIX LEVELS: node_to.level <= node.level: ', node_to.level, '<=', node.level);
                           node_to.level = node.level + 1;
                           node_to.color = NODE_COLORS[node_to.level];
@@ -349,6 +353,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                         edges_walked.push(edge.id); // add the edge to the walked edges
                         // recurse
                         fix_levels(node_to.id);
+                      
                       }
                     };
                     // ******** END FIX LEVEL WALK ********
@@ -443,12 +448,15 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       networkRef.current.on("hovered-nodes", nodeIds => {
         // console.log('hovered nodes received: ', nodeIds.length);
         // console.log(Object.values(nodeIds));
-        // setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
+        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
       });
 
 
       networkRef.current.on("hold", params => {
-        // networkRef.current?.network.setSelection({ nodes: [hoveredNodes] });
+        if (buttonModeRef.current === "pan") {
+          console.log('hold event received', params);
+          networkRef.current?.network.setSelection({ nodes: hoveredNodes.current });
+        }
       });
 
     }, [networkRef]);
@@ -470,4 +478,5 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
   }
 // );
 
-export default VisNetwork;
+export default memo(VisNetwork);
+// export default VisNetwork;
