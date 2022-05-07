@@ -4,10 +4,8 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, Theme, StyledEngineProvider } from "@mui/material/styles";
-
 import App from "components/App";
 import theme from "./theme";
-
 import "./index.css";
 
 
