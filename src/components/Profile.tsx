@@ -1,4 +1,6 @@
-import * as React from "react";
+import React, { useRef, useEffect } from "react";
+import useState from 'react-usestateref';
+import axios from "libs/axios";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import {
     Container,
@@ -15,72 +17,47 @@ import {
     Stack,
   } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
+import "./Profile.css";
 
 const theme = createTheme({
     typography: {
         fontFamily: 'Calibre,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji',
 
         h6: {
-          color: "#fff",
+            color: "#fff",
         },
         h8: {
             color: "#ddd",
-          }
-      }
-  });
+        },
+    },
+});
+
+const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
+    '& .MuiDataGrid-cell': {
+        color: 'rgba(255,255,255,0.65)',
+      },
+}));
 
 const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
     {
-        field: 'firstName',
-        headerName: 'First name',
+        field: 'name',
+        headerName: 'Name',
         width: 150,
-        editable: true,
+        editable: false,
     },
-    {
-        field: 'lastName',
-        headerName: 'Last name',
-        width: 150,
-        editable: true,
-    },
-    {
-        field: 'age',
-        headerName: 'Age',
-        type: 'number',
-        width: 110,
-        editable: true,
-    },
-    {
-        field: 'fullName',
-        headerName: 'Full name',
-        description: 'This column has a value getter and is not sortable.',
-        sortable: false,
-        width: 160,
-        valueGetter: (params: GridValueGetterParams) =>
-        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
-];
-const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
 function Profile() {
+    const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs
+    const refreshList = async () => {
+        const { data } = await axios.get(`/api/graphs/`);
+        setGraphs(data);
+    };
+
+    useEffect(() => {
+        refreshList();
+        // getMetaMaskAccount();
+      }, []);
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="lg">
@@ -104,12 +81,10 @@ function Profile() {
                         <Button variant="outlined">Connect wallet</Button>
                     </Grid>
                 </Grid>
-                <Grid // Body
-
+                <Grid
                     container
                     spacing={2}
                     align="center"
-
                 >
                     <Grid
                         item
@@ -133,15 +108,24 @@ function Profile() {
                             </Typography>
                             <Button variant="outlined">Start new concept</Button>
                         </Stack>
-                        <div style={{ height: 400, width: '100%' }}>
-                          <DataGrid
-                            rows={rows}
-                            columns={columns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            checkboxSelection
-                            disableSelectionOnClick
-                          />
+                        <div style={{ height: '1000px', width: '100%' }}>
+                            <StyledDataGrid
+                                sx={{
+                                    '.MuiDataGrid-columnSeparator': {
+                                        display: 'none',
+                                    },
+                                    // '&.MuiDataGrid-root': {
+                                    //   border: 'none',
+                                    // },
+                                }}
+                                rows={graphs}
+                                columns={columns}
+                                pageSize={25}
+                                rowsPerPageOptions={[25, 50, 100]}
+                                disableSelectionOnClick
+                                // headerHeight={0}
+                                hideFooter={true}
+                            />
                         </div>
                     </Grid>
                 </Grid>
