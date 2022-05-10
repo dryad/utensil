@@ -5,6 +5,6 @@ class Graph(models.Model):
     name = models.CharField(max_length=255)
     data = models.TextField()
     note = models.TextField(default="", null=True, blank=True)
-
-    def _str_(self):
+    private = models.BooleanField(default=True)
+    def __str__(self):
         return self.name

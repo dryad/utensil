@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 class GraphAdmin(admin.ModelAdmin):
-    list_display = ('name', 'data', 'note')
+    list_display = ('name', 'note', 'private')
 
 
 # Register your models here.
