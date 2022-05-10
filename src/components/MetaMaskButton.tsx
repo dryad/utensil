@@ -18,7 +18,10 @@ export default function MetaMaskButton(props) {
                 >Connect with MetaMask</Button>
             )}
             {window.ethereum && ethereum.isMetaMask && ethereum.selectedAddress && (
+                <>
                 <Typography>{ethereum.selectedAddress}</Typography>
+                <a href={'/profile/' + ethereum.selectedAddress} target="_blank">My profile</a>
+                </>
             )}
             {!window.ethereum && (
             <a href="https://metamask.io/" target="_blank">Get MetaMask to Connect</a>

@@ -96,94 +96,112 @@ const columns: GridColDef[] = [
 ];
 
 function Profile() {
-    const {address} = useParams()
-    const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs
+    const { addressId } = useParams()
+    const [graphs, setGraphs] = useState([]); // The list of graphs
+    const [address, setAddress] = useState({}); // The address object to display
     const refreshList = async () => {
         const { data } = await axios.get(`/api/graphs/`);
         setGraphs(data);
     };
+    const getAddress = async () => {
+        const { data } = await axios.get(`/api/address/${addressId}/`);
+        setAddress(data);
+    };
 
+    const shortenAddress = (address: string) => {
+        // display the first 6 characters of the address, then "..." then the last 4 characters
+        const first = address.slice(0, 6);
+        const last = address.slice(-4);
+        return `${first}...${last}`;
+
+    }
     useEffect(() => {
         refreshList();
+        getAddress();
         // getMetaMaskAccount();
-      }, []);
-    return (
-        <ThemeProvider theme={theme}>
-            <Container maxWidth="xl">
-                <Grid
-                    container
-                    spacing={2}
-                    align="center"
-                    style={{ borderBottom: '1px solid ##2d2d2d' }}
-                    marginTop={1}
-                    marginBottom={4}
-                >
-                    <Grid item xs={2}>
-                        <Typography variant="h6">
-                            dryad
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={8}>
-
-                    </Grid>
-                    <Grid item xs={2}>
-                        <Button variant="outlined" sx={{'borderColor': '#2d2d2d', 'borderRadius': '10px', 'marginRight': '0%', float: "right"}}>Connect wallet</Button>
-                    </Grid>
-                </Grid>
-                <Grid
-                    container
-                    spacing={2}
-                    align="center"
-                >
+    }, []);
+    if (addressId === undefined) {
+        return <div>No address provided</div>
+    }
+    else {
+        return (
+            <ThemeProvider theme={theme}>
+                <Container maxWidth="xl">
                     <Grid
-                        item
-                        xs={2}
-                        style={{ border: '1px solid #2d2d2d', borderRadius: '10px' }}
+                        container
+                        spacing={2}
+                        align="center"
+                        style={{ borderBottom: '1px solid ##2d2d2d' }}
+                        marginTop={1}
+                        marginBottom={4}
                     >
-                        <Stack alignItems={"center"} spacing={0.5}>
-                            <Avatar src="/broken-image.jpg" sx={{ width: 80, height: 80 }} />
+                        <Grid item xs={2}>
                             <Typography variant="h6">
-                                user
+                                dryad
                             </Typography>
-                            <Typography variant="h8">
-                                0x0000...0000
-                            </Typography>
-                        </Stack>
-                    </Grid>
-                    <Grid item xs={10}>
-                        <Stack direction="row" display="flex" justifyContent="space-between">
-                            <Typography variant="h6">
-                                Concepts
-                            </Typography>
-                            <Button variant="outlined" sx={{'borderColor': '#2d2d2d', 'borderRadius': '10px'}}>Start new concept</Button>
-                        </Stack>
-                        <div style={{ height: '1000px', width: '100%' }}>
-                            <StyledDataGrid
-                                sx={{
-                                    '.MuiDataGrid-columnSeparator': {
-                                        display: 'none',
-                                    },
-                                    '&.MuiDataGrid-root': {
-                                      border: '1px solid #2d2d2d',
-                                      borderRadius: '10px',
-                                      marginTop: '20px',
-                                    },
-                                }}
-                                rows={graphs}
-                                columns={columns}
-                                pageSize={25}
-                                rowsPerPageOptions={[25, 50, 100]}
-                                disableSelectionOnClick
-                                headerHeight={32}
-                                hideFooter={true}
-                            />
-                        </div>
-                    </Grid>
-                </Grid>
+                        </Grid>
+                        <Grid item xs={8}>
 
-            </Container>
-        </ThemeProvider>
-    );
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px', 'marginRight': '0%', float: "right" }}>Connect wallet</Button>
+                        </Grid>
+                    </Grid>
+                    <Grid
+                        container
+                        spacing={2}
+                        align="center"
+                    >
+                        <Grid
+                            item
+                            xs={2}
+                            style={{ border: '1px solid #2d2d2d', borderRadius: '10px' }}
+                        >
+                            <Stack alignItems={"center"} spacing={0.5}>
+                                <Avatar src="/broken-image.jpg" sx={{ width: 80, height: 80 }} />
+                                <Typography variant="h6">
+                                    { address.name == undefined ? 'unnamed' : address.name}
+                                </Typography>
+                                <Typography variant="h8">
+                                    { address.address && shortenAddress(address.address)}
+                                </Typography>
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={10}>
+                            <Stack direction="row" display="flex" justifyContent="space-between">
+                                <Typography variant="h6">
+                                    Concepts
+                                </Typography>
+                                <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}>Start new concept</Button>
+                            </Stack>
+                            <div style={{ height: '1000px', width: '100%' }}>
+                                <StyledDataGrid
+                                    sx={{
+                                        '.MuiDataGrid-columnSeparator': {
+                                            display: 'none',
+                                        },
+                                        '&.MuiDataGrid-root': {
+                                            border: '1px solid #2d2d2d',
+                                            borderRadius: '10px',
+                                            marginTop: '20px',
+                                        },
+                                    }}
+                                    rows={graphs}
+                                    columns={columns}
+                                    pageSize={25}
+                                    rowsPerPageOptions={[25, 50, 100]}
+                                    disableSelectionOnClick
+                                    headerHeight={32}
+                                    hideFooter={true}
+                                />
+                            </div>
+                        </Grid>
+                    </Grid>
+
+                </Container>
+            </ThemeProvider>
+        );
+    }
 }
 
 export default Profile;

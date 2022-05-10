@@ -10,7 +10,7 @@ function App() {
         <Route path="/" element={<Navigate to="/utensil" />} />
         <Route path="utensil" element={<Utensil />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="profile/:address" element={<Profile />} />
+        <Route path="profile/:addressId" element={<Profile />} />
         <Route path="profile/edit" element={<EditProfile />} />
       </Routes>
     </div>
