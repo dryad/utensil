@@ -18,6 +18,7 @@ import {
   } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "./Profile.css";
+import {useParams} from "react-router-dom";
 
 const theme = createTheme({
     palette: {
@@ -95,6 +96,7 @@ const columns: GridColDef[] = [
 ];
 
 function Profile() {
+    const {address} = useParams()
     const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs
     const refreshList = async () => {
         const { data } = await axios.get(`/api/graphs/`);
