@@ -27,5 +27,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),         
     path('api/graphs/', views.graphs),
     path('api/graphs/<int:graphId>/', views.graphs),
+    path('api/address/<str:addressId>/', views.address),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]

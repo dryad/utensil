@@ -1,10 +1,23 @@
-from .serializers import GraphSerializer
-from .models import Graph
+from .serializers import GraphSerializer, AddressSerializer
+from .models import Graph, Address
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+
+@csrf_exempt
+def address(request, addressId=None):
+    if request.method == 'GET':
+        if addressId is not None:
+            address = Address.objects.get(address=addressId)
+        # print (address)
+        if address:
+            serializer = AddressSerializer(address, many=False)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return HttpResponseNotFound()
 
 @csrf_exempt
 def graphs(request, graphId=None):
