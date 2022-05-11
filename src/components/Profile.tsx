@@ -179,7 +179,12 @@ function Profile() {
                             style={{ border: '1px solid #2d2d2d', borderRadius: '10px' }}
                         >
                             <Stack alignItems={"center"} spacing={0.5}>
-                                <Avatar src="/broken-image.jpg" sx={{ width: 80, height: 80 }} />
+                                {address.avatar_url && 
+                                    <Avatar src={`${address.avatar_url}`} sx={{ width: 100, height: 100 }} />
+                                }
+                                {!address.avatar_url &&
+                                    <Avatar sx={{ width: 100, height: 100 }} />
+                                }
                                 <Typography variant="h6">
                                     { address.name == undefined ? 'unnamed' : address.name}
                                 </Typography>

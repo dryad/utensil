@@ -17,3 +17,8 @@ class Address(models.Model):
         return self.name or ''
     class Meta:
         verbose_name_plural = "Addresses"
+    def avatar_url(self):
+        if self.avatar:
+            return '/static/' + self.avatar.url.split('/')[2]
+        else:
+            return ""

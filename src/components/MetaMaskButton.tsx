@@ -7,11 +7,12 @@ import makeStyles from '@mui/styles/makeStyles';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from "react-router-dom";
-
+import axios from "libs/axios";
 export default function MetaMaskButton(props) {
     
     let navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [address, setAddress] = useState({}); // The address object to display
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       setAnchorEl(event.currentTarget);
@@ -20,17 +21,23 @@ export default function MetaMaskButton(props) {
     const handleClose = () => {
       setAnchorEl(null);
     };
-
+    const getAddress = async () => {
+        const { data } = await axios.get(`/api/address/${ethereum.selectedAddress}/`);
+        setAddress(data);
+    };
     const navigateToProfile = () => {
         navigate("/profile/" + ethereum.selectedAddress);
     }
-
+    
     const shortenAddress = (address: string) => {
         // display the first 6 characters of the address, then "..." then the last 4 characters
         const first = address.slice(0, 6);
         const last = address.slice(-4);
         return `${first}...${last}`;
     }
+    useEffect(() => {
+        getAddress();
+    }, []);
     return (
         <>
             {window.ethereum && ethereum.isMetaMask && !ethereum.selectedAddress && (
@@ -45,7 +52,7 @@ export default function MetaMaskButton(props) {
                   aria-expanded={open ? 'true' : undefined}
                   onClick={handleClick}
                 >
-                    <Avatar sx={{width: '20px', height: '20px', 'marginRight': '5px'}} src={"https://stamp.fyi/avatar/" + ethereum.selectedAddress} />
+                    <Avatar sx={{width: '20px', height: '20px', 'marginRight': '5px'}} src={address.avatar_url} />
                     {shortenAddress(ethereum.selectedAddress)}
                 </Button>
                 <Menu
