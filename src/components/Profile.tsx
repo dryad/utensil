@@ -191,7 +191,7 @@ function Profile() {
                                 <Typography variant="h8">
                                     { address.address && (shortenAddress(address.address))}
                                 </Typography>
-                                { can_edit_profile && (
+                                { can_edit_profile() && (
                                     <Button
                                         variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
                                         

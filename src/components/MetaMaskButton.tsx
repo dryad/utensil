@@ -22,8 +22,11 @@ export default function MetaMaskButton(props) {
       setAnchorEl(null);
     };
     const getAddress = async () => {
-        const { data } = await axios.get(`/api/address/${ethereum.selectedAddress}/`);
-        setAddress(data);
+        if (typeof ethereum !== 'undefined') {
+            const { data } = await axios.get(`/api/address/${ethereum.selectedAddress}/`);
+            setAddress(data);
+            console.log('metamaskbutton set address', data.avatar_url);
+        }
     };
     const navigateToProfile = () => {
         navigate("/profile/" + ethereum.selectedAddress);
