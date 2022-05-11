@@ -661,7 +661,9 @@ const treeTraversal = async () => {
           </Paper>
         </Grid>
         <Grid item xs={3}>
+          <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
           <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
+          </Paper>
           <Paper>
             <Box m={1}>
               <TextField

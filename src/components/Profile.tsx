@@ -19,6 +19,7 @@ import {
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "./Profile.css";
 import {useParams} from "react-router-dom";
+import MetaMaskButton from "./MetaMaskButton";
 
 const theme = createTheme({
     palette: {
@@ -96,9 +97,11 @@ const columns: GridColDef[] = [
 ];
 
 function Profile() {
-    const { addressId } = useParams()
+    const { addressId } = useParams() // the addressId parameter from the URL
     const [graphs, setGraphs] = useState([]); // The list of graphs
     const [address, setAddress] = useState({}); // The address object to display
+    const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
+
     const refreshList = async () => {
         const { data } = await axios.get(`/api/graphs/`);
         setGraphs(data);
@@ -115,10 +118,23 @@ function Profile() {
         return `${first}...${last}`;
 
     }
+    const address_is_whitelisted = () => {
+        return WhitelistedAddresses.includes(metaMaskAccount);
+      }
+
+    async function getMetaMaskAccount() {
+        if (typeof ethereum !== 'undefined') {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            console.log('set metaMaskAccount', account);
+            setMetaMaskAccount(account);
+        }
+    };
+
     useEffect(() => {
         refreshList();
         getAddress();
-        // getMetaMaskAccount();
+        getMetaMaskAccount();
     }, []);
     if (addressId === undefined) {
         return <div>No address provided</div>
@@ -144,7 +160,7 @@ function Profile() {
 
                         </Grid>
                         <Grid item xs={2}>
-                            <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px', 'marginRight': '0%', float: "right" }}>Connect wallet</Button>
+                            <MetaMaskButton />
                         </Grid>
                     </Grid>
                     <Grid
