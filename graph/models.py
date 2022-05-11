@@ -12,6 +12,7 @@ class Graph(models.Model):
 class Address(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, unique=True)
+    avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     def __str__(self):
         return self.name or ''
     class Meta:

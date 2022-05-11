@@ -18,7 +18,7 @@ import {
   } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "./Profile.css";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
 
 const theme = createTheme({
@@ -97,6 +97,7 @@ const columns: GridColDef[] = [
 ];
 
 function Profile() {
+    let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
     const [graphs, setGraphs] = useState([]); // The list of graphs
     const [address, setAddress] = useState({}); // The address object to display
@@ -116,8 +117,8 @@ function Profile() {
         const first = address.slice(0, 6);
         const last = address.slice(-4);
         return `${first}...${last}`;
-
     }
+
     const address_is_whitelisted = () => {
         return WhitelistedAddresses.includes(metaMaskAccount);
       }
@@ -130,6 +131,10 @@ function Profile() {
             setMetaMaskAccount(account);
         }
     };
+
+    const can_edit_profile = () => {
+        return metaMaskAccount === address.address;
+    }
 
     useEffect(() => {
         refreshList();
@@ -179,8 +184,20 @@ function Profile() {
                                     { address.name == undefined ? 'unnamed' : address.name}
                                 </Typography>
                                 <Typography variant="h8">
-                                    { address.address && shortenAddress(address.address)}
+                                    { address.address && (shortenAddress(address.address))}
                                 </Typography>
+                                { can_edit_profile && (
+                                    <Button
+                                        variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
+                                        
+                                        // color="primary"
+                                        onClick={() => {
+                                            navigate("/profile/edit");
+                                        }}
+                                    >
+                                        Edit Profile
+                                    </Button>
+                                )}
                             </Stack>
                         </Grid>
                         <Grid item xs={10}>

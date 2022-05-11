@@ -18,6 +18,20 @@ def address(request, addressId=None):
             return JsonResponse(serializer.data, safe=False)
         else:
             return HttpResponseNotFound()
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        address, created = Address.objects.get_or_create(address=addressId)
+        address.name = data['address']['name']
+            # save avatar image from post request
+        if 'avatar' in data:
+            avatar = request.FILES['avatar']
+            address.avatar.save(avatar.name, avatar)
+
+        address.save()
+
+        serializer = AddressSerializer(address, many=False)
+        return JsonResponse(serializer.data, safe=False)
+
 
 @csrf_exempt
 def graphs(request, graphId=None):

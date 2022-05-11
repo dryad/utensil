@@ -1,4 +1,5 @@
-import * as React from "react";
+import React, { useRef, useEffect } from "react";
+import useState from 'react-usestateref';
 import {
     Container,
     Paper,
@@ -13,15 +14,39 @@ import {
     Avatar,
   } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "libs/axios";
+
 function EditProfile() {
     const navigate = useNavigate();
+    const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
+    const [address, setAddress] = useState({}); // The address object to display
+    const [errorTextName, setErrorTextName] = useState(""); // The error text to display for the name field
+    const savePressed = async () => {
+        console.log('savePressed');
 
+        // axios post to /api/address/123 containing name and image file
+        const { data } = await axios.post(`/api/address/${address.address}/`, {address});
+        navigate('/profile/' + address.address);
+    }
+    async function getMetaMaskAccount() {
+        if (typeof ethereum !== 'undefined') {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            console.log('set metaMaskAccount', account);
+            setMetaMaskAccount(account);
+            const { data } = await axios.get(`/api/address/${account}/`);
+            setAddress(data);
+        }
+    };
+
+    useEffect(() => {
+        getMetaMaskAccount();
+    }, []);
     return (
         <div className="Profile">
             <Container maxWidth="sm">
                 <Paper elevation={3}>
                     <Box padding={2}>
-                    <Avatar src="/broken-image.jpg" />
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
                                 <Typography variant="h5">
@@ -29,12 +54,31 @@ function EditProfile() {
                                 </Typography>
                             </Grid>
                             <Grid item xs={12}>
+                                {address.address}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Avatar sx={{'width': '75px', 'height': '75px'}} src="/broken-image.jpg" />
+                            </Grid>
+                            <Grid item xs={12}>
                                 <TextField
-
                                     id="standard-basic"
                                     label="Name"
-                                    variant="outlined"
+                                    // variant="filled"
                                     fullWidth
+                                    value={address.name || ''}
+                                    error={errorTextName.length > 0}
+                                    helperText={errorTextName}
+                                    onChange={(e) => {
+                                        if (e.target.value.length === 0) {
+                                            setErrorTextName("Name is required");
+                                        }
+                                        else {
+                                            setErrorTextName("");
+                                            
+                                        }
+                                        setAddress({ ...address, name: e.target.value });
+                                    }}
+
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -43,9 +87,14 @@ function EditProfile() {
                                     color="primary"
                                     aria-label="contained primary button group"
                                 >
-                                    <Button>Save</Button>
+                                    <Button
+                                        disabled={errorTextName.length !== 0}
+                                        onClick={() => {
+                                            savePressed();
+                                        }}
+                                    >Save</Button>
                                     <Button 
-                                        onClick={() => { navigate(`/profile`); }}
+                                        onClick={() => { navigate(-1); }}
                                     >
                                         Cancel
                                     </Button>
