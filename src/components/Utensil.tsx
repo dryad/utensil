@@ -52,6 +52,7 @@ function Utensil() {
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
+  const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -226,6 +227,10 @@ const treeTraversal = async () => {
 
   const setHoveredNodesFromNetwork = (hoveredNodes: string[]) => {
     setHoveredNodes(hoveredNodes);
+  };
+
+  const setSelectedNodesFromNetwork = (selectedNodes: string[]) => {
+    setSelectedNodes(selectedNodes);
   };
 
   const loadGraphFromString = (graph: string) => { // used by Undo/Redo. 
@@ -654,9 +659,11 @@ const treeTraversal = async () => {
               buttonModeRef={buttonModeRef}
               hoveredNodes={hoveredNodesRef}
               setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+              selectedNodes={selectedNodesRef}
+              setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} />
+              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef}/>
             </Box>
           </Paper>
         </Grid>

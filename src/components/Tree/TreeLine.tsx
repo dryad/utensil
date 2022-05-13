@@ -15,6 +15,7 @@ type IGraphListProps = {
     lineIndex: number;
     lineLength: number;
     hoveredNodes: string[];
+    selectedNodes: string[];
 };
 
 const TreeLine: React.FC<IGraphListProps> = (props) => {
@@ -70,7 +71,7 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
         }}>
     {line.map((node, nodeIndex) => {
         return <Chip
-        sx={{ backgroundColor: props.hoveredNodes.current?.includes(node.id) ? 'rgba(0, 0, 255, 0.4)' : 'rgba(0, 0, 0, 0)' }}
+        sx={{ backgroundColor: props.selectedNodes.current?.includes(node.id) ? 'rgba(255, 0, 0, 0.4)' : props.hoveredNodes.current?.includes(node.id) ? 'rgba(0, 0, 255, 0.4)' : 'rgba(0, 0, 0, 0)' }}
         key={nodeIndex}
         label={node.label}
         onClick={() => {

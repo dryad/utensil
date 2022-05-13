@@ -69,6 +69,10 @@ export default class VisCustomNetwork extends EventTarget {
       this.triggerEvent("hovered-nodes", nodeIds);
     });
 
+    this.network.on("selectedNodes", nodeIds => {
+      this.triggerEvent("selected-nodes", nodeIds);
+    });
+
     this.network.on("hold", (params) => {
       console.log('hold received: ', params);
       this.triggerEvent("hold", params);
@@ -239,6 +243,10 @@ export default class VisCustomNetwork extends EventTarget {
     //this is also duplicated code from the constructor, but it's necessary to receive the list of hovered nodes
     this.network.on("hoveredNodes", nodeIds => {
       this.triggerEvent("hovered-nodes", nodeIds);
+    });
+    
+    this.network.on("selectedNodes", nodeIds => {
+      this.triggerEvent("selected-nodes", nodeIds);
     });
     
     this.network.on("hold", ({params}) => {
