@@ -138,6 +138,10 @@ function Utensil() {
     console.log(networkRef.current?.network.getSelection());
   };
 
+  const setHoveredChipToVis = (nodeId?: string) => { //nodeId can be null, in which case we clear the hovered nodes.
+    networkRef.current?.network.setHover({node: nodeId});
+  }
+
 const treeTraversal = async () => {
 
   let treeText = "";
@@ -663,7 +667,7 @@ const treeTraversal = async () => {
               setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef}/>
+              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis}/>
             </Box>
           </Paper>
         </Grid>
