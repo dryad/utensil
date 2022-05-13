@@ -70,7 +70,7 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
         }}>
     {line.map((node, nodeIndex) => {
         return <Chip
-        sx={{backgroundColor: 'rgba(0, 0, 0, 0)', textDecoration: props.hoveredNodes.current?.includes(node.id) ? 'underline' : 'none'}}
+        sx={{ backgroundColor: props.hoveredNodes.current?.includes(node.id) ? 'rgba(0, 0, 255, 0.4)' : 'rgba(0, 0, 0, 0)' }}
         key={nodeIndex}
         label={node.label}
         onClick={() => {
