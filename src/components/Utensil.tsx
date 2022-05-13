@@ -21,7 +21,7 @@ import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
-import TreeList from "./TreeList";
+import TreeList from "./Tree/TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
