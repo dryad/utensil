@@ -667,7 +667,7 @@ const treeTraversal = async () => {
               setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis}/>
+              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis} graphs={graphs}/>
             </Box>
           </Paper>
         </Grid>

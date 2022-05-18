@@ -8,7 +8,7 @@ import {
   Divider,
   Box
 } from "@mui/material";
-import { Tree } from "models";
+import { Tree, Graph } from "models";
 import TreeItem from "./TreeItem";
 
 type IGraphListProps = {
@@ -16,6 +16,7 @@ type IGraphListProps = {
     hoveredNodes: string[];
     selectedNodes: string[];
     setHoveredChipToVis: Function;
+    graphs: Graph[];
 };
 
 const TreeList: React.FC<IGraphListProps> = (props) => {
@@ -38,7 +39,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         {trees.map((tree, index) => {
           return (
             <Stack key={index} direction="row" spacing={1} justifyContent="center">
-              <TreeItem tree={tree} hoveredNodes={props.hoveredNodes} selectedNodes={props.selectedNodes} setHoveredChipToVis={props.setHoveredChipToVis}/>
+              <TreeItem tree={tree} graphs={props.graphs} hoveredNodes={props.hoveredNodes} selectedNodes={props.selectedNodes} setHoveredChipToVis={props.setHoveredChipToVis}/>
             </Stack>
           )
 
