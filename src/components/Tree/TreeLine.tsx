@@ -25,9 +25,6 @@ const StyledChip = styled(Chip)`
   &:hover {
     background-color: rgba(0, 0, 255, 0.4);
   }
-  &:focus {
-    background-color: green;
-  }
 `;
 const TreeLine: React.FC<IGraphListProps> = (props) => {
   const line = props.line;
