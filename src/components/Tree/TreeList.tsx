@@ -24,6 +24,7 @@ type IGraphListProps = {
     selectedNodes: string[];
     setHoveredChipToVis: Function;
     graphs: Graph[];
+    addNodeFromChips: Function;
 };
 
 
@@ -70,7 +71,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         })}
         { autoCompleteOpen && (   
           <Stack key={'input'} direction="row" spacing={1} justifyContent="center">    
-            <TreeInput graphs={graphs}/>
+            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips}/>
           </Stack>
           
         )}

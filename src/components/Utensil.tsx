@@ -26,6 +26,7 @@ import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
+import { NODE_COLORS } from "constants/colors";
 
 function Utensil() {
   const UNDO_STEPS_LIMIT = 250;
@@ -381,6 +382,40 @@ const treeTraversal = async () => {
     return newGraph;
   };
 
+  const addNodeFromChips = (name: string, x: number, y: number) => {
+    const node = {
+      id: uuidv4(),
+      label: name,
+      x: 100,
+      y: 100,
+      color: NODE_COLORS[0],
+      level: 0,
+      opacity: 1, // node from chips will have label so opacity = 1
+      isLabelNode: false,
+    };
+    //create labelNode
+    const labelNode = {
+      id: uuidv4(),
+      label: name,
+      font: {
+        size: 14,
+        color: "#000000",
+      },
+      shape: "ellipse",
+      x: -20, //labelNode position is an offset from node
+      y: -20,
+      isLabelNode: true,
+      labelOfNode: node.id,
+      level: node.level,
+    };
+s
+    const existingGraph = JSON.parse(stringifyGraph());
+    existingGraph.nodes.push(node);
+    existingGraph.nodes.push(labelNode);
+    networkRef.current?.setData(existingGraph);
+
+  };
+
   const confirmImportGraph = () => {
     const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
     const data = JSON.parse(graph?.data);
@@ -667,7 +702,13 @@ const treeTraversal = async () => {
               setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
             />
             <Box m={5}>
-              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis} graphs={graphs}/>
+              <TreeList Trees={trees} 
+                hoveredNodes={hoveredNodesRef} 
+                selectedNodes={selectedNodesRef} 
+                setHoveredChipToVis={setHoveredChipToVis}
+                graphs={graphs}
+                addNodeFromChips={addNodeFromChips}
+              />
             </Box>
           </Paper>
         </Grid>

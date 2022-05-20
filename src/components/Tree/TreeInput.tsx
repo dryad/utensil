@@ -13,6 +13,8 @@ import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 type IGraphListProps = {
     graphs: Graph[];
+    setAutoCompleteOpen: Function;
+    addNodeFromChips: Function;
 };
 const filter = createFilterOptions<Graph>();
 
@@ -31,12 +33,8 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
   let marginRight = "0px";
   let marginLeft = "0px";
   const graphs = props.graphs;
-  const [value, setValue] = React.useState<Graph | null>(null);
-  useEffect (() => {
-    if (value !== null) {
-      console.log('new value', value);
-    }
-  }, [value]);
+  const [value, setValue] = React.useState("");
+
   return (
     <Box width={250} sx={{ 
             p: 1, 
@@ -49,21 +47,28 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             backgroundColor: 'rgba(0, 0, 0, 0.1)' 
         }}>
       <Autocomplete
-        value={value}
-        // onChange={(event, newValue) => {
-        //   if (typeof newValue === 'string') {
-        //     setValue({
-        //       name: newValue,
-        //     });
-        //   } else if (newValue && newValue.inputValue) {
-        //     // Create a new value from the user input
-        //     setValue({
-        //       name: newValue.inputValue,
-        //     });
-        //   } else {
-        //     setValue(newValue);
-        //   }
-        // }}
+        inputValue={value}
+        onChange={(event, newValue) => {
+          console.log('onChange', newValue);
+          if (typeof newValue === 'string') {
+            console.log('Creating node with name:', newValue);
+
+
+            setValue("");
+            props.addNodeFromChips(newValue, 100, 100);
+            // enable this after creating node works
+            // props.setAutoCompleteOpen(false);
+          
+          } else if (newValue && newValue.name) {
+            console.log('Importing graph with name:', newValue.name);
+            // Create a new value from the user input
+            // setValue({
+            //   name: newValue.inputValue,
+            // });
+          } else {
+
+          }
+        }}
         filterOptions={(options, params) => {
           const filtered = filter(options, params);
           console.log('filtered', filtered);
@@ -104,6 +109,10 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             {...params} 
             label="" 
             InputProps={{...params.InputProps, disableUnderline: true, style: { fontSize: '0.8125rem' }}}
+            onChange={(event) =>
+              {
+                  setValue(event.target.value)
+              }}
           />
         )}
       />
