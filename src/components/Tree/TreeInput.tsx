@@ -15,6 +15,7 @@ type IGraphListProps = {
     graphs: Graph[];
     setAutoCompleteOpen: Function;
     addNodeFromChips: Function;
+    importGraphFromChips: Function;
 };
 const filter = createFilterOptions<Graph>();
 
@@ -54,24 +55,21 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             console.log('Creating node with name:', newValue);
 
 
-            setValue("");
+
             props.addNodeFromChips(newValue, 100, 100);
-            // enable this after creating node works
-            props.setAutoCompleteOpen(false);
           
           } else if (newValue && newValue.name) {
-            console.log('Importing graph with name:', newValue.name);
-            // Create a new value from the user input
-            // setValue({
-            //   name: newValue.inputValue,
-            // });
+            console.log('Importing graph with name and id:', newValue.name, newValue.id);
+            props.importGraphFromChips(newValue.id);
           } else {
 
           }
+          setValue("");
+          props.setAutoCompleteOpen(false);
         }}
         filterOptions={(options, params) => {
           const filtered = filter(options, params);
-          console.log('filtered', filtered);
+          // console.log('filtered', filtered);
           const { inputValue } = params;
           // Suggest the creation of a new value
           const isExisting = options.some((option) => inputValue === option.name);

@@ -37,7 +37,7 @@ function Utensil() {
   const [graph, setGraph] = useState<Graph | null>(null); // The currently loaded graph object.
   const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
-  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
+  const [graphToLoad, setGraphToLoad, graphToLoadRef] = useState<Graph | null>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
   const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
   const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
@@ -416,8 +416,18 @@ const treeTraversal = async () => {
 
   };
 
+  const importGraphFromChips = async (id: number) => {
+    const graphToImport = graphs.find(g => g.id === id);
+    if (graphToImport) {
+      await setGraphToLoad(graphToImport);
+      confirmImportGraph();
+    };
+
+  }
+
   const confirmImportGraph = () => {
-    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    const graph = graphToLoadRef.current; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    console.log('attempting to parse, graph: ', graph);
     const data = JSON.parse(graph?.data);
     for (let node of data.nodes) {
       if (node.label && node.label.length > 0) {
@@ -430,7 +440,7 @@ const treeTraversal = async () => {
 
     let existingGraph = JSON.parse(stringifyGraph());
     console.log('existing graph', existingGraph);
-    console.log('graph to load', JSON.parse(graphToLoad?.data));
+    console.log('graph to load', JSON.parse(graphToLoadRef?.current.data));
 
     //merge the two graphs
     const newGraph = mergeGraphs(existingGraph, data);
@@ -708,6 +718,7 @@ const treeTraversal = async () => {
                 setHoveredChipToVis={setHoveredChipToVis}
                 graphs={graphs}
                 addNodeFromChips={addNodeFromChips}
+                importGraphFromChips={importGraphFromChips}
               />
             </Box>
           </Paper>

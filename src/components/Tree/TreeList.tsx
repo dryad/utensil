@@ -25,6 +25,7 @@ type IGraphListProps = {
     setHoveredChipToVis: Function;
     graphs: Graph[];
     addNodeFromChips: Function;
+    importGraphFromChips: Function;
 };
 
 
@@ -46,11 +47,11 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
   //   };
   // }, [autoCompleteOpen]);
   
-  // useEffect(() => {
-  //   if (trees.length == 0) {
-  //     setAutoCompleteOpen(true);
-  //   }
-  // }, [trees]);
+  useEffect(() => {
+    if (trees.length == 0) {
+      setAutoCompleteOpen(true);
+    }
+  }, [trees]);
 
   return (
     <Box 
@@ -71,7 +72,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         })}
         { autoCompleteOpen && (   
           <Stack key={'input'} direction="row" spacing={1} justifyContent="center">    
-            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips}/>
+            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips} importGraphFromChips={props.importGraphFromChips}/>
           </Stack>
           
         )}
