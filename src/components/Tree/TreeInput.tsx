@@ -57,7 +57,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             setValue("");
             props.addNodeFromChips(newValue, 100, 100);
             // enable this after creating node works
-            // props.setAutoCompleteOpen(false);
+            props.setAutoCompleteOpen(false);
           
           } else if (newValue && newValue.name) {
             console.log('Importing graph with name:', newValue.name);

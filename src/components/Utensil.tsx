@@ -408,7 +408,7 @@ const treeTraversal = async () => {
       labelOfNode: node.id,
       level: node.level,
     };
-s
+
     const existingGraph = JSON.parse(stringifyGraph());
     existingGraph.nodes.push(node);
     existingGraph.nodes.push(labelNode);

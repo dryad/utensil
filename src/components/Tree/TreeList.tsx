@@ -46,11 +46,11 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
   //   };
   // }, [autoCompleteOpen]);
   
-  useEffect(() => {
-    if (trees.length == 0) {
-      setAutoCompleteOpen(true);
-    }
-  }, [trees]);
+  // useEffect(() => {
+  //   if (trees.length == 0) {
+  //     setAutoCompleteOpen(true);
+  //   }
+  // }, [trees]);
 
   return (
     <Box 
