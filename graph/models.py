@@ -1,4 +1,5 @@
 from django.db import models
+from backend.settings import PRODUCTION
 
 
 class Graph(models.Model):
@@ -19,6 +20,9 @@ class Address(models.Model):
         verbose_name_plural = "Addresses"
     def avatar_url(self):
         if self.avatar:
-            return '/static/' + self.avatar.url.split('/')[2]
+            if PRODUCTION:
+                return '/avatars/' + self.avatar.url.split('/')[2]
+            else:
+                return '/static/' + self.avatar.url.split('/')[2]
         else:
             return ""

@@ -31,6 +31,7 @@ SECRET_KEY = '8cbt66kg@!-3l2dgeaqmarjgy6wy0h+7(&+a^2*hd3olh6vj*b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+PRODUCTION = False # used by models.py to set correct avatar location 
 
 # ALLOWED_HOSTS = ['react-dj-todoapp.herokuapp.com', '127.0.0.1:8000', 'localhost']
 ALLOWED_HOSTS = ['*']
@@ -144,7 +145,7 @@ STATICFILES_DIRS = [
    
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # # Whitelist localhost:3000 because that's where frontend will be served
@@ -155,6 +156,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Activate Django-Heroku.
-django_heroku.settings(locals())
-options = DATABASES['default'].get('OPTIONS', {})
-options.pop('sslmode', None)
+#django_heroku.settings(locals())
+#options = DATABASES['default'].get('OPTIONS', {})
+#options.pop('sslmode', None)
