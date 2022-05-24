@@ -4,7 +4,7 @@
 # We will create a graph/serializers.py file:
 
 from rest_framework import serializers
-from .models import Graph
+from .models import Graph, Address
 
 #  Specify the model to work with and the fields we want to be converted to JSON.
 
@@ -13,3 +13,8 @@ class GraphSerializer(serializers.ModelSerializer):
     class Meta:
         model = Graph
         fields = ('id', 'name', 'data', 'note')
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('id', 'name', 'address', 'avatar_url')

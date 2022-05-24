@@ -26,10 +26,11 @@ type INetworkProps = {
   buttonModeRef: any;
   hoveredNodes: any;
   setHoveredNodesFromNetwork: Function;
-
+  selectedNodes: any;
+  setSelectedNodesFromNetwork: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -435,7 +436,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       networkRef.current.on("click-node", node => {
         if (!node.isLabelNode) {
-          deleteIfDeleteMode(); // run callback function to App.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
+          deleteIfDeleteMode(); // run callback function to Utensil.tsx, where it can check if delete mode is on. The selected (last clicked) node will be deleted if delete mode is on.
         }
       });
 
@@ -448,7 +449,13 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       networkRef.current.on("hovered-nodes", nodeIds => {
         // console.log('hovered nodes received: ', nodeIds.length);
         // console.log(Object.values(nodeIds));
-        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to App.tsx, will save the hovered node IDs to state  
+        setHoveredNodesFromNetwork(Object.values(nodeIds)); // run callback function to Utensil.tsx, will save the hovered node IDs to state  
+      });
+
+      networkRef.current.on("selected-nodes", nodeIds => {
+        console.log('selected nodes received: ', nodeIds.length);
+        console.log(Object.values(nodeIds));
+        setSelectedNodesFromNetwork(Object.values(nodeIds)); // run callback function to Utensil.tsx, will save the hovered node IDs to state  
       });
 
 
