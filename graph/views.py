@@ -1,10 +1,45 @@
-from .serializers import GraphSerializer
-from .models import Graph
+from .serializers import GraphSerializer, AddressSerializer
+from .models import Graph, Address
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, base64
+from django.core.files.base import ContentFile
+
+@csrf_exempt
+def address(request, addressId=None):
+    if request.method == 'GET':
+        if addressId is not None:
+            address, created = Address.objects.get_or_create(address=addressId)
+        # print (address)
+        if address:
+            serializer = AddressSerializer(address, many=False)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return HttpResponseNotFound()
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        address, created = Address.objects.get_or_create(address=addressId)
+        # print('DATA:', data)
+        address.name = data['editAddress']['name']
+            # save avatar image from post request
+        if 'avatar' in data['editAddress']:
+            avatar = data['editAddress']['avatar']
+            print('avatar length:', len(avatar))
+            if len(avatar) > 0:
+                format, imgstr = avatar.split(';base64,') 
+                ext = format.split('/')[-1] 
+                data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext) # You can save this as file instance.
+                address.avatar.save(address.address + '.png', data, save=True)
+                # address.avatar = address.address + '.png'
+            # address.avatar.save(avatar.name, avatar)
+
+        address.save()
+
+        serializer = AddressSerializer(address, many=False)
+        return JsonResponse(serializer.data, safe=False)
+
 
 @csrf_exempt
 def graphs(request, graphId=None):

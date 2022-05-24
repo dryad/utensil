@@ -15,12 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from graph import views
 
+#urlpatterns = [
+#    path('', RedirectView.as_view(url='/graph/', permanent=True)),
+
+
 urlpatterns = [
+    path('admin', RedirectView.as_view(url='/admin/', permanent=True)),
     path('admin/', admin.site.urls),         
     path('api/graphs/', views.graphs),
     path('api/graphs/<int:graphId>/', views.graphs),
+    path('api/address/<str:addressId>/', views.address),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]

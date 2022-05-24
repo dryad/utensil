@@ -1,10 +1,12 @@
-from graph.models import Graph
+from graph.models import Graph, Address
 from django.contrib import admin
 
 
 class GraphAdmin(admin.ModelAdmin):
-    list_display = ('name', 'data', 'note')
+    list_display = ('name', 'note', 'private')
 
-
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('name', 'address')
 # Register your models here.
 admin.site.register(Graph, GraphAdmin)
+admin.site.register(Address, AddressAdmin)

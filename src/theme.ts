@@ -19,7 +19,7 @@ const theme = createTheme(adaptV4Theme({
     //   main: red.A400,
     // },
     background: {
-      default: "#282c34",
+      default: "#211f24",
     },
   },
   overrides: {
