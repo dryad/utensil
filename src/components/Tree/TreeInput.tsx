@@ -6,7 +6,13 @@ import {
   Stack,
   Typography,
   Divider,
-  Box
+  Box,
+  Card,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Popper
 } from "@mui/material";
 import { Node, TreeNode, Graph } from "models";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
@@ -24,6 +30,17 @@ const StyledChip = styled(Chip)`
     background-color: rgba(0, 0, 255, 0.4);
   }
 `;
+
+const styles = (theme) => ({
+  popper: {
+    maxWidth: "fit-content"
+  }
+});
+
+const PopperMy = function (props) {
+  return <Popper {...props} style={styles.popper} placement="bottom-start" />;
+};
+
 const TreeInput: React.FC<IGraphListProps> = (props) => {
   // console.log('props.hoverNodes', props.hoveredNodes.current?.includes('a0e91e03-21bd-4413-b875-4c8cb801f335'));
   let borderTopLeftRadius = 16;
@@ -48,6 +65,69 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             backgroundColor: 'rgba(0, 0, 0, 0.1)' 
         }}>
       <Autocomplete
+        PopperComponent={PopperMy}
+        // renderOption={(props, option, state) => {
+        //   return (
+        //     <>
+        //     <Box
+        //       sx={{
+        //         p: 1,
+        //         backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        //       }}
+        //     ></Box>
+        //       <li
+        //         key={`${option.id}: ${option.name}`}
+        //       >{`${option.id}: ${option.name}`}</li>
+        //       </>
+        //       ); //display value
+        // }}
+        // renderOption={(props, option, state) => 
+        //     <ListItem alignItems="flex-start" key={option.id}>
+        //     <ListItemAvatar>
+        //       <Avatar alt={option.name.toUpperCase()} src="/static/images/avatar/1.jpg" />
+        //     </ListItemAvatar>
+        //     <ListItemText
+        //       primary={option.name}
+        //       secondary={
+        //         <React.Fragment>
+        //           <Typography
+        //             component="span"
+        //             variant="body2"
+        //             // className={classes.inline}
+        //             color="textPrimary"
+        //           >
+        //             {option.note}
+        //           </Typography>
+        //         </React.Fragment>
+        //       }
+        //     />
+        //     </ListItem>
+        // }
+        renderOption={(props, option) => (
+          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+            <img
+              loading="lazy"
+              width="40"
+              height="40"
+              alt=""
+            />
+                 <ListItemText
+                   primary={option.name}
+                   secondary={
+                     <React.Fragment>
+                       <Typography
+                         component="span"
+                         variant="body2"
+                         // className={classes.inline}
+                         color="textPrimary"
+                       >
+                         {option.note}
+                      </Typography>
+             </React.Fragment>
+            }
+            />
+          </Box>
+        )}
         inputValue={value}
         onChange={(event, newValue) => {
           console.log('onChange', newValue);
@@ -55,7 +135,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             // type name of graph, its found in db. press enter or click name.
             console.log('Importing graph with name and id:', newValue.name, newValue.id);
             props.importGraphFromChips(newValue.id);
-          } else if (typeof newValue === 'string' || (newValue.name && typeof newValue.name === 'string')) {
+          } else if (typeof newValue === 'string' || (newValue !== null && newValue.name !== null && typeof newValue.name === 'string')) {
             // type name of new node press enter or click name
             let nodeName = newValue.inputValue ? newValue.inputValue : newValue;
             console.log('Creating node with name:', nodeName);
@@ -95,7 +175,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
           // Regular option
           return option.name;
         }}
-        renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
+        // renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
         freeSolo
         renderInput={(params) => (
           <TextField 
