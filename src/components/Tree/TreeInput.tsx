@@ -31,18 +31,11 @@ const StyledChip = styled(Chip)`
   }
 `;
 
-const styles = (theme) => ({
-  popper: {
-    maxWidth: "fit-content"
-  }
-});
-
-const PopperMy = function (props) {
-  return <Popper {...props} style={styles.popper} placement="bottom-start" />;
+const StyledPopper = function (props) {
+  return <Popper {...props} style={{maxWidth: "fit-content"}} placement="bottom-start" />;
 };
 
 const TreeInput: React.FC<IGraphListProps> = (props) => {
-  // console.log('props.hoverNodes', props.hoveredNodes.current?.includes('a0e91e03-21bd-4413-b875-4c8cb801f335'));
   let borderTopLeftRadius = 16;
   let borderTopRightRadius = 16;
   let borderBottomLeftRadius = 16;
@@ -65,44 +58,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             backgroundColor: 'rgba(0, 0, 0, 0.1)' 
         }}>
       <Autocomplete
-        PopperComponent={PopperMy}
-        // renderOption={(props, option, state) => {
-        //   return (
-        //     <>
-        //     <Box
-        //       sx={{
-        //         p: 1,
-        //         backgroundColor: 'rgba(0, 0, 0, 0.1)',
-        //       }}
-        //     ></Box>
-        //       <li
-        //         key={`${option.id}: ${option.name}`}
-        //       >{`${option.id}: ${option.name}`}</li>
-        //       </>
-        //       ); //display value
-        // }}
-        // renderOption={(props, option, state) => 
-        //     <ListItem alignItems="flex-start" key={option.id}>
-        //     <ListItemAvatar>
-        //       <Avatar alt={option.name.toUpperCase()} src="/static/images/avatar/1.jpg" />
-        //     </ListItemAvatar>
-        //     <ListItemText
-        //       primary={option.name}
-        //       secondary={
-        //         <React.Fragment>
-        //           <Typography
-        //             component="span"
-        //             variant="body2"
-        //             // className={classes.inline}
-        //             color="textPrimary"
-        //           >
-        //             {option.note}
-        //           </Typography>
-        //         </React.Fragment>
-        //       }
-        //     />
-        //     </ListItem>
-        // }
+        PopperComponent={StyledPopper}
         renderOption={(props, option) => (
           <div key={option.id}>
           <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
@@ -178,7 +134,6 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
           // Regular option
           return option.name;
         }}
-        // renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
         freeSolo
         renderInput={(params) => (
           <TextField 
