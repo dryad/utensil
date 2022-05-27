@@ -44,7 +44,6 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
   let marginRight = "0px";
   let marginLeft = "0px";
   const graphs = props.graphs;
-  const [value, setValue] = React.useState("");
 
   return (
     <Box width={250} sx={{ 
@@ -86,7 +85,6 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
           </Box>
           </div>
         )}
-        inputValue={value}
         onChange={(event, newValue) => {
           console.log('onChange', newValue);
           if (newValue && newValue.data) {
@@ -99,7 +97,6 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             console.log('Creating node with name:', nodeName);
             props.addNodeFromChips(nodeName, 100, 100);
           }
-          setValue("");
           props.setAutoCompleteOpen(false);
         }}
         filterOptions={(options, params) => {
@@ -138,14 +135,9 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
         renderInput={(params) => (
           <TextField 
             variant="standard" 
-            fullWidth 
             {...params} 
             label="" 
             InputProps={{...params.InputProps, disableUnderline: true, style: { fontSize: '0.8125rem' }}}
-            onChange={(event) =>
-              {
-                  setValue(event.target.value)
-              }}
           />
         )}
       />
