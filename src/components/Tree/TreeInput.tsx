@@ -51,18 +51,15 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
         inputValue={value}
         onChange={(event, newValue) => {
           console.log('onChange', newValue);
-          if (typeof newValue === 'string') {
-            console.log('Creating node with name:', newValue);
-
-
-
-            props.addNodeFromChips(newValue, 100, 100);
-          
-          } else if (newValue && newValue.name) {
+          if (newValue && newValue.id) {
+            // type name of graph, its found in db. press enter or click name.
             console.log('Importing graph with name and id:', newValue.name, newValue.id);
             props.importGraphFromChips(newValue.id);
-          } else {
-
+          } else if (typeof newValue === 'string' || (newValue.name && typeof newValue.name === 'string')) {
+            // type name of new node press enter or click name
+            let nodeName = newValue.inputValue ? newValue.inputValue : newValue;
+            console.log('Creating node with name:', nodeName);
+            props.addNodeFromChips(nodeName, 100, 100);
           }
           setValue("");
           props.setAutoCompleteOpen(false);
