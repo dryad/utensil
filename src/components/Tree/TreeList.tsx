@@ -35,17 +35,6 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
   const graphs = props.graphs;
 
   const [autoCompleteOpen, setAutoCompleteOpen] = React.useState(false);
-
-  // useEffect(() => {
-  //   if (autoCompleteOpen) {
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //   } else {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   }
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [autoCompleteOpen]);
   
   useEffect(() => {
     if (trees.length == 0) {
@@ -56,12 +45,15 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
   return (
     <Box 
       sx={{ p: 2, border: '1px solid grey', borderRadius: '16px' }}
-      // onClick={() => { setAutoCompleteOpen(false) }}
+      onClick={(event) => { 
+        if (event.target === event.currentTarget) {
+          setAutoCompleteOpen(true);
+        }
+      }}
     >
       <Stack
         direction="column"
         spacing={1}
-        onClick={() => { setAutoCompleteOpen(true) }}
       >
         {trees.map((tree, index) => {
           return (
