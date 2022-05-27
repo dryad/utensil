@@ -262,34 +262,6 @@ const treeTraversal = async () => {
     }
   };
 
-  const confirmReplaceGraph = () => {
-      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
-      setGraph(graph);
-      setGraphId(graphToIdToLoad);
-
-      setGraphName(graph.name);
-      setGraphNote(graph.note);
-      const data = JSON.parse(graph?.data);
-
-      for (let node of data.nodes) {
-        if (node.label && node.label.length > 0) {
-          node.opacity = 1;
-        }
-        else {
-          node.opacity = 0;
-        }
-      }
-
-      networkRef.current?.setData(data);
-        
-      //clear Undo/Redo history
-      // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
-      setHistoryListForward([]);
-
-      //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
-      onButton('pan');
-  }
-
   const confirmDeleteGraph = async () => {
     // this is run when the user confirms they want to delete a graph.
     console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
@@ -419,8 +391,14 @@ const treeTraversal = async () => {
   const importGraphFromChips = async (id: number) => {
     const graphToImport = graphs.find(g => g.id === id);
     if (graphToImport) {
+      graphToImport.id = null; // clear id so it will be imported as a new graph, and we will not be able to "save" / overwrite it
       await setGraphToLoad(graphToImport);
-      confirmImportGraph();
+      if (canImportGraph()) {
+        confirmImportGraph();
+      }
+      else {
+        confirmReplaceGraph();
+      }
     };
 
   }
@@ -449,7 +427,35 @@ const treeTraversal = async () => {
     networkRef.current?.setData(newGraph);
       
   }
-  
+
+  const confirmReplaceGraph = () => {
+    const graph = graphToLoadRef.current; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    setGraph(graph);
+    setGraphId(graph.id);
+
+    setGraphName(graph.name);
+    setGraphNote(graph.note);
+    const data = JSON.parse(graph?.data);
+
+    for (let node of data.nodes) {
+      if (node.label && node.label.length > 0) {
+        node.opacity = 1;
+      }
+      else {
+        node.opacity = 0;
+      }
+    }
+
+    networkRef.current?.setData(data);
+      
+    //clear Undo/Redo history
+    // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
+    setHistoryListForward([]);
+
+    //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
+    onButton('pan');
+  }
+
   const setGraphFromNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
     // console.log('Setting snapped nodes and edges:', nodes, edges);
     const existingGraph = JSON.parse(stringifyGraph());
