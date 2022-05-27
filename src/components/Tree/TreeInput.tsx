@@ -104,6 +104,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
         //     </ListItem>
         // }
         renderOption={(props, option) => (
+          <div key={option.id}>
           <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
             <img
               loading="lazy"
@@ -127,11 +128,12 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             }
             />
           </Box>
+          </div>
         )}
         inputValue={value}
         onChange={(event, newValue) => {
           console.log('onChange', newValue);
-          if (newValue && newValue.id) {
+          if (newValue && newValue.data) {
             // type name of graph, its found in db. press enter or click name.
             console.log('Importing graph with name and id:', newValue.name, newValue.id);
             props.importGraphFromChips(newValue.id);
@@ -154,6 +156,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             filtered.push({
               inputValue,
               name: `Add "${inputValue}"`,
+              id: '0',
             });
           }
           return filtered;
