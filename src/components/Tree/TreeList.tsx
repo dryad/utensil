@@ -58,7 +58,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         spacing={1}
       >
         {!autoCompleteOpen && (
-          <Stack direction="row" spacing={1} justifyContent="center">
+          <Stack key={0} direction="row" spacing={1} justifyContent="center">
           <IconButton color="primary" aria-label="add" component="span">
             <AddCircleOutlineIcon
               onClick={() => {

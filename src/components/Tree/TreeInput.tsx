@@ -137,6 +137,7 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             variant="standard" 
             {...params} 
             label="" 
+            autoFocus
             InputProps={{...params.InputProps, disableUnderline: true, style: { fontSize: '0.8125rem' }}}
           />
         )}
