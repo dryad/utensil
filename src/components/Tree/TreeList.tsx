@@ -53,7 +53,12 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
     //   }
     // }}
     >
+      <Stack
+        direction="column"
+        spacing={1}
+      >
         {!autoCompleteOpen && (
+          <Stack direction="row" spacing={1} justifyContent="center">
           <IconButton color="primary" aria-label="add" component="span">
             <AddCircleOutlineIcon
               onClick={() => {
@@ -68,11 +73,8 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
             }}
             />
           </IconButton>
+          </Stack>
         )}
-      <Stack
-        direction="column"
-        spacing={1}
-      >
         {trees.map((tree, index) => {
           return (
             <Stack key={index} direction="row" spacing={1} justifyContent="center">
