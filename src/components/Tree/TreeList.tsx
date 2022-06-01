@@ -75,6 +75,11 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
           </IconButton>
           </Stack>
         )}
+        {autoCompleteOpen && (
+          <Stack key={'input'} direction="row" spacing={1} justifyContent="center">
+            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips} importGraphFromChips={props.importGraphFromChips} />
+          </Stack>
+        )}
         {trees.map((tree, index) => {
           return (
             <Stack key={index} direction="row" spacing={1} justifyContent="center">
@@ -82,11 +87,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
             </Stack>
           )
         })}
-        {autoCompleteOpen && (
-          <Stack key={'input'} direction="row" spacing={1} justifyContent="center">
-            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips} importGraphFromChips={props.importGraphFromChips} />
-          </Stack>
-        )}
+
       </Stack>
     </Box>
   );
