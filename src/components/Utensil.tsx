@@ -275,13 +275,12 @@ const treeTraversal = async () => {
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
   }
 
-  function mergeGraphs(graph1: Graph, graph2: Graph) {
-
+  function getFullWidth(graph: Graph) {
     //calculate min(x), min(y), max(x), max(y) of graph1
     //quick and dirty calculation
     let x_values = [];
     let y_values = [];
-    for (const node of graph1.nodes) {
+    for (const node of graph.nodes) {
       x_values.push(node.x);
       y_values.push(node.y);
     }
@@ -295,9 +294,24 @@ const treeTraversal = async () => {
     console.log('max_x', max_x);
     console.log('max_y', max_y);
 
-    const fullWidth = (max_x - min_x);
-    const halfGraphWidth = fullWidth / 2;
+    return max_x - min_x;
+  }
 
+  function getMaxGraphX(graph: Graph) {
+    //calculate min(x), min(y), max(x), max(y) of graph1
+    //quick and dirty calculation
+    let x_values = [];
+    for (const node of graph.nodes) {
+      x_values.push(node.x);
+    }
+    const max_x = Math.max(...x_values);
+
+    return max_x;
+  }
+
+  function mergeGraphs(graph1: Graph, graph2: Graph) {
+
+    const fullWidth = getFullWidth(graph1);
     let renamed_nodes = {}; // old_id: new id
 
     // To prevent duplicate node IDs from the incoming graph, give each node a new id
@@ -358,8 +372,8 @@ const treeTraversal = async () => {
     const node = {
       id: uuidv4(),
       label: name,
-      x: 100,
-      y: 100,
+      x: 0,
+      y: 0,
       color: NODE_COLORS[0],
       level: 0,
       opacity: 1, // node from chips will have label so opacity = 1
@@ -381,7 +395,12 @@ const treeTraversal = async () => {
       level: node.level,
     };
 
+    
     const existingGraph = JSON.parse(stringifyGraph());
+    let max_x = getMaxGraphX(existingGraph);
+
+    node.x = max_x + 50;
+    node.y = 50;
     existingGraph.nodes.push(node);
     existingGraph.nodes.push(labelNode);
     networkRef.current?.setData(existingGraph);
