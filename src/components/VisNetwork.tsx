@@ -453,8 +453,9 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       });
 
       networkRef.current.on("selected-nodes", nodeIds => {
-        console.log('selected nodes received: ', nodeIds.length);
-        console.log(Object.values(nodeIds));
+        // console.log('selected nodes received: ', nodeIds.length);
+        // console.log('isUserDragging: ', window.isUserDragging);
+        // console.log(Object.values(nodeIds));
         setSelectedNodesFromNetwork(Object.values(nodeIds)); // run callback function to Utensil.tsx, will save the hovered node IDs to state  
       });
 
