@@ -275,54 +275,55 @@ const treeTraversal = async () => {
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
   }
 
-  function getFullWidth(graph: Graph) {
-    //calculate min(x), min(y), max(x), max(y) of graph1
-    //quick and dirty calculation
+  function getMaxGraphX(graph: Graph) {
+
     let x_values = [];
-    let y_values = [];
     for (const node of graph.nodes) {
-      x_values.push(node.x);
-      y_values.push(node.y);
+      if (!node.isLabelNode) {
+        x_values.push(node.x);
+      }
     }
-    const min_x = Math.min(...x_values);
-    const min_y = Math.min(...y_values);
     const max_x = Math.max(...x_values);
-    const max_y = Math.max(...y_values);
-
-    console.log('min_x', min_x);
-    console.log('min_y', min_y);
-    console.log('max_x', max_x);
-    console.log('max_y', max_y);
-
-    return max_x - min_x;
+    if (max_x > 0) {
+      return max_x;
+    }
+    else {
+      return 0;
+    }
   }
 
-  function getMaxGraphX(graph: Graph) {
-    //calculate min(x), min(y), max(x), max(y) of graph1
-    //quick and dirty calculation
+  function getMinGraphX(graph: Graph) {
+
     let x_values = [];
     for (const node of graph.nodes) {
-      x_values.push(node.x);
+      if (!node.isLabelNode) {
+        x_values.push(node.x);
+      }
     }
-    const max_x = Math.max(...x_values);
-
-    return max_x;
+    const min_x = Math.min(...x_values);
+    return min_x;
   }
 
   function mergeGraphs(graph1: Graph, graph2: Graph) {
 
-    const fullWidth = getFullWidth(graph1);
+    const max_x = getMaxGraphX(graph1);
+    const min_x = getMinGraphX(graph2);
     let renamed_nodes = {}; // old_id: new id
 
+    console.log('max_x', max_x);
+    console.log('min_x', min_x);
     // To prevent duplicate node IDs from the incoming graph, give each node a new id
     // first pass is non-labelNodes because we need a complete map of all nodes before labelNodes are processed, so we can update labelOfNode field of labelNodes.
     // alternative is to sort the nodes by isLabelNode, so it will process non-labelNodes first, then labelNodes second
+    
+    const offset = Math.abs(max_x - min_x);
+
     for (const node of graph2.nodes) {
       if (!node.isLabelNode) {
         const new_id = uuidv4();
         renamed_nodes[node.id] = new_id;
         node.id = new_id;
-        node.x += fullWidth + 20; // apply offset calculated above
+        node.x += offset + 50; // when importing graph, offset by abs(max_x(graph1) - min_x(graph2)) + 50
       }
     }
 
@@ -398,7 +399,6 @@ const treeTraversal = async () => {
     
     const existingGraph = JSON.parse(stringifyGraph());
     let max_x = getMaxGraphX(existingGraph);
-
     node.x = max_x + 50;
     node.y = 50;
     existingGraph.nodes.push(node);
