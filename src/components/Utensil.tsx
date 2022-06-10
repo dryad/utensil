@@ -752,7 +752,7 @@ const treeTraversal = async () => {
           <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
           <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
           </Paper>
-          <Paper>
+          {/* <Paper>
             <Box m={1}>
               <TextField
                 margin="normal"
@@ -768,14 +768,14 @@ const treeTraversal = async () => {
               />
 
             </Box>
-          </Paper>
-          <GraphList
+          </Paper> */}
+          {/* <GraphList
             graphs={graphs}
             onGraphSelected={handleGraphSelected}
             onGraphDelete={handleGraphDelete}
             searchQuery={searchQuery}
             address_is_whitelisted={address_is_whitelisted}
-          />
+          /> */}
           <Card variant="outlined">
             <CardContent>
               <Box m={1}>
