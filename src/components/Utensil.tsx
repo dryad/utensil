@@ -590,8 +590,10 @@ const treeTraversal = async () => {
 
     if (nodes) {
       for (const node of nodes) {
-        node.x = positions[node.id].x;
-        node.y = positions[node.id].y;
+        if (positions[node.id] !== undefined) {
+          node.x = positions[node.id].x;
+          node.y = positions[node.id].y;
+        }
       }
 
     }
@@ -648,6 +650,16 @@ const treeTraversal = async () => {
     saveGraphToDatabase(true);
   }
 
+  const handleClearGraph = async () => {
+    networkRef.current?.setData({ nodes: [], edges: [] });
+    setGraphName("");
+    setGraphNote("");
+    setGraphId(null);
+    setHistoryListBack([]);
+    setHistoryListForward([]);
+    setTrees([]);
+  }
+
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
@@ -680,12 +692,12 @@ const treeTraversal = async () => {
                 <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
                   Save
                 </Button>
-                <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
+                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} sx={{ 'margin-bottom': 'unset' }}>
                   Save As New
                 </Button>
-                {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
-                  Clear Graph
-                </Button> */}
+                <Button variant="outlined" color="primary" onClick={handleClearGraph} sx={{ 'margin-bottom': 'unset' }}>
+                  Clear
+                </Button>
                 { address_is_whitelisted() && (
                   <>
                   <Button variant="outlined" color="primary" onClick={testButton}>
