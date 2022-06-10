@@ -21,6 +21,7 @@ import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import ConfirmClearDialog from "./ConfirmClearDialog";
 import TreeList from "./Tree/TreeList";
 import { Tree } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -51,6 +52,7 @@ function Utensil() {
   const [trees, setTrees] = useState<Tree[]>([]); // The list of trees shown on the bottom of the app.
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false); // Whether the user is currently confirming a graph clear.
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
@@ -512,7 +514,6 @@ const treeTraversal = async () => {
     } 
   };
 
-
   const onUndo = () => {
     if (historyListBack.length > 1) {
       const newHistoryForward : string = stringifyGraph();
@@ -663,6 +664,14 @@ const treeTraversal = async () => {
   }
 
   const handleClearGraph = async () => {
+    if (changedSinceLastSave) {
+      setConfirmClearOpen(true);
+    }
+    else {
+      confirmClearGraph();
+    }
+  }
+  const confirmClearGraph = async () => {
     networkRef.current?.setData({ nodes: [], edges: [] });
     setGraphName("");
     setGraphNote("");
@@ -749,6 +758,15 @@ const treeTraversal = async () => {
               onConfirmDelete={confirmDeleteGraph}
             >
             </ConfirmDeleteDialog>
+            <ConfirmClearDialog
+              // title={graphToLoad && graphToLoad.name}
+              open={confirmClearOpen}
+              setOpen={setConfirmClearOpen}
+              onConfirmClear={confirmClearGraph}
+              // onConfirmImport={confirmImportGraph}
+              // canImportGraph={canImportGraph}
+            >
+            </ConfirmClearDialog>
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
