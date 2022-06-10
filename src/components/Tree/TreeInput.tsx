@@ -43,26 +43,32 @@ const StyledPopper = function (props) {
   return <Popper {...props}
     modifiers={{
       flip: {
-        enabled: false,
+        // enabled: false,
+      },
+      scroll: {
+        enabled: true,
       }
     }}
     popperOptions={{
       placement: 'top',
     }}
-    style={{ maxWidth: "fit-content" }} placement="bottom-start" />;
+    style={{ maxWidth: "fit-content" }} />;
 };
 
 const customListbox = (props) => {
   const { children, ...other } = props;
   return (
-    <Table
+    <Table style={{ overflowY: 'scroll' }}
       {...other}
     >
-      <TableBody>
+      <TableBody >
         {children}
       </TableBody>
       <TableFooter>
              <TableRow>
+                  <TableCell>
+                   image
+                 </TableCell>
                  <TableCell>
                    NAME
                  </TableCell>
@@ -114,7 +120,15 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
         PopperComponent={StyledPopper}
         ListboxComponent={customListbox}
         renderOption={(props, option) => (
-          <TableRow>
+          <TableRow key={option.id}>
+                   <TableCell>
+                   <img
+                      loading="lazy"
+                      width="40"
+                      height="40"
+                      alt=""
+                    />
+                   </TableCell>
                    <TableCell>
                      {option.name}
                    </TableCell>
