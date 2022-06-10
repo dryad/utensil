@@ -22,6 +22,7 @@ type IGraphListProps = {
     setAutoCompleteOpen: Function;
     addNodeFromChips: Function;
     importGraphFromChips: Function;
+    setSearchQuery: Function;
 };
 const filter = createFilterOptions<Graph>();
 
@@ -44,6 +45,10 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
   let marginRight = "0px";
   let marginLeft = "0px";
   const graphs = props.graphs;
+
+  const handleChange = async (value) => {
+    props.setSearchQuery(value);
+  };
 
   return (
     <Box width={250} sx={{ 
@@ -139,6 +144,11 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             label="" 
             autoFocus
             InputProps={{...params.InputProps, disableUnderline: true, style: { fontSize: '0.8125rem' }}}
+            onChange={event => {
+              if (event.target.value !== "" || event.target.value !== null) {
+                handleChange(event.target.value);
+              }
+            }}
           />
         )}
       />

@@ -28,6 +28,7 @@ type IGraphListProps = {
     graphs: Graph[];
     addNodeFromChips: Function;
     importGraphFromChips: Function;
+    setSearchQuery: Function;
 };
 
 
@@ -77,7 +78,7 @@ const TreeList: React.FC<IGraphListProps> = (props) => {
         )}
         {autoCompleteOpen && (
           <Stack key={'input'} direction="row" spacing={1} justifyContent="center">
-            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips} importGraphFromChips={props.importGraphFromChips} />
+            <TreeInput graphs={graphs} setAutoCompleteOpen={setAutoCompleteOpen} addNodeFromChips={props.addNodeFromChips} importGraphFromChips={props.importGraphFromChips} setSearchQuery={props.setSearchQuery} />
           </Stack>
         )}
         {trees.map((tree, index) => {

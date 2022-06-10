@@ -744,6 +744,7 @@ const treeTraversal = async () => {
                 graphs={graphs}
                 addNodeFromChips={addNodeFromChips}
                 importGraphFromChips={importGraphFromChips}
+                setSearchQuery={setSearchQuery}
               />
             </Box>
           </Paper>

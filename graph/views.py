@@ -48,7 +48,7 @@ def graphs(request, graphId=None):
         if search_query is not None:
             graphs = Graph.objects.filter(
                 Q(name__icontains=search_query) |
-                Q(data__icontains=search_query) |
+                # Q(data__icontains=search_query) |
                 Q(note__icontains=search_query)
             )
         else:
