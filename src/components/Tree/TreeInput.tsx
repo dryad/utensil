@@ -12,8 +12,15 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
-  Popper
+  Popper,
+  TableFooter,
 } from "@mui/material";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import { Node, TreeNode, Graph } from "models";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
@@ -33,8 +40,49 @@ const StyledChip = styled(Chip)`
 `;
 
 const StyledPopper = function (props) {
-  return <Popper {...props} style={{maxWidth: "fit-content"}} placement="bottom-start" />;
+  return <Popper {...props}
+    modifiers={{
+      flip: {
+        enabled: false,
+      }
+    }}
+    popperOptions={{
+      placement: 'top',
+    }}
+    style={{ maxWidth: "fit-content" }} placement="bottom-start" />;
 };
+
+const customListbox = (props) => {
+  const { children, ...other } = props;
+  return (
+    <Table
+      {...other}
+    >
+      <TableBody>
+        {children}
+      </TableBody>
+      <TableFooter>
+             <TableRow>
+                 <TableCell>
+                   NAME
+                 </TableCell>
+                 <TableCell>
+                   # uses
+                 </TableCell>
+                 <TableCell>
+                   depth
+                 </TableCell>
+                 <TableCell>
+                   # authors
+                 </TableCell>
+                 <TableCell>
+                   description
+                 </TableCell>
+               </TableRow>
+      </TableFooter>
+    </Table>
+  );
+}
 
 const TreeInput: React.FC<IGraphListProps> = (props) => {
   let borderTopLeftRadius = 16;
@@ -62,33 +110,27 @@ const TreeInput: React.FC<IGraphListProps> = (props) => {
             backgroundColor: 'rgba(0, 0, 0, 0.1)' 
         }}>
       <Autocomplete
+        // disablePortal={true} // always on top
         PopperComponent={StyledPopper}
+        ListboxComponent={customListbox}
         renderOption={(props, option) => (
-          <div key={option.id}>
-          <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-            <img
-              loading="lazy"
-              width="40"
-              height="40"
-              alt=""
-            />
-                 <ListItemText
-                   primary={option.name}
-                   secondary={
-                     <React.Fragment>
-                       <Typography
-                         component="span"
-                         variant="body2"
-                         // className={classes.inline}
-                         color="textPrimary"
-                       >
-                         {option.note}
-                      </Typography>
-             </React.Fragment>
-            }
-            />
-          </Box>
-          </div>
+          <TableRow>
+                   <TableCell>
+                     {option.name}
+                   </TableCell>
+                   <TableCell>
+                     <></>
+                   </TableCell>
+                   <TableCell>
+                    <></>
+                   </TableCell>
+                   <TableCell>
+                    <></> 
+                   </TableCell>
+                   <TableCell>
+                     {option.note}
+                   </TableCell>
+                 </TableRow>
         )}
         onChange={(event, newValue) => {
           console.log('onChange', newValue);
