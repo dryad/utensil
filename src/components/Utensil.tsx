@@ -54,6 +54,7 @@ function Utensil() {
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
+  const [changedSinceLastSave, setChangedSinceLastSave] = useState(false); // Whether the graph has changed since it was last saved.
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -85,6 +86,9 @@ function Utensil() {
           let newHistoryObject = JSON.parse(newHistory);
           newHistoryObject.isUndoStep = true; // this is where we classify graph history as an undo step, for above comparison.
           setHistoryListBack((state) => [JSON.stringify(newHistoryObject), ...state.slice(0, UNDO_STEPS_LIMIT - 1)]); // appends new undo step, but only keeps the last X steps.
+          if (historyListBackRef.current.length > 1 ) {
+            setChangedSinceLastSave(true);
+          }
         }
       }
       repeat = setTimeout(detectChange, 500);
@@ -473,6 +477,12 @@ const treeTraversal = async () => {
 
     //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
     onButton('pan');
+    
+    //start timer after 500ms, to override changedSinceLastSave, because after loading a graph, an undo step is created which will set it to true, but it needs to be false
+    setTimeout(() => {
+      setChangedSinceLastSave(false);
+    }, 500);
+       
   }
 
   const setGraphFromNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
@@ -644,10 +654,12 @@ const treeTraversal = async () => {
 
   const handleSave = async () => {
     saveGraphToDatabase();
+    setChangedSinceLastSave(false);
   };
 
   const handleSaveAsNew = async () => {
     saveGraphToDatabase(true);
+    setChangedSinceLastSave(false);
   }
 
   const handleClearGraph = async () => {
@@ -658,6 +670,8 @@ const treeTraversal = async () => {
     setHistoryListBack([]);
     setHistoryListForward([]);
     setTrees([]);
+    setChangedSinceLastSave(false);
+    setButtonMode("pan");
   }
 
   useEffect(() => {
@@ -703,7 +717,12 @@ const treeTraversal = async () => {
                   <Button variant="outlined" color="primary" onClick={testButton}>
                     Test
                   </Button>
+                  <p>
                   Graph ID: {graphId}
+                  </p>
+                  <p>
+                  Changed: {changedSinceLastSave ? "Yes" : "No"}
+                  </p>
                   </>
                 )}
                 
