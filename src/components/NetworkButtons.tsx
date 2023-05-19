@@ -91,13 +91,13 @@ export default function NetworkButtons(props) {
                                 <HighlightOff color="error" />
                             </IconButton>
                         </ToggleButton>
-                        <ToggleButton value="left" aria-label="left" classes={{ selected: classes.selected }}>
-                            <IconButton aria-label="Left">
+                        <ToggleButton value="expansion" aria-label="expansion" classes={{ selected: classes.selected }}>
+                            <IconButton aria-label="Expansion">
                                 <ChangeHistory style={{ 'transform': 'rotate(-90deg)' }} />
                             </IconButton>
                         </ToggleButton>
-                        <ToggleButton value="right" aria-label="right" classes={{ selected: classes.selected }}>
-                            <IconButton aria-label="Right">
+                        <ToggleButton value="contraction" aria-label="contraction" classes={{ selected: classes.selected }}>
+                            <IconButton aria-label="Contraction">
                                 <ChangeHistory style={{ 'transform': 'rotate(90deg)' }} />
                             </IconButton>
                         </ToggleButton>

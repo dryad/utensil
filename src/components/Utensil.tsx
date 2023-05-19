@@ -53,6 +53,7 @@ function Utensil() {
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
+  
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -262,31 +263,31 @@ const treeTraversal = async () => {
   };
 
   const confirmReplaceGraph = () => {
-      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
-      setGraph(graph);
-      setGraphId(graphToIdToLoad);
+    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+    setGraph(graph);
+    setGraphId(graphToIdToLoad);
 
-      setGraphName(graph.name);
-      setGraphNote(graph.note);
-      const data = JSON.parse(graph?.data);
+    setGraphName(graph?.name);
+    setGraphNote(graph?.note);
+    const data = JSON.parse(graph?.data);
 
-      for (let node of data.nodes) {
-        if (node.label && node.label.length > 0) {
-          node.opacity = 1;
-        }
-        else {
-          node.opacity = 0;
-        }
+    for (let node of data.nodes) {
+      if (node.label && node.label.length > 0) {
+        node.opacity = 1;
       }
+      else {
+        node.opacity = 0;
+      }
+    }
 
-      networkRef.current?.setData(data);
-        
-      //clear Undo/Redo history
-      // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
-      setHistoryListForward([]);
+    networkRef.current?.setData(data);
+      
+    //clear Undo/Redo history
+    // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
+    setHistoryListForward([]);
 
-      //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
-      onButton('pan');
+    //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
+    onButton('pan');
   }
 
   const confirmDeleteGraph = async () => {
@@ -500,9 +501,77 @@ const treeTraversal = async () => {
           networkRef.current?.network.disableEditMode();  // disable any of the other modes, node edge, etc.
           setDeleteMode(true);
           break;
+        case "contraction":
+          break;  
+        case "expansion":
+          break;    
       }
       
   };
+
+  useEffect(() => {
+    if (buttonMode === "contraction") {
+       
+      if (selectedNodes.length === 1) {
+        const nodes = networkRef.current?.nodes.get();
+        const foundSelectedNode = nodes.filter(node => node.id === selectedNodes[0])[0]
+                
+        const label = graph?.name;
+        const nodeID = uuidv4();
+        const node: any = {};
+        node.id = nodeID;
+        node.label = label;
+        node.color = "#333";
+        node.font = {color: "#fff"};
+        node.x = foundSelectedNode?.x || 0;
+        node.y = foundSelectedNode?.y || 0;
+        node.level = 0;
+        node.opacity = 1;
+        node.hasDefinition = true;
+        node.graphId = graph?.id;
+        
+        const labelNode = {
+          id: uuidv4(),
+          label: label,
+          font: {
+            size: 14,
+            color: "#000000",
+          },
+          shape: "ellipse",        
+          x: -20, 
+          y: -20,
+          isLabelNode: true,
+          labelOfNode: node.id,
+          level: 0,
+          opacity: 1,
+          hasDefinition:true,
+          graphId: graph?.id
+        };
+        setGraphFromNodesAndEdges([node, labelNode], []);
+      }
+    }
+  },[selectedNodes, buttonMode]) 
+
+  useEffect(() => {
+    if (buttonMode === "expansion") {
+      
+      if (selectedNodes.length === 1) {
+        const nodes = networkRef.current?.nodes.get();
+        const foundSelectedNode = nodes.filter(node => node.id === selectedNodes[0])[0]
+       
+        if (foundSelectedNode && foundSelectedNode.hasOwnProperty('hasDefinition')) {
+          const definedGraph = getGraphById(foundSelectedNode.graphId);
+          setGraphToLoad(definedGraph);
+          confirmReplaceGraph();
+        }
+      }
+    }
+  },[selectedNodes, buttonMode]) 
+
+  function getGraphById(id: number) {
+    const foundGraph = graphs.filter((el: Graph) => el.id === id);
+    return foundGraph[0]
+  } 
 
   const addNodeComplete = () => {
     networkRef.current?.network.addNodeMode(); // Makes adding nodes continual
