@@ -22,7 +22,7 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import TreeList from "./Tree/TreeList";
-import { Tree } from "models";
+import { Tree, Edge } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
@@ -143,91 +143,104 @@ function Utensil() {
     networkRef.current?.network.setHover({node: nodeId});
   }
 
-const treeTraversal = async () => {
+  const treeTraversal = async () => {
 
-  let treeText = "";
-  let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
-  const edges = networkRef.current?.edges.get(); // get all edges from the network.
-  const positions = networkRef.current?.network.getPositions();
+    let treeText = "";
+    let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
+    const edges = networkRef.current?.edges.get(); // get all edges from the network.
+    const positions = networkRef.current?.network.getPositions();
 
-  const to_traverse = [];
-  const id_to_edge = {};
-  const id_to_node = {};
+    const to_traverse = [];
+    const id_to_edge: any = {};
+    const id_to_node: any = {};
 
-  // gather nodes and skip labelNodes
-  for (const node of nodes) {
-    if (node.isLabelNode !== true) {
-      to_traverse.push(node);
-      id_to_node[node.id] = node;
+    // gather nodes and skip labelNodes
+    for (const node of nodes) {
+      if (node.isLabelNode !== true) {
+        to_traverse.push(node);
+        id_to_node[node.id] = node;
 
-      for (const edge of edges) {
-        if (node.id == edge.to) {
-          id_to_edge[node.id] = edge;
+        for (const edge of edges) {
+          if (node.id == edge.to) {
+            id_to_edge[node.id] = edge;
+          }
         }
       }
-    }
-  };
+    };
 
-  //this sort is strictly for convenience in analyzing console data
-  to_traverse.sort((a, b) => {
-    return b.level - a.level;
-  });
-
-  function getLeftChild(node) {
-    return id_to_node[id_to_edge[node.id].from];
-  }
-  function getRightChild(node) {
-    return id_to_node[id_to_edge[node.id].eventual];
-  }
-
-  // this algorithm is well known 
-  function inOrderTraversal(currentNode, treeList) {
-    if (currentNode.level > 0) {
-      treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
-      treeList.push(currentNode);
-      treeList = inOrderTraversal(getRightChild(currentNode), treeList);
-    }
-    else {
-      treeList.push(currentNode);
-    }
-    return treeList
-  };
-
-  //selects the highest edge that has not yet been parsed
-  function getStartNode(traversedSet) {
-    let difference = new Set(
-      [...toTraverseSet].filter(x => !traversedSet.has(x))
-    );
-    let tmp = Array.from(difference);
-    tmp.sort((a, b) => {
+    //this sort is strictly for convenience in analyzing console data
+    to_traverse.sort((a, b) => {
       return b.level - a.level;
     });
-    return tmp[0];
-  };
 
-  const toTraverseSet = new Set(to_traverse);
-  // if (false) {
-  var parseList = [];
-  if (to_traverse.length > 0) {
-    var traversedSet = new Set();
-
-    for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
-      var treeList = [];
-      const startNode = getStartNode(traversedSet);
-
-      const res = inOrderTraversal(startNode, treeList);
-      parseList.push({ 'nodes': res });
-      res.forEach(item => traversedSet.add(item))
-
-      if (traversedSet.size == to_traverse.length) {
-        break
-      };
-      // console.log('i', i+1); // the number of roots / highest edges
+    function getLeftChild(node: any) {
+      if (id_to_edge[node.id]) {
+        return id_to_node[id_to_edge[node.id].from];
+      }
+      else {
+        return null;
+      }
     }
-  };
+    function getRightChild(node: any) {
+      if (id_to_edge[node.id]) {
+        return id_to_node[id_to_edge[node.id].eventual];
+      }
+      else {
+        return null;
+      }
+      
+    }
 
-  console.log('result', parseList) ;
-  setTrees(parseList);
+    // this algorithm is well known 
+    function inOrderTraversal(currentNode, treeList) {
+      if (currentNode) {
+        if (currentNode.level > 0) {
+          treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
+          treeList.push(currentNode);
+          treeList = inOrderTraversal(getRightChild(currentNode), treeList);
+        }
+        else {
+          treeList.push(currentNode);
+        }
+      }
+      return treeList
+    };
+
+    //selects the highest edge that has not yet been parsed
+    function getStartNode(traversedSet) {
+      let difference = new Set(
+        [...toTraverseSet].filter(x => !traversedSet.has(x))
+      );
+      let tmp = Array.from(difference);
+      tmp.sort((a, b) => {
+        return b.level - a.level;
+      });
+      return tmp[0];
+    };
+
+    const toTraverseSet = new Set(to_traverse);
+    // if (false) {
+    var parseList = [];
+    if (to_traverse.length > 0) {
+      var traversedSet = new Set();
+
+      for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
+        var treeList = [];
+        const startNode = getStartNode(traversedSet);
+
+        const res = inOrderTraversal(startNode, treeList);
+        parseList.push({ 'nodes': res });
+        res.forEach(item => traversedSet.add(item))
+
+        if (traversedSet.size == to_traverse.length) {
+          break
+        };
+        // console.log('i', i+1); // the number of roots / highest edges
+      }
+    };
+
+    console.log('result', parseList) ;
+    setTrees(parseList);
   };
 
   const setHoveredNodesFromNetwork = (hoveredNodes: string[]) => {
@@ -502,8 +515,12 @@ const treeTraversal = async () => {
           setDeleteMode(true);
           break;
         case "contraction":
+          networkRef.current?.network.disableEditMode();
+          setSelectedNodesFromNetwork([]);
           break;  
         case "expansion":
+          networkRef.current?.network.disableEditMode();
+          setSelectedNodesFromNetwork([]);
           break;    
       }
       
@@ -511,46 +528,203 @@ const treeTraversal = async () => {
 
   useEffect(() => {
     if (buttonMode === "contraction") {
-       
+       console.log(networkRef.current?.edges.get())
+       console.log(networkRef.current?.nodes.get())
+      
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
-        const foundSelectedNode = nodes.filter(node => node.id === selectedNodes[0])[0]
-                
-        const label = graph?.name;
-        const nodeID = uuidv4();
-        const node: any = {};
-        node.id = nodeID;
-        node.label = label;
-        node.color = "#333";
-        node.font = {color: "#fff"};
-        node.x = foundSelectedNode?.x || 0;
-        node.y = foundSelectedNode?.y || 0;
-        node.level = 0;
-        node.opacity = 1;
-        node.hasDefinition = true;
-        node.graphId = graph?.id;
+         
+        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0]
         
-        const labelNode = {
-          id: uuidv4(),
-          label: label,
-          font: {
-            size: 14,
-            color: "#000000",
-          },
-          shape: "ellipse",        
-          x: -20, 
-          y: -20,
-          isLabelNode: true,
-          labelOfNode: node.id,
-          level: 0,
-          opacity: 1,
-          hasDefinition:true,
-          graphId: graph?.id
-        };
-        setGraphFromNodesAndEdges([node, labelNode], []);
+        if (foundSelectedNode?.level > 0 && foundSelectedNode.isLabelNode !== true && !foundSelectedNode.hasOwnProperty('hasDefinition')) {
+
+          const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode);
+
+          if (canBeContracted) {
+            const viewPosition = networkRef.current?.network.getViewPosition();
+            const scale = networkRef.current?.network.getScale();
+
+            const foundSelectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selectedNodes[0])[0]
+            subGraphData?.nodes.push(foundSelectedNode);
+            subGraphData?.nodes.push(foundSelectedNodeHasLabel);
+
+            const subGraphObject = { 
+              edges: subGraphData?.edges, 
+              nodes: subGraphData?.nodes, 
+              viewPosition: viewPosition, 
+              scale: scale 
+            };
+            const subGraph = JSON.stringify(subGraphObject);
+            const savedAndLoadedGraph = graphs.filter((graph: any) => graph.id === graphId)[0];
+
+            const {nodesIdSet: subGraphNodesIdsSet, edgesIdSet: subGraphEdgesIdsSet} = graphIdsTraversal(subGraphData);
+            const {nodesIdSet: graphNodesIdsSet, edgesIdSet: graphEdgesIdsSet} = graphIdsTraversal(JSON.parse(savedAndLoadedGraph.data));
+            
+            const subGraphIsEqualSavedGraph = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
+            areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet)
+                //  console.log(subGraphIsEqualSavedGraph)       
+            const label = subGraphIsEqualSavedGraph ? savedAndLoadedGraph?.name : '';
+            
+            const updatedNodes = externalGraphData?.nodes.map((el: any) => {
+              if (el.id === externalGraphData.nodeId) {
+                el.label = label;
+                el.font = {color: "#fff"};
+                el.hasDefinition = true;
+                el.subGraphData = subGraph;
+                el.shape = "hexagon";
+                el.opacity = label === '' ? 0 : 1;
+                // el.shape = 'custom';
+                // el.ctxRenderer = function ctxRenderer({ ctx, id, x, y, state: { selected, hover }, style, label }) {
+                  
+                //   return {
+                //     drawNode() {
+                //       const r = style.size;
+                //       ctx.beginPath();
+                //       ctx.arc(x, y, 8, 0, Math.PI * 2, true);
+                //       ctx.fillStyle = label === '' ? 'green' : 'black';
+                //       ctx.fill(); 
+                //       ctx.arc(x, y, 12, 0, Math.PI * 2, true)
+                //       ctx.closePath();
+                //       ctx.save();
+                      
+                //       ctx.stroke();
+                //       ctx.restore();
+
+                //       ctx.font = "normal 12px sans-serif";
+                //       ctx.fillStyle = 'black';
+                //     },
+                //   };
+                // }
+              }
+              if (el.labelOfNode === externalGraphData.nodeId) {
+                el.label = label;
+                el.font = {
+                  size: 14,
+                  color: "#000000",
+                };
+                el.opacity = 1;
+              }
+              return el;
+            })
+                        
+            const externalGraph = JSON.parse(stringifyGraph());
+            externalGraph.nodes = updatedNodes;
+            externalGraph.edges = externalGraphData?.edges;
+            
+            networkRef.current?.setData(externalGraph);
+          }
+        }
       }
     }
-  },[selectedNodes, buttonMode]) 
+  },[selectedNodes, buttonMode]);
+  
+  function graphIdsTraversal(graphData: any) {
+    let nodesIdSet = new Set();
+    let edgesIdSet = new Set();
+
+    graphData.edges.forEach((edge:any) => {
+      edgesIdSet.add(edge.id);
+    });
+
+    graphData.nodes.forEach((node:any) => {
+      recursionNodesIdTraversal(node);  
+    });
+
+    function recursionNodesIdTraversal(node: any) {
+      if (node.hasOwnProperty('hasDefinition')) {
+        const arrayNodes = JSON.parse(node.subGraphData).nodes;
+        const arrayEdges = JSON.parse(node.subGraphData).edges;
+        arrayNodes.forEach((node: any) => recursionNodesIdTraversal(node));
+        arrayEdges.forEach((edge: any) => edgesIdSet.add(edge.id));
+      }
+      else {
+        nodesIdSet.add(node.id);
+      }
+    }
+    return {nodesIdSet, edgesIdSet};
+  }
+
+  function areSetsEqual(a: any, b: any) {
+    return a.size === b.size && [...a].every(value => b.has(value));
+  } 
+
+  function contractAction(selNode:any) {
+    const nodes = networkRef.current?.nodes.get();
+    const edges = networkRef.current?.edges.get();
+
+    const edgeToSelNode = edges.filter((el: any) => el.to === selNode.id); 
+    
+    let subGraphNodes = new Set();
+    let subGraphEdges = new Set();
+
+    const fromNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].from || el?.labelOfNode === edgeToSelNode[0].from);
+    const eventualNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].eventual || el?.labelOfNode === edgeToSelNode[0].eventual);
+
+    fromNodes.forEach(el => subGraphNodes.add(el));
+    eventualNodes.forEach(el => subGraphNodes.add(el));
+    subGraphEdges.add(edgeToSelNode[0]);
+
+    let newNodes = Array.from(subGraphNodes);
+    let arrayNodes = Array.from(subGraphNodes);
+
+    for (let i = selNode.level - 1; i > 0; i--) {
+      for (const node of arrayNodes) {
+               
+        if (node.level === i) {
+          const e = edges.filter((el: any) => el.to === node.id);
+          
+          if (e.length > 0) {
+            const fromTempNodes = nodes.filter((el: any) => el.id === e[0].from || (el.isLabelNode === true && el?.labelOfNode === e[0].from));
+            const eventualTempNodes = nodes.filter((el: any) => el.id === e[0].eventual || (el.isLabelNode === true && el?.labelOfNode === e[0].eventual));
+  
+            newNodes.push(...fromTempNodes);
+            newNodes.push(...eventualTempNodes);
+            subGraphEdges.add(e[0]);
+          }
+        }
+      }
+      subGraphNodes = new Set(newNodes);
+      arrayNodes = Array.from(subGraphNodes);
+    }
+
+    const externalEdgesSet = new Set(edges.filter((e: any) => !subGraphEdges.has(e))); 
+    
+    let canBeContracted = true;
+    let subGraphNodeIdsSet = new Set();
+
+    for (const node of Array.from(subGraphNodes)) {
+      if (node.isLabelNode !== true) {
+        subGraphNodeIdsSet.add(node.id);
+      }
+    }
+
+    // define if subGraph can be contracted
+    for (const edge of Array.from(externalEdgesSet)) {
+      if ((subGraphNodeIdsSet.has(edge.from) || subGraphNodeIdsSet.has(edge.eventual))
+        && !subGraphNodeIdsSet.has(edge.to)) {
+          canBeContracted = false;
+      }
+    }
+
+    let externalNodesSet = new Set();
+    let subGraphData;
+    let externalGraphData;
+    if (canBeContracted) {
+      externalNodesSet = new Set(nodes.filter((node: any) => !subGraphNodes.has(node)));
+      subGraphData = {
+        edges: Array.from(subGraphEdges),
+        nodes: Array.from(subGraphNodes),
+        nodeId: selNode.id
+      };
+      externalGraphData = {
+        edges: Array.from(externalEdgesSet),
+        nodes: Array.from(externalNodesSet),
+        nodeId: selNode.id
+      }
+    }
+      
+    return {canBeContracted, subGraphData, externalGraphData}
+  }
 
   useEffect(() => {
     if (buttonMode === "expansion") {
@@ -568,7 +742,7 @@ const treeTraversal = async () => {
     }
   },[selectedNodes, buttonMode]) 
 
-  function getGraphById(id: number) {
+  const getGraphById = (id: number) => {
     const foundGraph = graphs.filter((el: Graph) => el.id === id);
     return foundGraph[0]
   } 

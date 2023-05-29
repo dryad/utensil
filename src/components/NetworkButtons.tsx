@@ -5,7 +5,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
 
-export default function NetworkButtons(props) {
+export default function NetworkButtons(props: any) {
     
     const escFunction = useCallback((event) => {
         if(event.keyCode === 27) { //Escape key
