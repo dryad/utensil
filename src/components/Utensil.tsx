@@ -555,15 +555,53 @@ function Utensil() {
               scale: scale 
             };
             const subGraph = JSON.stringify(subGraphObject);
-            const savedAndLoadedGraph = graphs.filter((graph: any) => graph.id === graphId)[0];
+            const graphFromDBloaded = graphs.filter((graph: any) => graph.id === graphId)[0];
+            const graphFromDB = JSON.parse(graphFromDBloaded.data);
 
-            const {nodesIdSet: subGraphNodesIdsSet, edgesIdSet: subGraphEdgesIdsSet} = graphIdsTraversal(subGraphData);
-            const {nodesIdSet: graphNodesIdsSet, edgesIdSet: graphEdgesIdsSet} = graphIdsTraversal(JSON.parse(savedAndLoadedGraph.data));
-            
-            const subGraphIsEqualSavedGraph = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
-            areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet)
-                //  console.log(subGraphIsEqualSavedGraph)       
-            const label = subGraphIsEqualSavedGraph ? savedAndLoadedGraph?.name : '';
+            const {
+              nodesIdSet: subGraphNodesIdsSet, 
+              edgesIdSet: subGraphEdgesIdsSet, 
+              labelsMap: subGraphLabels
+            } = graphIdsTraversal(subGraphData);
+
+            const {
+              nodesIdSet: graphNodesIdsSet, 
+              edgesIdSet: graphEdgesIdsSet,
+              labelsMap: graphFromDBLabels
+            } = graphIdsTraversal(graphFromDB);
+            console.log(subGraphLabels,graphFromDBLabels)
+            const subGraphIsEqualGraphFromDBByIds = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
+                                                    areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet);
+
+            let subGraphIsEqualGraphFromDB = true;
+
+            if (subGraphIsEqualGraphFromDBByIds) {
+              console.log('graphNodesIdsSet', Array.from(graphNodesIdsSet))
+              console.log('subGraphData', subGraphData?.nodes )
+              for (const id of Array.from(graphNodesIdsSet)) {
+                // const node1 = subGraphData?.nodes.filter((node: any) => node.id === id)[0];
+                // const node2 = graphFromDB?.nodes.filter((node: any) => node.id === id)[0];
+                // console.log('node1', node1)
+                // console.log('node2', node2)
+                // if (node1.label !== node2.label) {
+                //   subGraphIsEqualGraphFromDB = false;
+                //   console.log('subGraphIsEqualGraphFromDB', subGraphIsEqualGraphFromDB, node1, node2)
+                //   break;
+                // } else {
+                //   console.log('subGraphIsEqualGraphFromDB', subGraphIsEqualGraphFromDB, node1, node2)
+                // }
+                console.log(subGraphLabels.get(id) )
+                console.log(graphFromDBLabels.get(id))
+                if (subGraphLabels.get(id) !== graphFromDBLabels.get(id)) {
+                  subGraphIsEqualGraphFromDB = false;
+                  // break;
+                } 
+              }
+            } else {
+              subGraphIsEqualGraphFromDB = false;
+            }
+                 console.log('22',subGraphIsEqualGraphFromDB)       
+            const label = subGraphIsEqualGraphFromDB ? graphFromDBloaded?.name : '';
             
             const updatedNodes = externalGraphData?.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
@@ -616,11 +654,12 @@ function Utensil() {
         }
       }
     }
-  },[selectedNodes, buttonMode]);
+  }, [selectedNodes, buttonMode]);
   
   function graphIdsTraversal(graphData: any) {
     let nodesIdSet = new Set();
     let edgesIdSet = new Set();
+    let labelsMap = new Map();
 
     graphData.edges.forEach((edge:any) => {
       edgesIdSet.add(edge.id);
@@ -639,9 +678,10 @@ function Utensil() {
       }
       else {
         nodesIdSet.add(node.id);
+        labelsMap.set(node.id, node.label);
       }
     }
-    return {nodesIdSet, edgesIdSet};
+    return {nodesIdSet, edgesIdSet, labelsMap};
   }
 
   function areSetsEqual(a: any, b: any) {
@@ -660,12 +700,12 @@ function Utensil() {
     const fromNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].from || el?.labelOfNode === edgeToSelNode[0].from);
     const eventualNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].eventual || el?.labelOfNode === edgeToSelNode[0].eventual);
 
-    fromNodes.forEach(el => subGraphNodes.add(el));
-    eventualNodes.forEach(el => subGraphNodes.add(el));
+    fromNodes.forEach((el: any) => subGraphNodes.add(el));
+    eventualNodes.forEach((el:any) => subGraphNodes.add(el));
     subGraphEdges.add(edgeToSelNode[0]);
 
-    let newNodes = Array.from(subGraphNodes);
-    let arrayNodes = Array.from(subGraphNodes);
+    let newNodes: any[] = Array.from(subGraphNodes);
+    let arrayNodes: any[] = Array.from(subGraphNodes);
 
     for (let i = selNode.level - 1; i > 0; i--) {
       for (const node of arrayNodes) {
