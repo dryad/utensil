@@ -530,6 +530,7 @@ function Utensil() {
     if (buttonMode === "contraction") {
        console.log(networkRef.current?.edges.get())
        console.log(networkRef.current?.nodes.get())
+      //  console.log(graph)
       
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
@@ -544,9 +545,9 @@ function Utensil() {
             const viewPosition = networkRef.current?.network.getViewPosition();
             const scale = networkRef.current?.network.getScale();
 
-            const foundSelectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selectedNodes[0])[0]
-            subGraphData?.nodes.push(foundSelectedNode);
-            subGraphData?.nodes.push(foundSelectedNodeHasLabel);
+            // const foundSelectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selectedNodes[0])[0]
+            // subGraphData?.nodes.push(foundSelectedNode);
+            // subGraphData?.nodes.push(foundSelectedNodeHasLabel);
 
             const subGraphObject = { 
               edges: subGraphData?.edges, 
@@ -561,23 +562,53 @@ function Utensil() {
             const {
               nodesIdSet: subGraphNodesIdsSet, 
               edgesIdSet: subGraphEdgesIdsSet, 
-              labelsMap: subGraphLabels
+              labelsMap: subGraphLabels,
+              labelsHasDefinitionMap: map1
             } = graphIdsTraversal(subGraphData);
 
             const {
               nodesIdSet: graphNodesIdsSet, 
               edgesIdSet: graphEdgesIdsSet,
-              labelsMap: graphFromDBLabels
+              labelsMap: graphFromDBLabels,
+              labelsHasDefinitionMap: map2
             } = graphIdsTraversal(graphFromDB);
+
             console.log(subGraphLabels,graphFromDBLabels)
+            console.log(map1,map2);
+
+            let contractedNodesHaveEqualLabels = true;
+
+            map1.forEach((value1, key1, map) => {
+              const value2 = map2.get(key1);
+              if (value2 && value2 !== value1) {
+                contractedNodesHaveEqualLabels = false;
+              }
+              if (!value2 && value1 !== '') {
+                contractedNodesHaveEqualLabels = false;
+              }
+            });
+
+            map2.forEach((value2, key2, map) => {
+              const value1 = map1.get(key2);
+              if (value1 && value1 !== value2) {
+                contractedNodesHaveEqualLabels = false;
+              }
+              if (!value1 && value2 !== '') {
+                contractedNodesHaveEqualLabels = false;
+              }
+            });
+
+            console.log(contractedNodesHaveEqualLabels)
+            
+            
             const subGraphIsEqualGraphFromDBByIds = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
                                                     areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet);
 
             let subGraphIsEqualGraphFromDB = true;
 
             if (subGraphIsEqualGraphFromDBByIds) {
-              console.log('graphNodesIdsSet', Array.from(graphNodesIdsSet))
-              console.log('subGraphData', subGraphData?.nodes )
+              // console.log('graphNodesIdsSet', Array.from(graphNodesIdsSet))
+              // console.log('subGraphData', subGraphData?.nodes )
               for (const id of Array.from(graphNodesIdsSet)) {
                 // const node1 = subGraphData?.nodes.filter((node: any) => node.id === id)[0];
                 // const node2 = graphFromDB?.nodes.filter((node: any) => node.id === id)[0];
@@ -592,16 +623,16 @@ function Utensil() {
                 // }
                 console.log(subGraphLabels.get(id) )
                 console.log(graphFromDBLabels.get(id))
-                if (subGraphLabels.get(id) !== graphFromDBLabels.get(id)) {
+                if ((subGraphLabels.has(id)) && (subGraphLabels.get(id) !== graphFromDBLabels.get(id))) {
                   subGraphIsEqualGraphFromDB = false;
-                  // break;
+                  break;
                 } 
               }
             } else {
               subGraphIsEqualGraphFromDB = false;
             }
-                 console.log('22',subGraphIsEqualGraphFromDB)       
-            const label = subGraphIsEqualGraphFromDB ? graphFromDBloaded?.name : '';
+                //  console.log('22',subGraphIsEqualGraphFromDB)       
+            const label = subGraphIsEqualGraphFromDB && contractedNodesHaveEqualLabels ? graphFromDBloaded?.name : '';
             
             const updatedNodes = externalGraphData?.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
@@ -660,7 +691,8 @@ function Utensil() {
     let nodesIdSet = new Set();
     let edgesIdSet = new Set();
     let labelsMap = new Map();
-
+    let labelsHasDefinitionMap = new Map();
+    
     graphData.edges.forEach((edge:any) => {
       edgesIdSet.add(edge.id);
     });
@@ -671,17 +703,20 @@ function Utensil() {
 
     function recursionNodesIdTraversal(node: any) {
       if (node.hasOwnProperty('hasDefinition')) {
+        labelsHasDefinitionMap.set(node.id, node.label);
         const arrayNodes = JSON.parse(node.subGraphData).nodes;
         const arrayEdges = JSON.parse(node.subGraphData).edges;
-        arrayNodes.forEach((node: any) => recursionNodesIdTraversal(node));
         arrayEdges.forEach((edge: any) => edgesIdSet.add(edge.id));
+        arrayNodes.forEach((node: any) => recursionNodesIdTraversal(node));
       }
       else {
         nodesIdSet.add(node.id);
-        labelsMap.set(node.id, node.label);
+        if (!node.hasOwnProperty('isLabelNode')) {
+          labelsMap.set(node.id, node.label);
+        }
       }
     }
-    return {nodesIdSet, edgesIdSet, labelsMap};
+    return {nodesIdSet, edgesIdSet, labelsMap, labelsHasDefinitionMap};
   }
 
   function areSetsEqual(a: any, b: any) {
@@ -749,6 +784,7 @@ function Utensil() {
     let externalNodesSet = new Set();
     let subGraphData;
     let externalGraphData;
+
     if (canBeContracted) {
       externalNodesSet = new Set(nodes.filter((node: any) => !subGraphNodes.has(node)));
       subGraphData = {
@@ -756,11 +792,15 @@ function Utensil() {
         nodes: Array.from(subGraphNodes),
         nodeId: selNode.id
       };
+      const selectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selNode.id)[0];
+      subGraphData?.nodes.push(selNode);
+      subGraphData?.nodes.push(selectedNodeHasLabel);
+
       externalGraphData = {
         edges: Array.from(externalEdgesSet),
         nodes: Array.from(externalNodesSet),
         nodeId: selNode.id
-      }
+      };
     }
       
     return {canBeContracted, subGraphData, externalGraphData}
