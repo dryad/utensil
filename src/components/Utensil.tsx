@@ -530,6 +530,7 @@ function Utensil() {
     if (buttonMode === "contraction") {
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
+        console.log(nodes)
         const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
         
         if (
@@ -538,7 +539,7 @@ function Utensil() {
           !foundSelectedNode.hasOwnProperty('hasDefinition')
         ) {
           const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode);
-
+console.log(canBeContracted, subGraphData, externalGraphData)
           if (canBeContracted) {
             const viewPosition = networkRef.current?.network.getViewPosition();
             const scale = networkRef.current?.network.getScale();
@@ -625,8 +626,9 @@ function Utensil() {
     graphData.edges.forEach((edge:any) => {
       edgesIdSet.add(edge.id);
     });
-
+console.log(graphData.nodes)
     graphData.nodes.forEach((node:any) => {
+      console.log(node)
       recursionNodesIdTraversal(node);  
     });
 
@@ -723,7 +725,7 @@ function Utensil() {
       };
       const selectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selNode.id)[0];
       subGraphData?.nodes.push(selNode);
-      subGraphData?.nodes.push(selectedNodeHasLabel);
+      selectedNodeHasLabel && subGraphData?.nodes.push(selectedNodeHasLabel);
 
       externalGraphData = {
         edges: Array.from(externalEdgesSet),
