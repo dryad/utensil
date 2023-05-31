@@ -528,26 +528,20 @@ function Utensil() {
 
   useEffect(() => {
     if (buttonMode === "contraction") {
-       console.log(networkRef.current?.edges.get())
-       console.log(networkRef.current?.nodes.get())
-      //  console.log(graph)
-      
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
-         
-        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0]
+        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
         
-        if (foundSelectedNode?.level > 0 && foundSelectedNode.isLabelNode !== true && !foundSelectedNode.hasOwnProperty('hasDefinition')) {
-
+        if (
+          foundSelectedNode?.level > 0 && 
+          foundSelectedNode.isLabelNode !== true && 
+          !foundSelectedNode.hasOwnProperty('hasDefinition')
+        ) {
           const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode);
 
           if (canBeContracted) {
             const viewPosition = networkRef.current?.network.getViewPosition();
             const scale = networkRef.current?.network.getScale();
-
-            // const foundSelectedNodeHasLabel = nodes.filter((node: any) => node.labelOfNode === selectedNodes[0])[0]
-            // subGraphData?.nodes.push(foundSelectedNode);
-            // subGraphData?.nodes.push(foundSelectedNodeHasLabel);
 
             const subGraphObject = { 
               edges: subGraphData?.edges, 
@@ -556,7 +550,7 @@ function Utensil() {
               scale: scale 
             };
             const subGraph = JSON.stringify(subGraphObject);
-            const graphFromDBloaded = graphs.filter((graph: any) => graph.id === graphId)[0];
+            const graphFromDBloaded = getGraphById(graphId); 
             const graphFromDB = JSON.parse(graphFromDBloaded.data);
 
             const {
@@ -573,66 +567,24 @@ function Utensil() {
               labelsHasDefinitionMap: map2
             } = graphIdsTraversal(graphFromDB);
 
-            console.log(subGraphLabels,graphFromDBLabels)
-            console.log(map1,map2);
-
-            let contractedNodesHaveEqualLabels = true;
-
-            map1.forEach((value1, key1, map) => {
-              const value2 = map2.get(key1);
-              if (value2 && value2 !== value1) {
-                contractedNodesHaveEqualLabels = false;
-              }
-              if (!value2 && value1 !== '') {
-                contractedNodesHaveEqualLabels = false;
-              }
-            });
-
-            map2.forEach((value2, key2, map) => {
-              const value1 = map1.get(key2);
-              if (value1 && value1 !== value2) {
-                contractedNodesHaveEqualLabels = false;
-              }
-              if (!value1 && value2 !== '') {
-                contractedNodesHaveEqualLabels = false;
-              }
-            });
-
-            console.log(contractedNodesHaveEqualLabels)
-            
-            
             const subGraphIsEqualGraphFromDBByIds = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
                                                     areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet);
 
-            let subGraphIsEqualGraphFromDB = true;
+            let subGraphIsEqualGraphFromDBByLabels = true;
 
             if (subGraphIsEqualGraphFromDBByIds) {
-              // console.log('graphNodesIdsSet', Array.from(graphNodesIdsSet))
-              // console.log('subGraphData', subGraphData?.nodes )
               for (const id of Array.from(graphNodesIdsSet)) {
-                // const node1 = subGraphData?.nodes.filter((node: any) => node.id === id)[0];
-                // const node2 = graphFromDB?.nodes.filter((node: any) => node.id === id)[0];
-                // console.log('node1', node1)
-                // console.log('node2', node2)
-                // if (node1.label !== node2.label) {
-                //   subGraphIsEqualGraphFromDB = false;
-                //   console.log('subGraphIsEqualGraphFromDB', subGraphIsEqualGraphFromDB, node1, node2)
-                //   break;
-                // } else {
-                //   console.log('subGraphIsEqualGraphFromDB', subGraphIsEqualGraphFromDB, node1, node2)
-                // }
-                console.log(subGraphLabels.get(id) )
-                console.log(graphFromDBLabels.get(id))
                 if ((subGraphLabels.has(id)) && (subGraphLabels.get(id) !== graphFromDBLabels.get(id))) {
-                  subGraphIsEqualGraphFromDB = false;
+                  subGraphIsEqualGraphFromDBByLabels = false;
                   break;
                 } 
               }
             } else {
-              subGraphIsEqualGraphFromDB = false;
+              subGraphIsEqualGraphFromDBByLabels = false;
             }
-                //  console.log('22',subGraphIsEqualGraphFromDB)       
-            const label = subGraphIsEqualGraphFromDB && contractedNodesHaveEqualLabels ? graphFromDBloaded?.name : '';
+                  
+            const { contractedNodesHaveEqualLabels } = compareGraphsByContractedNodesLabels(map1, map2);         
+            const label = subGraphIsEqualGraphFromDBByLabels && contractedNodesHaveEqualLabels ? graphFromDBloaded?.name : '';
             
             const updatedNodes = externalGraphData?.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
@@ -642,28 +594,6 @@ function Utensil() {
                 el.subGraphData = subGraph;
                 el.shape = "hexagon";
                 el.opacity = label === '' ? 0 : 1;
-                // el.shape = 'custom';
-                // el.ctxRenderer = function ctxRenderer({ ctx, id, x, y, state: { selected, hover }, style, label }) {
-                  
-                //   return {
-                //     drawNode() {
-                //       const r = style.size;
-                //       ctx.beginPath();
-                //       ctx.arc(x, y, 8, 0, Math.PI * 2, true);
-                //       ctx.fillStyle = label === '' ? 'green' : 'black';
-                //       ctx.fill(); 
-                //       ctx.arc(x, y, 12, 0, Math.PI * 2, true)
-                //       ctx.closePath();
-                //       ctx.save();
-                      
-                //       ctx.stroke();
-                //       ctx.restore();
-
-                //       ctx.font = "normal 12px sans-serif";
-                //       ctx.fillStyle = 'black';
-                //     },
-                //   };
-                // }
               }
               if (el.labelOfNode === externalGraphData.nodeId) {
                 el.label = label;
@@ -679,7 +609,6 @@ function Utensil() {
             const externalGraph = JSON.parse(stringifyGraph());
             externalGraph.nodes = updatedNodes;
             externalGraph.edges = externalGraphData?.edges;
-            
             networkRef.current?.setData(externalGraph);
           }
         }
@@ -806,12 +735,38 @@ function Utensil() {
     return {canBeContracted, subGraphData, externalGraphData}
   }
 
+  function compareGraphsByContractedNodesLabels(map1: any, map2: any) {
+    let contractedNodesHaveEqualLabels = true;
+
+    map1.forEach((value1: string, key1: string) => {
+      const value2 = map2.get(key1);
+      if (value2 && value2 !== value1) {
+        contractedNodesHaveEqualLabels = false;
+      }
+      if (!value2 && value1 !== '') {
+        contractedNodesHaveEqualLabels = false;
+      }
+    });
+
+    map2.forEach((value2: string, key2: string) => {
+      const value1 = map1.get(key2);
+      if (value1 && value1 !== value2) {
+        contractedNodesHaveEqualLabels = false;
+      }
+      if (!value1 && value2 !== '') {
+        contractedNodesHaveEqualLabels = false;
+      }
+    });
+
+    return { contractedNodesHaveEqualLabels }
+  }
+
   useEffect(() => {
     if (buttonMode === "expansion") {
       
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
-        const foundSelectedNode = nodes.filter(node => node.id === selectedNodes[0])[0]
+        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0]
        
         if (foundSelectedNode && foundSelectedNode.hasOwnProperty('hasDefinition')) {
           const definedGraph = getGraphById(foundSelectedNode.graphId);
@@ -822,8 +777,8 @@ function Utensil() {
     }
   },[selectedNodes, buttonMode]) 
 
-  const getGraphById = (id: number) => {
-    const foundGraph = graphs.filter((el: Graph) => el.id === id);
+  const getGraphById = (id: number | null) => {
+    const foundGraph = graphs.filter((graph: Graph) => graph.id === id);
     return foundGraph[0]
   } 
 
