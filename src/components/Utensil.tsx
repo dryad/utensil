@@ -761,26 +761,33 @@ function Utensil() {
     return { contractedNodesHaveEqualLabels }
   }
 
-  useEffect(() => {
-    if (buttonMode === "expansion") {
-      
-      if (selectedNodes.length === 1) {
-        const nodes = networkRef.current?.nodes.get();
-        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0]
-       
-        if (foundSelectedNode && foundSelectedNode.hasOwnProperty('hasDefinition')) {
-          const definedGraph = getGraphById(foundSelectedNode.graphId);
-          setGraphToLoad(definedGraph);
-          confirmReplaceGraph();
-        }
-      }
-    }
-  },[selectedNodes, buttonMode]) 
-
   const getGraphById = (id: number | null) => {
     const foundGraph = graphs.filter((graph: Graph) => graph.id === id);
     return foundGraph[0]
   } 
+
+  useEffect(() => {
+    if (buttonMode === "expansion") {
+      if (selectedNodes.length === 1) {
+        const nodes = networkRef.current?.nodes.get();
+        const edges = networkRef.current?.edges.get();
+        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
+       
+        if (foundSelectedNode.hasOwnProperty('hasDefinition')) {
+          const subGraphData = JSON.parse(foundSelectedNode.subGraphData);
+          const updatedEdges = edges.concat(subGraphData.edges);
+          const updatedNodes = nodes
+            .filter((node: any) => node.id !== foundSelectedNode.id && node.labelOfNode !== foundSelectedNode.id)
+            .concat(subGraphData.nodes);
+
+          const expansedGraph = JSON.parse(stringifyGraph());
+          expansedGraph.nodes = updatedNodes;
+          expansedGraph.edges = updatedEdges;
+          networkRef.current?.setData(expansedGraph);
+        }
+      }
+    }
+  },[selectedNodes, buttonMode]) 
 
   const addNodeComplete = () => {
     networkRef.current?.network.addNodeMode(); // Makes adding nodes continual
