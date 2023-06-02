@@ -12,7 +12,7 @@ import { Graph } from "models";
 
 type IGraphListProps = {
   graphs: Graph[];
-  onGraphSelected: React.MouseEventHandler<HTMLDivElement>;
+  onGraphSelected: (id: number) => void;
   onGraphDelete: React.MouseEventHandler<HTMLDivElement>;
   searchQuery: string;
   address_is_whitelisted: () => boolean;

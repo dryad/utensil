@@ -12,6 +12,7 @@ export type Node = {
 };
 
 export type Edge = {
+  id: string;
   from: string;
   to: string;
   eventual: string;
@@ -23,9 +24,11 @@ export type TreeNode = {
   color: string;
   label: string;
   isLabelNode: boolean;
+  labelOfNode: string;
   x: number;
   y: number;
   level: number;
+  subGraphData: string;
 };
 
 export type Tree = {

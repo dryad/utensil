@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dialog, TextField } from "@mui/material";
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 
-const ConfirmLoadDialog = (props) => {
+const ConfirmLoadDialog = (props: any) => {
   const { title, children, open, setOpen, onConfirmReplace, onConfirmImport, canImportGraph } = props;
   return (
     <Dialog
@@ -37,14 +37,14 @@ const ConfirmLoadDialog = (props) => {
         )}
         {!canImportGraph() && (
         <Button
-        variant="contained"
-        onClick={() => {
-          setOpen(false);
-          onConfirmReplace();
-        }}
-      >
-        Load graph
-      </Button>
+          variant="contained"
+          onClick={() => {
+            setOpen(false);
+            onConfirmReplace();
+          }}
+        >
+          Load graph
+        </Button>
         )}
         <Button
           color="secondary"

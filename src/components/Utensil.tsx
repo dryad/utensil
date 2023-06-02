@@ -22,7 +22,7 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import TreeList from "./Tree/TreeList";
-import { Tree, Edge } from "models";
+import { Tree, TreeNode, Edge } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
@@ -36,7 +36,7 @@ function Utensil() {
   const [graph, setGraph] = useState<Graph | null>(null); // The currently loaded graph object.
   const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
-  const [graphToLoad, setGraphToLoad] = useState<Graph | null>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
+  const [graphToLoad, setGraphToLoad] = useState<Graph | null | undefined>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
   const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
   const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
@@ -181,7 +181,7 @@ function Utensil() {
         return null;
       }
     }
-    function getRightChild(node: any) {
+    function getRightChild(node: TreeNode) {
       if (id_to_edge[node.id]) {
         return id_to_node[id_to_edge[node.id].eventual];
       }
@@ -192,7 +192,7 @@ function Utensil() {
     }
 
     // this algorithm is well known 
-    function inOrderTraversal(currentNode, treeList) {
+    function inOrderTraversal(currentNode: TreeNode, treeList: TreeNode[]) {
       if (currentNode) {
         if (currentNode.level > 0) {
           treeList = inOrderTraversal(getLeftChild(currentNode), treeList);
@@ -207,7 +207,7 @@ function Utensil() {
     };
 
     //selects the highest edge that has not yet been parsed
-    function getStartNode(traversedSet) {
+    function getStartNode(traversedSet: Set<TreeNode>) {
       let difference = new Set(
         [...toTraverseSet].filter(x => !traversedSet.has(x))
       );
@@ -222,10 +222,10 @@ function Utensil() {
     // if (false) {
     var parseList = [];
     if (to_traverse.length > 0) {
-      var traversedSet = new Set();
+      var traversedSet: Set<TreeNode> = new Set();
 
       for (let i = 0; i < to_traverse.length; i++) { // avoid while loop
-        var treeList = [];
+        var treeList: TreeNode[] = [];
         const startNode = getStartNode(traversedSet);
 
         const res = inOrderTraversal(startNode, treeList);
@@ -276,39 +276,42 @@ function Utensil() {
   };
 
   const confirmReplaceGraph = () => {
-    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
-    setGraph(graph);
-    setGraphId(graphToIdToLoad);
-
-    setGraphName(graph?.name);
-    setGraphNote(graph?.note);
-    const data = JSON.parse(graph?.data);
-
-    for (let node of data.nodes) {
-      if (node.label && node.label.length > 0) {
-        node.opacity = 1;
+    if (graphToLoad) {
+      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+      setGraph(graph);
+      setGraphId(graphToIdToLoad);
+  
+      setGraphName(graph.name);
+      setGraphNote(graph.note);
+      const data = JSON.parse(graph.data);
+  
+      for (let node of data.nodes) {
+        if (node.label && node.label.length > 0) {
+          node.opacity = 1;
+        }
+        else {
+          node.opacity = 0;
+        }
       }
-      else {
-        node.opacity = 0;
-      }
+  
+      networkRef.current?.setData(data);
+        
+      //clear Undo/Redo history
+      // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
+      setHistoryListForward([]);
+  
+      //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
+      onButton('pan');
     }
-
-    networkRef.current?.setData(data);
-      
-    //clear Undo/Redo history
-    // setHistoryListBack([]); // no longer clearing Undo steps on graph load. 
-    setHistoryListForward([]);
-
-    //Set button to pan mode when loading a new graph. Vis-network state will be in pan mode, so we want the button to show the pan tool.
-    onButton('pan');
   }
 
   const confirmDeleteGraph = async () => {
-    // this is run when the user confirms they want to delete a graph.
-    console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
-    await axios.delete(`/api/graphs/${graphToDelete.id}/`);
-    await refreshList();
-
+    if (graphToDelete) {
+      // this is run when the user confirms they want to delete a graph.
+      console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
+      await axios.delete(`/api/graphs/${graphToDelete.id}/`);
+      await refreshList();
+    }
   }
 
   const canImportGraph = () =>{
@@ -316,7 +319,7 @@ function Utensil() {
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
   }
 
-  function mergeGraphs(graph1: Graph, graph2: Graph) {
+  function mergeGraphs(graph1: any, graph2: any) {
 
     //calculate min(x), min(y), max(x), max(y) of graph1
     //quick and dirty calculation
@@ -384,7 +387,7 @@ function Utensil() {
     const newName = graph1.name;
     const newNote = graph1.note;
     const newData = JSON.stringify(newNodes) + JSON.stringify(newEdges);
-    const newGraph : Graph = {
+    const newGraph = {
       nodes: newNodes,
       edges: newEdges,
       viewPosition: newViewPosition,
@@ -396,30 +399,31 @@ function Utensil() {
   };
 
   const confirmImportGraph = () => {
-    const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
-    const data = JSON.parse(graph?.data);
-    for (let node of data.nodes) {
-      if (node.label && node.label.length > 0) {
-        node.opacity = 1;
+    if (graphToLoad) {
+      const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
+      const data = JSON.parse(graph.data);
+      for (let node of data.nodes) {
+        if (node.label && node.label.length > 0) {
+          node.opacity = 1;
+        }
+        else {
+          node.opacity = 0;
+        }
       }
-      else {
-        node.opacity = 0;
-      }
+
+      let existingGraph = JSON.parse(stringifyGraph());
+      console.log('existing graph', existingGraph);
+      console.log('graph to load', JSON.parse(graphToLoad.data));
+
+      //merge the two graphs
+      const newGraph = mergeGraphs(existingGraph, data);
+
+      setGraph(newGraph);
+      networkRef.current?.setData(newGraph);
     }
-
-    let existingGraph = JSON.parse(stringifyGraph());
-    console.log('existing graph', existingGraph);
-    console.log('graph to load', JSON.parse(graphToLoad?.data));
-
-    //merge the two graphs
-    const newGraph = mergeGraphs(existingGraph, data);
-
-    setGraph(newGraph);
-    networkRef.current?.setData(newGraph);
-      
   }
   
-  const setGraphFromNodesAndEdges = (nodes, edges) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
+  const setGraphFromNodesAndEdges = (nodes: TreeNode[], edges: Edge[]) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
     // console.log('Setting snapped nodes and edges:', nodes, edges);
     const existingGraph = JSON.parse(stringifyGraph());
     existingGraph.nodes = nodes;
@@ -428,9 +432,9 @@ function Utensil() {
     networkRef.current?.setData(existingGraph);
   };
 
-  const handleGraphSelected = (id: any) => {
-    const graph = graphs?.find((g: any) => g.id === id);
-    if (graph !== null) {
+  const handleGraphSelected = (id: number) => {
+    const graph = graphs.find((g: Graph) => g.id === id);
+    if (graph) {
       setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
       setGraphIdToLoad(id);
       setConfirmGraphLoadOpen(true);
@@ -440,7 +444,7 @@ function Utensil() {
   const handleGraphDelete = (id: any) => {
     //set the graph to be potentially deleted
     const graph = graphs?.find((g: any) => g.id === id);
-    if (graph !== null) {
+    if (graph) {
       setGraphToDelete(graph); // after confirming 'yes', the confirmDeleteGraph function will be called, and will delete this graph from the database.
       setConfirmGraphDeleteOpen(true);
     } 
@@ -530,7 +534,10 @@ function Utensil() {
     if (buttonMode === "contraction") {
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
-        console.log(nodes)
+        const edges = networkRef.current?.edges.get();
+        console.log('all nodes: ',nodes)
+        console.log('all edges', edges)
+        console.log('trees', trees)
         const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
         
         if (
@@ -539,7 +546,8 @@ function Utensil() {
           !foundSelectedNode.hasOwnProperty('hasDefinition')
         ) {
           const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode);
-console.log(canBeContracted, subGraphData, externalGraphData)
+          console.log('contraction data (subGraph, extraGraph): ', subGraphData, externalGraphData);
+
           if (canBeContracted) {
             const viewPosition = networkRef.current?.network.getViewPosition();
             const scale = networkRef.current?.network.getScale();
@@ -553,6 +561,8 @@ console.log(canBeContracted, subGraphData, externalGraphData)
             const subGraph = JSON.stringify(subGraphObject);
             const graphFromDBloaded = getGraphById(graphId); 
             const graphFromDB = JSON.parse(graphFromDBloaded.data);
+            console.log('graphFromDB' ,graphFromDB);
+            console.log('name', graphFromDBloaded.name)
 
             const {
               nodesIdSet: subGraphNodesIdsSet, 
@@ -618,17 +628,16 @@ console.log(canBeContracted, subGraphData, externalGraphData)
   }, [selectedNodes, buttonMode]);
   
   function graphIdsTraversal(graphData: any) {
-    let nodesIdSet = new Set();
-    let edgesIdSet = new Set();
-    let labelsMap = new Map();
-    let labelsHasDefinitionMap = new Map();
+    let nodesIdSet: Set<string> = new Set();
+    let edgesIdSet: Set<string> = new Set();
+    let labelsMap: Map<string, string> = new Map();
+    let labelsHasDefinitionMap: Map<string, string> = new Map();
     
-    graphData.edges.forEach((edge:any) => {
+    graphData.edges.forEach((edge: Edge) => {
       edgesIdSet.add(edge.id);
     });
-console.log(graphData.nodes)
-    graphData.nodes.forEach((node:any) => {
-      console.log(node)
+
+    graphData.nodes.forEach((node: any) => {
       recursionNodesIdTraversal(node);  
     });
 
@@ -650,28 +659,28 @@ console.log(graphData.nodes)
     return {nodesIdSet, edgesIdSet, labelsMap, labelsHasDefinitionMap};
   }
 
-  function areSetsEqual(a: any, b: any) {
+  function areSetsEqual(a: Set<string>, b: Set<string>) {
     return a.size === b.size && [...a].every(value => b.has(value));
   } 
 
   function contractAction(selNode:any) {
-    const nodes = networkRef.current?.nodes.get();
-    const edges = networkRef.current?.edges.get();
+    const nodes: TreeNode[] = networkRef.current?.nodes.get();
+    const edges: Edge[] = networkRef.current?.edges.get();
 
     const edgeToSelNode = edges.filter((el: any) => el.to === selNode.id); 
     
-    let subGraphNodes = new Set();
-    let subGraphEdges = new Set();
+    let subGraphNodes: Set<TreeNode> = new Set();
+    let subGraphEdges: Set<Edge> = new Set();
 
-    const fromNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].from || el?.labelOfNode === edgeToSelNode[0].from);
-    const eventualNodes = nodes.filter((el: any) => el.id === edgeToSelNode[0].eventual || el?.labelOfNode === edgeToSelNode[0].eventual);
+    const fromNodes = nodes.filter((el) => el.id === edgeToSelNode[0].from || el?.labelOfNode === edgeToSelNode[0].from);
+    const eventualNodes = nodes.filter((el) => el.id === edgeToSelNode[0].eventual || el?.labelOfNode === edgeToSelNode[0].eventual);
 
-    fromNodes.forEach((el: any) => subGraphNodes.add(el));
-    eventualNodes.forEach((el:any) => subGraphNodes.add(el));
+    fromNodes.forEach((el) => subGraphNodes.add(el));
+    eventualNodes.forEach((el) => subGraphNodes.add(el));
     subGraphEdges.add(edgeToSelNode[0]);
 
-    let newNodes: any[] = Array.from(subGraphNodes);
-    let arrayNodes: any[] = Array.from(subGraphNodes);
+    let newNodes = Array.from(subGraphNodes);
+    let arrayNodes = Array.from(subGraphNodes);
 
     for (let i = selNode.level - 1; i > 0; i--) {
       for (const node of arrayNodes) {
@@ -693,10 +702,10 @@ console.log(graphData.nodes)
       arrayNodes = Array.from(subGraphNodes);
     }
 
-    const externalEdgesSet = new Set(edges.filter((e: any) => !subGraphEdges.has(e))); 
+    const externalEdgesSet = new Set(edges.filter((e: Edge) => !subGraphEdges.has(e))); 
     
     let canBeContracted = true;
-    let subGraphNodeIdsSet = new Set();
+    let subGraphNodeIdsSet: Set<string> = new Set();
 
     for (const node of Array.from(subGraphNodes)) {
       if (node.isLabelNode !== true) {
@@ -712,12 +721,12 @@ console.log(graphData.nodes)
       }
     }
 
-    let externalNodesSet = new Set();
+    let externalNodesSet: Set<TreeNode> = new Set();
     let subGraphData;
     let externalGraphData;
 
     if (canBeContracted) {
-      externalNodesSet = new Set(nodes.filter((node: any) => !subGraphNodes.has(node)));
+      externalNodesSet = new Set(nodes.filter((node) => !subGraphNodes.has(node)));
       subGraphData = {
         edges: Array.from(subGraphEdges),
         nodes: Array.from(subGraphNodes),
@@ -771,8 +780,8 @@ console.log(graphData.nodes)
   useEffect(() => {
     if (buttonMode === "expansion") {
       if (selectedNodes.length === 1) {
-        const nodes = networkRef.current?.nodes.get();
-        const edges = networkRef.current?.edges.get();
+        const nodes: TreeNode[] = networkRef.current?.nodes.get();
+        const edges: Edge[] = networkRef.current?.edges.get();
         const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
        
         if (foundSelectedNode.hasOwnProperty('hasDefinition')) {
