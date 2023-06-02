@@ -52,7 +52,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
       node.label = label;
-      
+      if (node.hasOwnProperty('name')) {
+        node.name = label;
+      }
+
       if (node.label && node.label.length > 0) {
         node.opacity = 1.0;
       }

@@ -29,6 +29,7 @@ export type TreeNode = {
   y: number;
   level: number;
   subGraphData: string;
+  name: string;
 };
 
 export type Tree = {
