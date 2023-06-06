@@ -149,7 +149,7 @@ function Utensil() {
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
     const edges = networkRef.current?.edges.get(); // get all edges from the network.
     const positions = networkRef.current?.network.getPositions();
-
+    console.log('all nodes: ',nodes)
     const to_traverse = [];
     const id_to_edge: any = {};
     const id_to_node: any = {};
@@ -540,7 +540,7 @@ function Utensil() {
         console.log('all edges', edges)
         
         const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
-        console.log('contracted node ---',foundSelectedNode)
+        console.log('contracted node ---',foundSelectedNode, foundSelectedNode.name)
         
         if (
           foundSelectedNode?.level > 0 && 
@@ -577,17 +577,21 @@ function Utensil() {
             const nodeName = (graphNameFromDB !== '') ?  graphNameFromDB :
               (foundSelectedNode.hasOwnProperty('name') && externalGraphData.nodes.length > 2 && foundSelectedNode.name) ? foundSelectedNode.name : '';
             
+            const finalName = graphId 
+              ? nodeName 
+              : foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';  
+            
             const updatedNodes = externalGraphData.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
-                el.label = nodeName;
+                el.label = finalName;
                 el.font = {color: "#fff"};
                 el.subGraphData = subGraph;
-                el.name = nodeName;
+                el.name = finalName;
                 el.shape = "hexagon";
-                el.opacity = nodeName === '' ? 0 : 1;
+                el.opacity = finalName === '' ? 0 : 1;
               }
               if (el.labelOfNode === externalGraphData.nodeId) {
-                el.label = nodeName;
+                el.label = finalName;
                 el.font = {
                   size: 14,
                   color: "#000000",
@@ -596,14 +600,14 @@ function Utensil() {
               }
               return el;
             })
-            // console.log('updated nodes: ',updatedNodes)
+            console.log('updated nodes: ',updatedNodes)
             
             const existingLabelNode = updatedNodes.find(node => node.labelOfNode === externalGraphData.nodeId)
             
-            if (!existingLabelNode && nodeName !== '') {
+            if (!existingLabelNode && finalName !== '') {
               const labelNode = {
                 id: uuidv4(),
-                label: nodeName,
+                label: finalName,
                 font: {
                   size: 14,
                   color: "#000000",
@@ -819,20 +823,21 @@ function Utensil() {
         const nodes: TreeNode[] = networkRef.current?.nodes.get();
         const edges: Edge[] = networkRef.current?.edges.get();
         const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
-       
+        
         if (foundSelectedNode.hasOwnProperty('subGraphData')) {
           const subGraphData = JSON.parse(foundSelectedNode.subGraphData);
           const updatedEdges = edges.concat(subGraphData.edges);
+          const nodeName = foundSelectedNode.name!;
+          
           const updatedNodes = nodes
             .filter(node => node.id !== foundSelectedNode.id && node.labelOfNode !== foundSelectedNode.id)
             .concat(subGraphData.nodes)
-            .map(node => {
-              if (node.id === foundSelectedNode.id) {
-                node.name = foundSelectedNode.name;
+            .map((el) => {
+              if (el.id === foundSelectedNode.id) {
+                el.name = nodeName;
               }
-              return node;
-            })
-
+              return el;
+            });
           const expansedGraph = JSON.parse(stringifyGraph());
           expansedGraph.nodes = updatedNodes;
           expansedGraph.edges = updatedEdges;
