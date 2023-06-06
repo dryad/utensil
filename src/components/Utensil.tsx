@@ -535,10 +535,12 @@ function Utensil() {
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
         const edges = networkRef.current?.edges.get();
+        
         console.log('all nodes: ',nodes)
         console.log('all edges', edges)
-        console.log('trees', trees)
-        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
+        
+        const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
+        console.log('contracted node ---',foundSelectedNode)
         
         if (
           foundSelectedNode?.level > 0 && 
@@ -548,7 +550,7 @@ function Utensil() {
           const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode);
           console.log('contraction data (subGraph, extraGraph): ', subGraphData, externalGraphData);
 
-          if (canBeContracted) {
+          if (canBeContracted && subGraphData && externalGraphData) {
             const viewPosition = networkRef.current?.network.getViewPosition();
             const scale = networkRef.current?.network.getScale();
 
@@ -559,32 +561,33 @@ function Utensil() {
               scale: scale 
             };
             const subGraph = JSON.stringify(subGraphObject);
-
+            
             let graphNameFromDB = ''; // We don't know if the graph from DB is loaded
-
+            
             if (graphId) { // The graph from DB is loaded
               const graphFromDBloaded = getGraphById(graphId); 
               const graphFromDB = JSON.parse(graphFromDBloaded.data);
-              console.log('graphFromDB' ,graphFromDB);
-              console.log('name', graphFromDBloaded.name);
+              // console.log('graphFromDB' ,graphFromDB);
+              // console.log('graphFromDB name', graphFromDBloaded.name);
 
               const areEqualGraphs = compareGraphs(subGraphData, graphFromDB);
               graphNameFromDB = areEqualGraphs ? graphFromDBloaded?.name : '';
             }
             
-            const graphName = foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : graphNameFromDB;
-
-            const updatedNodes = externalGraphData?.nodes.map((el: any) => {
+            const nodeName = (graphNameFromDB !== '') ?  graphNameFromDB :
+              (foundSelectedNode.hasOwnProperty('name') && externalGraphData.nodes.length > 2 && foundSelectedNode.name) ? foundSelectedNode.name : '';
+            
+            const updatedNodes = externalGraphData.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
-                el.label = graphName;
+                el.label = nodeName;
                 el.font = {color: "#fff"};
                 el.subGraphData = subGraph;
-                el.name = graphName;
+                el.name = nodeName;
                 el.shape = "hexagon";
-                el.opacity = graphName === '' ? 0 : 1;
+                el.opacity = nodeName === '' ? 0 : 1;
               }
               if (el.labelOfNode === externalGraphData.nodeId) {
-                el.label = graphName;
+                el.label = nodeName;
                 el.font = {
                   size: 14,
                   color: "#000000",
@@ -593,7 +596,28 @@ function Utensil() {
               }
               return el;
             })
-                        
+            // console.log('updated nodes: ',updatedNodes)
+            
+            const existingLabelNode = updatedNodes.find(node => node.labelOfNode === externalGraphData.nodeId)
+            
+            if (!existingLabelNode && nodeName !== '') {
+              const labelNode = {
+                id: uuidv4(),
+                label: nodeName,
+                font: {
+                  size: 14,
+                  color: "#000000",
+                },
+                shape: "ellipse",        
+                x: -20, 
+                y: -20,
+                isLabelNode: true,
+                labelOfNode: foundSelectedNode.id,
+                level: foundSelectedNode.level,
+              };
+              updatedNodes.push(labelNode);
+            }
+
             const externalGraph = JSON.parse(stringifyGraph());
             externalGraph.nodes = updatedNodes;
             externalGraph.edges = externalGraphData?.edges;
@@ -661,12 +685,13 @@ function Utensil() {
         arrayNodes.forEach((node: any) => recursionNodesIdTraversal(node));
       }
       else {
-        nodesIdSet.add(node.id);
         if (!node.hasOwnProperty('isLabelNode')) {
+          nodesIdSet.add(node.id);
           labelsMap.set(node.id, node.label);
         }
       }
     }
+    
     return {nodesIdSet, edgesIdSet, labelsMap, labelsHasDefinitionMap};
   }
 

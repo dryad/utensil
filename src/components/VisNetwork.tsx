@@ -52,7 +52,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
       node.label = label;
-      if (node.hasOwnProperty('name')) {
+      if (node.hasOwnProperty('name') && node.hasOwnProperty('subGraphData')) {
         node.name = label;
       }
 
