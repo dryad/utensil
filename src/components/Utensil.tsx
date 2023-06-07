@@ -540,7 +540,7 @@ function Utensil() {
         console.log('all edges', edges)
         
         const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
-        console.log('contracted node ---',foundSelectedNode, foundSelectedNode.name)
+        console.log('contracted node ---',foundSelectedNode)
         
         if (
           foundSelectedNode?.level > 0 && 
@@ -563,35 +563,63 @@ function Utensil() {
             const subGraph = JSON.stringify(subGraphObject);
             
             let graphNameFromDB = ''; // We don't know if the graph from DB is loaded
-            
+            let areEqualGraphs: boolean;
+
             if (graphId) { // The graph from DB is loaded
               const graphFromDBloaded = getGraphById(graphId); 
               const graphFromDB = JSON.parse(graphFromDBloaded.data);
               // console.log('graphFromDB' ,graphFromDB);
               // console.log('graphFromDB name', graphFromDBloaded.name);
 
-              const areEqualGraphs = compareGraphs(subGraphData, graphFromDB);
-              graphNameFromDB = areEqualGraphs ? graphFromDBloaded?.name : '';
+              areEqualGraphs = compareGraphs(subGraphData, graphFromDB);
+              console.log('areEqual graphs ----' , areEqualGraphs)
+              graphNameFromDB = graphFromDBloaded.name;
             }
             
-            const nodeName = (graphNameFromDB !== '') ?  graphNameFromDB :
-              (foundSelectedNode.hasOwnProperty('name') && externalGraphData.nodes.length > 2 && foundSelectedNode.name) ? foundSelectedNode.name : '';
-            
-            const finalName = graphId 
-              ? nodeName 
-              : foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';  
+            const defineName = () => {
+              let nodeName = '';
+
+              if (!graphId && foundSelectedNode.hasOwnProperty('name')) {
+                nodeName = foundSelectedNode.name;
+              }
+              if (!graphId && !foundSelectedNode.hasOwnProperty('name')) {
+                nodeName = '';
+              }
+              if (graphId && areEqualGraphs && foundSelectedNode.hasOwnProperty('name')) {
+                nodeName = foundSelectedNode.name !== '' ? foundSelectedNode.name : graphNameFromDB;
+              }
+              if (graphId && areEqualGraphs && !foundSelectedNode.hasOwnProperty('name')) {
+                nodeName = graphNameFromDB;
+              }
+              if (graphId && !areEqualGraphs && foundSelectedNode.hasOwnProperty('name') 
+                && foundSelectedNode.name !== graphNameFromDB) {
+                nodeName = foundSelectedNode.name;
+              }
+              if (graphId && !areEqualGraphs && foundSelectedNode.hasOwnProperty('name') 
+                && foundSelectedNode.name === graphNameFromDB) {
+                nodeName = '';
+              }
+              if (graphId && !areEqualGraphs && !foundSelectedNode.hasOwnProperty('name')) {
+                nodeName = '';
+              }
+
+              return {nodeName}
+            }
+
+            const { nodeName } = defineName();
+            console.log('nodeName ---', nodeName)
             
             const updatedNodes = externalGraphData.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
-                el.label = finalName;
+                el.label = nodeName;
                 el.font = {color: "#fff"};
                 el.subGraphData = subGraph;
-                el.name = finalName;
+                el.name = nodeName;
                 el.shape = "hexagon";
-                el.opacity = finalName === '' ? 0 : 1;
+                el.opacity = nodeName === '' ? 0 : 1;
               }
               if (el.labelOfNode === externalGraphData.nodeId) {
-                el.label = finalName;
+                el.label = nodeName;
                 el.font = {
                   size: 14,
                   color: "#000000",
@@ -604,10 +632,10 @@ function Utensil() {
             
             const existingLabelNode = updatedNodes.find(node => node.labelOfNode === externalGraphData.nodeId)
             
-            if (!existingLabelNode && finalName !== '') {
+            if (!existingLabelNode && nodeName !== '') {
               const labelNode = {
                 id: uuidv4(),
-                label: finalName,
+                label: nodeName,
                 font: {
                   size: 14,
                   color: "#000000",
@@ -633,22 +661,24 @@ function Utensil() {
   }, [selectedNodes, buttonMode]);
 
   function compareGraphs(graph1: any, graph2: any) {
+    console.log('graph1, graph2 ---', graph1, graph2)
     const {
       nodesIdSet: subGraphNodesIdsSet, 
       edgesIdSet: subGraphEdgesIdsSet, 
       labelsMap: subGraphLabels,
-      labelsHasDefinitionMap: map1
+      nodesHaveNameMap: map1
     } = graphIdsTraversal(graph1);
     const {
       nodesIdSet: graphNodesIdsSet, 
       edgesIdSet: graphEdgesIdsSet,
       labelsMap: graphFromDBLabels,
-      labelsHasDefinitionMap: map2
+      nodesHaveNameMap: map2
     } = graphIdsTraversal(graph2);
 
     const subGraphIsEqualGraphFromDBByIds = areSetsEqual(subGraphEdgesIdsSet, graphEdgesIdsSet) &&
                                             areSetsEqual(subGraphNodesIdsSet, graphNodesIdsSet);
     let graphsAreEqualByLabels = true;
+    console.log('subGraphIsEqualGraphFromDBByIds', subGraphIsEqualGraphFromDBByIds);
 
     if (subGraphIsEqualGraphFromDBByIds) {
       for (const id of Array.from(graphNodesIdsSet)) {
@@ -660,10 +690,14 @@ function Utensil() {
     } else {
       graphsAreEqualByLabels = false;
     }
-          
-    const { contractedNodesHaveEqualLabels } = compareGraphsByContractedNodesLabels(map1, map2);
 
-    return graphsAreEqualByLabels && contractedNodesHaveEqualLabels;
+    console.log('graphsAreEqualByLabels', graphsAreEqualByLabels);  
+    map1.delete(graph1.nodeId);
+    const {graphsAreEqualByNames} = compareGraphsByNames(map1, map2);
+    
+    console.log('maps ----', map1, map2);
+
+    return graphsAreEqualByLabels && graphsAreEqualByNames;
   }
   
   function graphIdsTraversal(graphData: any) {
@@ -671,6 +705,7 @@ function Utensil() {
     let edgesIdSet: Set<string> = new Set();
     let labelsMap: Map<string, string> = new Map();
     let labelsHasDefinitionMap: Map<string, string> = new Map();
+    let nodesHaveNameMap: Map<string, string> = new Map();
     
     graphData.edges.forEach((edge: Edge) => {
       edgesIdSet.add(edge.id);
@@ -683,6 +718,10 @@ function Utensil() {
     function recursionNodesIdTraversal(node: any) {
       if (node.hasOwnProperty('subGraphData')) {
         labelsHasDefinitionMap.set(node.id, node.label);
+        if (node.hasOwnProperty('name')) {
+          nodesHaveNameMap.set(node.id, node.name);
+          console.log(node.id, node.name)
+        }
         const arrayNodes = JSON.parse(node.subGraphData).nodes;
         const arrayEdges = JSON.parse(node.subGraphData).edges;
         arrayEdges.forEach((edge: any) => edgesIdSet.add(edge.id));
@@ -693,10 +732,14 @@ function Utensil() {
           nodesIdSet.add(node.id);
           labelsMap.set(node.id, node.label);
         }
+        if (node.hasOwnProperty('name')) {
+          !nodesHaveNameMap.has(node.id) && nodesHaveNameMap.set(node.id, node.name);
+          console.log(node.id, node.name)
+        }
       }
     }
     
-    return {nodesIdSet, edgesIdSet, labelsMap, labelsHasDefinitionMap};
+    return {nodesIdSet, edgesIdSet, labelsMap, labelsHasDefinitionMap, nodesHaveNameMap};
   }
 
   function areSetsEqual(a: Set<string>, b: Set<string>) {
@@ -786,30 +829,34 @@ function Utensil() {
     return {canBeContracted, subGraphData, externalGraphData}
   }
 
-  function compareGraphsByContractedNodesLabels(map1: any, map2: any) {
-    let contractedNodesHaveEqualLabels = true;
+  function compareGraphsByNames(map1: any, map2: any) {
+    let graphsAreEqualByNames = true;
 
-    map1.forEach((value1: string, key1: string) => {
+    for (const [key1, value1] of map1) {
       const value2 = map2.get(key1);
       if (value2 && value2 !== value1) {
-        contractedNodesHaveEqualLabels = false;
+        graphsAreEqualByNames = false;
+        break;
       }
       if (!value2 && value1 !== '') {
-        contractedNodesHaveEqualLabels = false;
+        graphsAreEqualByNames = false;
+        break;
       }
-    });
+    }
 
-    map2.forEach((value2: string, key2: string) => {
+    for (const [key2, value2] of map2) {
       const value1 = map1.get(key2);
       if (value1 && value1 !== value2) {
-        contractedNodesHaveEqualLabels = false;
+        graphsAreEqualByNames = false;
+        break;
       }
       if (!value1 && value2 !== '') {
-        contractedNodesHaveEqualLabels = false;
+        graphsAreEqualByNames = false;
+        break;
       }
-    });
+    }
 
-    return { contractedNodesHaveEqualLabels }
+    return { graphsAreEqualByNames }
   }
 
   const getGraphById = (id: number | null) => {
@@ -822,12 +869,12 @@ function Utensil() {
       if (selectedNodes.length === 1) {
         const nodes: TreeNode[] = networkRef.current?.nodes.get();
         const edges: Edge[] = networkRef.current?.edges.get();
-        const foundSelectedNode = nodes.filter((node: any) => node.id === selectedNodes[0])[0];
+        const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0])!;
         
         if (foundSelectedNode.hasOwnProperty('subGraphData')) {
           const subGraphData = JSON.parse(foundSelectedNode.subGraphData);
           const updatedEdges = edges.concat(subGraphData.edges);
-          const nodeName = foundSelectedNode.name!;
+          const nodeName = foundSelectedNode.name ? foundSelectedNode.name : '';
           
           const updatedNodes = nodes
             .filter(node => node.id !== foundSelectedNode.id && node.labelOfNode !== foundSelectedNode.id)
