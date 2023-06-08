@@ -574,6 +574,10 @@ function Utensil() {
               areEqualGraphs = compareGraphs(subGraphData, graphFromDB);
               console.log('areEqual graphs ----' , areEqualGraphs)
               graphNameFromDB = graphFromDBloaded.name;
+
+              const areGraphsEqualByStructure = compareGraphsByStructure(subGraphData, graphFromDB, foundSelectedNode);
+              console.log('compareGraphsByStructure---', areGraphsEqualByStructure);
+              alert( `Are the contracted graph and the loaded graph from DB equal without Name attribute comparison?  --- ${areGraphsEqualByStructure}`);
             }
             
             const defineName = () => {
@@ -659,6 +663,164 @@ function Utensil() {
       }
     }
   }, [selectedNodes, buttonMode]);
+
+  function compareGraphsByStructure(graph1: any, graph2: any, selNode1: any) {
+    let areEqual = true;
+
+    console.log('graph1, graph2, selNode1 ---', graph1, graph2, selNode1);
+
+    const { 
+      nodes: nodes1, 
+      edges: edges1 
+    } = graphTraversal(graph1);
+    const { 
+      nodes: nodes2, 
+      edges: edges2 
+    } = graphTraversal(graph2);
+
+    console.log('nodes1, nodes2, edges1, edges2 ---', nodes1, nodes2, edges1, edges2);
+
+    if (nodes1.length !== nodes2.length) {
+      areEqual = false; 
+      return areEqual;
+    }
+
+    nodes2.sort((a,b) => b.level - a.level);
+
+    const selNode2 = nodes2[0];
+   
+    const id_to_edge_1: Map<string, Edge> = new Map();
+    const id_to_node_1: Map<string, TreeNode> = new Map();
+    const id_to_edge_2: Map<string, Edge> = new Map();
+    const id_to_node_2: Map<string, TreeNode> = new Map();
+
+    for (const node of nodes1) {
+      id_to_node_1.set(node.id, node);
+      for (const edge of edges1) {
+        if (node.id === edge.to) {
+          id_to_edge_1.set(node.id, edge)
+        }
+      }
+    };
+    for (const node of nodes2) {
+      id_to_node_2.set(node.id, node);
+      for (const edge of edges2) {
+        if (node.id === edge.to) {
+          id_to_edge_2.set(node.id, edge)
+        }
+      }
+    };
+
+    function getLeftNode(node: any, nodeMap: any, edgeMap: any) {
+      if (edgeMap.has(node.id)) {
+        return nodeMap.get(edgeMap.get(node.id).from)
+      }
+      else {
+        return null;
+      }
+    }
+
+    function getRightNode(node: any, nodeMap: any, edgeMap: any) {
+      if (edgeMap.has(node.id)) {
+        return nodeMap.get(edgeMap.get(node.id).eventual);
+      }
+      else {
+        return null;
+      }
+    }
+
+    areEqual = comparison(selNode1, selNode2);
+
+    function comparison(top1: any, top2: any): any {
+      if (
+        (!top1 && top2) || 
+        (!top2 && top1)
+      ) {
+        return false;
+      }
+
+      if (
+        top1.level === 0 && 
+        top2.level === 0 && 
+        top1.label === top2.label
+      ) {
+        return true;      
+      }
+
+      if (
+        top1.level !== top2.level ||
+        top1.label !== top2.label
+      ) {
+        return false;
+      } else 
+      {
+        const edgeToTop1 = edges1.find(el => el.to === top1.id);
+        const edgeToTop2 = edges2.find(el => el.to === top2.id);
+       
+        if (
+          (!edgeToTop1 && edgeToTop2) ||
+          (!edgeToTop2 && edgeToTop1) ||
+          edgeToTop1?.directed !== edgeToTop2?.directed
+        ) {
+          return false;
+        } else {
+          if (edgeToTop1 && edgeToTop2) {
+            return (
+              comparison(
+                getLeftNode(id_to_node_1.get(edgeToTop1.to), id_to_node_1, id_to_edge_1),
+                getLeftNode(id_to_node_2.get(edgeToTop2.to), id_to_node_2, id_to_edge_2)
+              ) &&
+              comparison(
+                getRightNode(id_to_node_1.get(edgeToTop1.to), id_to_node_1, id_to_edge_1),
+                getRightNode(id_to_node_2.get(edgeToTop2.to), id_to_node_2, id_to_edge_2)
+              )
+            )
+          }
+        }
+      }
+    }
+    return areEqual;
+  }
+
+  function graphTraversal(graphData: any) {
+    let nodesSet: Set<TreeNode> = new Set();
+    let edgesSet: Set<Edge> = new Set();
+        
+    graphData.edges.forEach((edge: Edge) => {
+      edgesSet.add(edge);
+    });
+
+    graphData.nodes.forEach((node: any) => {
+      recursionNodesTraversal(node);  
+    });
+
+    function recursionNodesTraversal(node: any) {
+      if (node.hasOwnProperty('subGraphData')) {
+        // nodesSet.add(node);
+        const arrayNodes = JSON.parse(node.subGraphData).nodes;
+        const arrayEdges = JSON.parse(node.subGraphData).edges;
+        arrayEdges.forEach((edge: any) => edgesSet.add(edge));
+        arrayNodes.forEach((node: any) => recursionNodesTraversal(node));
+      }
+      else {
+        if (!node.hasOwnProperty('isLabelNode')) {
+          nodesSet.add(node);
+        }
+      }
+    }
+    
+    const nodes = Array.from(nodesSet);
+    const edges = Array.from(edgesSet);
+
+    return {nodes, edges};
+  }
+
+
+
+
+
+
+
 
   function compareGraphs(graph1: any, graph2: any) {
     console.log('graph1, graph2 ---', graph1, graph2)
