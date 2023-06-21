@@ -342,7 +342,7 @@ function Utensil() {
     const fullWidth = (max_x - min_x);
     const halfGraphWidth = fullWidth / 2;
 
-    let renamed_nodes = {}; // old_id: new id
+    let renamed_nodes: {[index: string]: string} = {}; // old_id: new id
 
     // To prevent duplicate node IDs from the incoming graph, give each node a new id
     // first pass is non-labelNodes because we need a complete map of all nodes before labelNodes are processed, so we can update labelOfNode field of labelNodes.
@@ -351,6 +351,10 @@ function Utensil() {
       if (!node.isLabelNode) {
         const new_id = uuidv4();
         renamed_nodes[node.id] = new_id;
+        if (node.subGraphData) {
+          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData),node.id, new_id, fullWidth);
+          node.subGraphData = JSON.stringify(newSubgraphData);
+        }
         node.id = new_id;
         node.x += fullWidth + 20; // apply offset calculated above
       }
@@ -397,6 +401,43 @@ function Utensil() {
     };
     return newGraph;
   };
+
+  function renameSubgraphIds(graph: any, oldId: string, newId: string, fullWidth: number) {
+    
+    let renamed_nodes: {[index: string]: string} = {};
+
+    for (const node of graph.nodes) {
+      if (!node.isLabelNode) {
+        const new_id = node.id === oldId ? newId : uuidv4();
+        renamed_nodes[node.id] = new_id;
+        if (node.subGraphData) {
+          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData),node.id, new_id, fullWidth);
+          node.subGraphData = JSON.stringify(newSubgraphData);
+        }
+        node.id = new_id;
+        node.x += fullWidth + 20;
+      }
+    }
+
+    for (const node of graph.nodes) {
+      if (node.isLabelNode) {
+        const new_id = uuidv4();
+        node.id = new_id;
+        node.labelOfNode = renamed_nodes[node.labelOfNode]; 
+      }
+    }
+
+    for (const edge of graph.edges) {
+        const new_id = uuidv4();
+        edge.id = new_id;
+
+        edge.from = renamed_nodes[edge.from];
+        edge.to = renamed_nodes[edge.to];
+        edge.eventual = renamed_nodes[edge.eventual];
+    }
+    
+    return graph;
+  }
 
   const confirmImportGraph = () => {
     if (graphToLoad) {
@@ -577,7 +618,7 @@ function Utensil() {
 
               const areGraphsEqualByStructure = compareGraphsByStructure(subGraphData, graphFromDB, foundSelectedNode);
               console.log('compareGraphsByStructure---', areGraphsEqualByStructure);
-              alert( `Are the contracted graph and the loaded graph from DB equal without Name attribute comparison?  --- ${areGraphsEqualByStructure}`);
+              // alert( `Are the contracted graph and the loaded graph from DB equal without Name attribute comparison?  --- ${areGraphsEqualByStructure}`);
             }
             
             const defineName = () => {
