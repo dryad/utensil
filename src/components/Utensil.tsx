@@ -669,15 +669,31 @@ function Utensil() {
           const updatedEdges = edges.concat(subGraphData.edges);
           const nodeName = foundSelectedNode.name ? foundSelectedNode.name : '';
           
+          // implement offset to the subgraph nodes if it is
+          const subgraphNodes = subGraphData.nodes;
+          const keyNode = subgraphNodes.find((el: any) => el.id === foundSelectedNode.id);
+          if (keyNode.x !== foundSelectedNode.x || keyNode.y !== foundSelectedNode.y) {
+            const offsetX = keyNode.x - foundSelectedNode.x;
+            const offsetY = keyNode.y - foundSelectedNode.y;
+
+            subgraphNodes.map((el: any) => {
+              if (!el.labelOfNode) {
+                el.x -= offsetX;
+                el.y -= offsetY; 
+              }              
+            })
+          }
+          
           const updatedNodes = nodes
             .filter(node => node.id !== foundSelectedNode.id && node.labelOfNode !== foundSelectedNode.id)
-            .concat(subGraphData.nodes)
+            .concat(subgraphNodes)
             .map((el) => {
               if (el.id === foundSelectedNode.id) {
                 el.name = nodeName;
               }
               return el;
             });
+            
           const expansedGraph = JSON.parse(stringifyGraph());
           expansedGraph.nodes = updatedNodes;
           expansedGraph.edges = updatedEdges;
