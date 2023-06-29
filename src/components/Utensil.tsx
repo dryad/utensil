@@ -593,7 +593,7 @@ function Utensil() {
           console.log('contraction data (subGraph, extraGraph): ', subGraphData, externalGraphData);
 
           if (canBeContracted && subGraphData && externalGraphData) {
-            const viewPosition = networkRef.current?.network.getViewPosition();
+            const viewPosition = networkRef.current?.network.getViewPosition()!;
             const scale = networkRef.current?.network.getScale();
 
             const subGraphObject = { 
@@ -604,8 +604,7 @@ function Utensil() {
             };
             const subGraph = JSON.stringify(subGraphObject);
             const nodeName = foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';
-            console.log('nodeName ---', nodeName)
-            
+                        
             const updatedNodes = externalGraphData.nodes.map((el: any) => {
               if (el.id === externalGraphData.nodeId) {
                 el.label = nodeName;
@@ -651,6 +650,11 @@ function Utensil() {
             externalGraph.nodes = updatedNodes;
             externalGraph.edges = externalGraphData?.edges;
             networkRef.current?.setData(externalGraph);
+            networkRef.current?.network.moveTo({
+              position: { x: viewPosition.x, y: viewPosition.y },
+              scale: scale || 1,
+              animation: false,
+            });
           }
         }
       }
@@ -668,6 +672,9 @@ function Utensil() {
           const subGraphData = JSON.parse(foundSelectedNode.subGraphData);
           const updatedEdges = edges.concat(subGraphData.edges);
           const nodeName = foundSelectedNode.name ? foundSelectedNode.name : '';
+
+          const viewPosition = networkRef.current?.network.getViewPosition()!;
+          const scale = networkRef.current?.network.getScale();
           
           // implement offset to the subgraph nodes if it is
           const subgraphNodes = subGraphData.nodes;
@@ -698,6 +705,11 @@ function Utensil() {
           expansedGraph.nodes = updatedNodes;
           expansedGraph.edges = updatedEdges;
           networkRef.current?.setData(expansedGraph);
+          networkRef.current?.network.moveTo({
+            position: { x: viewPosition.x, y: viewPosition.y },
+            scale: scale || 1,
+            animation: false,
+          });
         }
       }
     }
