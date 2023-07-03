@@ -134,6 +134,22 @@ function EditProfile() {
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <TextField
+                                    id="standard-basic"
+                                    label="About"
+                                    // variant="filled"
+                                    fullWidth
+                                    multiline
+                                    value={address.about || ''}
+                                    error={errorTextName.length > 0}
+                                    // helperText={errorTextName}
+                                    onChange={(e) => {
+                                        setAddress({ ...address, about: e.target.value });
+                                    }}
+
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
                                 <ButtonGroup
                                     variant="contained"
                                     color="primary"
