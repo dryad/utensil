@@ -744,8 +744,30 @@ function Utensil() {
   
   };
 
+  function resizedataURL(datas:any, width: any, height:any){
+    return new Promise(async function(resolve,reject){
+
+        let img = document.createElement('img');
+        img.onload = function()
+        {        
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(this, 0, 0, width, height);
+            let dataURI = canvas.toDataURL();
+            resolve(dataURI);
+        };
+        img.src = datas;
+      })
+  }
+
   async function saveGraphToDatabase(isNew: boolean = false) {
-    
+         
+    let networkImg = networkRef.current?.dom.childNodes[0].firstChild;
+    let newDataUri = await resizedataURL(networkImg.toDataURL(),100,100);
+    console.log('---thumbnail image string format---', newDataUri)
+
     const data = stringifyGraph();
     if (isNew) {
       await axios.post("/api/graphs/", {
@@ -765,11 +787,10 @@ function Utensil() {
         name: graphName,
         note: graphNote,
         data: data,
-      });
+      });         
     }  
-
+    
     await refreshList();
-  
   };
   
   async function getMetaMaskAccount() {
@@ -898,7 +919,6 @@ function Utensil() {
                 fullWidth
                 InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
               />
-
             </Box>
           </Paper>
           <GraphList
