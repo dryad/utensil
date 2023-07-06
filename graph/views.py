@@ -23,6 +23,7 @@ def address(request, addressId=None):
         address, created = Address.objects.get_or_create(address=addressId)
         # print('DATA:', data)
         address.name = data['editAddress']['name']
+        address.about = data['editAddress']['about']
             # save avatar image from post request
         if 'avatar' in data['editAddress']:
             avatar = data['editAddress']['avatar']

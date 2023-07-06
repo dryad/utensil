@@ -29,6 +29,14 @@ interface TabPanelProps {
     value: number;
 }
 
+type Address = {
+    id: number;
+    name: string;
+    about: string;
+    address: string;
+    avatar_url: string;
+}
+
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
   
@@ -135,7 +143,7 @@ function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
     const [graphs, setGraphs] = useState([]); // The list of graphs
-    const [address, setAddress] = useState({}); // The address object to display
+    const [address, setAddress] = useState<Address>({}); // The address object to display
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
 
@@ -230,6 +238,9 @@ function Profile() {
                                 </Typography>
                                 <Typography variant="h8">
                                     { address.address && (shortenAddress(address.address))}
+                                </Typography>
+                                <Typography variant="h8" sx={{'color': '#888', 'wordBreak': 'break-all', 'pt': 2, 'pb': 2}}>
+                                    { address.about ? address.about : ''}
                                 </Typography>
                                 { can_edit_profile() && (
                                     <Button
