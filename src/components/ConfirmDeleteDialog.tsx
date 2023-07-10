@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Dialog, TextField } from "@mui/material";
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 
-const ConfirmDeleteDialog = (props) => {
+const ConfirmDeleteDialog = (props: any) => {
   const { title, children, open, setOpen, onConfirmDelete } = props;
   return (
     <Dialog

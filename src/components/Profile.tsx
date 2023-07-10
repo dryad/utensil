@@ -16,12 +16,14 @@ import {
     Avatar,
     Stack,
     Tabs,
-    Tab
+    Tab,
+    Drawer 
   } from "@mui/material";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import "./Profile.css";
 import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
+import Utensil from "./Utensil";
 
 interface TabPanelProps {
     children?: ReactNode;
@@ -146,6 +148,28 @@ function Profile() {
     const [address, setAddress] = useState<Address>({}); // The address object to display
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
+    const [startNewConcept, setStartNewConcept] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
+
+    const toggleDrawer =
+    (open: boolean) =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (!open) {
+            setShowWarning(true);
+        }
+        if (!showWarning) {
+            if (
+                event.type === 'keydown' &&
+                ((event as React.KeyboardEvent).key === 'Tab' ||
+                  (event as React.KeyboardEvent).key === 'Shift')
+              ) {
+                return;
+              }
+        }
+      
+      setStartNewConcept(open);
+    
+    };
 
     const handleChange = (event: SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -261,7 +285,33 @@ function Profile() {
                                 <Typography variant="h6">
                                     Concepts
                                 </Typography>
-                                <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}>Start new concept</Button>
+                                <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
+                                    onClick={toggleDrawer(true)}
+                                >
+                                    Start new concept
+                                </Button>
+                                <Drawer
+                                    anchor={"right"}
+                                    open={startNewConcept}
+                                    onClose={toggleDrawer(false)}
+                                    hideBackdrop={true}
+                                >
+                                    <div style={{
+                                        width: '84vw', 
+                                        padding: '2rem',
+                                        backgroundColor: '#211f24', 
+                                        height: '100vh'}}
+                                    >
+                                        <Utensil newConcept={true} showWarning={showWarning} setShowWarning={setShowWarning} setStartNewConcept={setStartNewConcept}/>
+                                    </div>
+
+
+                                    
+                                    {/* <div style={{width: '100vw'}}>
+                                    asa f fjsdfdshfhfs hfgiusd ufgh ghus gs hfjkds hfusd hfu hfsi fhusiuf shd ufdshius
+
+                                    </div> */}
+                                </Drawer>
                             </Stack>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
@@ -293,7 +343,7 @@ function Profile() {
                                 </div>
                             </TabPanel>
                             <TabPanel value={value} index={1}>
-                                <Box sx={{color: '#fff', pt: 2}}>
+                                <Box sx={{'color': '#fff', 'pt': 2}}>
                                     Private concepts
                                 </Box>
                             </TabPanel>

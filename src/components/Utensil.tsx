@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, FC } from "react";
 import {
   Container,
   Paper,
@@ -21,6 +21,7 @@ import NetworkButtons from "./NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
+import ShowWarningDialog from "./ShowWarningDialog";
 import TreeList from "./Tree/TreeList";
 import { Tree, TreeNode, Edge } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -28,7 +29,14 @@ import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
 
-function Utensil() {
+interface UtensilProps {
+  newConcept: boolean;
+  showWarning: boolean;
+  setShowWarning: (value :boolean) => void;
+  setStartNewConcept: (value :boolean) => void;
+}
+
+function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewConcept}: UtensilProps) {
   const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
@@ -810,6 +818,10 @@ function Utensil() {
     saveGraphToDatabase(true);
   }
 
+  const handleSaveGraph = () => {
+    console.log('777')
+  }
+
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
@@ -818,8 +830,8 @@ function Utensil() {
   
   return (
     <Container>
-      <Grid container spacing={0}>
-        <Grid item>
+      <Grid container spacing={newConcept ? 2 : 0} >
+        <Grid item >
           <Paper>
             <NetworkButtons
               networkRef={networkRef}
@@ -839,10 +851,12 @@ function Utensil() {
               }}
             >
               <ButtonGroup orientation="vertical">
-                <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
-                  Save
-                </Button>
-                <Button variant="outlined" color="primary" onClick={handleSaveAsNew}>
+                {!newConcept &&
+                  <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
+                    Save
+                  </Button>
+                }
+                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} sx={{color: newConcept ? 'blue' : '', border: newConcept ? '1px solid blue' : ''}}>
                   Save As New
                 </Button>
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
@@ -878,6 +892,16 @@ function Utensil() {
               onConfirmDelete={confirmDeleteGraph}
             >
             </ConfirmDeleteDialog>
+            <ShowWarningDialog 
+              showWarning={showWarning} 
+              setShowWarning={setShowWarning} 
+              handleSaveGraph={handleSaveGraph}
+              setStartNewConcept={setStartNewConcept}
+            >
+            </ShowWarningDialog>    
+            {/* {showWarning &&
+              <ShowWarningDialog showWarning={showWarning}, setShowWarning, handleSaveGraph/>
+            } */}
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
@@ -901,64 +925,76 @@ function Utensil() {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={3}>
-          <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
-          <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
-          </Paper>
-          <Paper>
-            <Box m={1}>
-              <TextField
-                margin="normal"
-                id="outlined-basic"
-                label="Search"
-                rows={1}
-                variant="outlined"
-                size="small"
-                value={searchQuery}
-                onChange={(e: any) => setSearchQuery(e.target.value)}
-                fullWidth
-                InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
-              />
-            </Box>
-          </Paper>
-          <GraphList
-            graphs={graphs}
-            onGraphSelected={handleGraphSelected}
-            onGraphDelete={handleGraphDelete}
-            searchQuery={searchQuery}
-            address_is_whitelisted={address_is_whitelisted}
-          />
-          <Card variant="outlined">
-            <CardContent>
+        {newConcept && 
+          <Grid item xs={1} sx={{"marginLeft": "auto"}}>
+            <Button variant="outlined" 
+                    sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px',"fontSize": "1rem","color": "#fff", "fontWeight": "900" }}
+                    onClick={() => setShowWarning(true)}
+            >
+              X
+            </Button>
+          </Grid>
+        }  
+        {!newConcept && 
+          <Grid item xs={3}>
+            <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
+            <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
+            </Paper>
+            <Paper>
               <Box m={1}>
                 <TextField
+                  margin="normal"
                   id="outlined-basic"
-                  label="Graph Name"
+                  label="Search"
+                  rows={1}
                   variant="outlined"
                   size="small"
-                  value={graphName}
-                  onChange={(e: any) => setGraphName(e.target.value)}
+                  value={searchQuery}
+                  onChange={(e: any) => setSearchQuery(e.target.value)}
                   fullWidth
+                  InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
                 />
               </Box>
-              {graph && (
+            </Paper>
+            <GraphList
+              graphs={graphs}
+              onGraphSelected={handleGraphSelected}
+              onGraphDelete={handleGraphDelete}
+              searchQuery={searchQuery}
+              address_is_whitelisted={address_is_whitelisted}
+            />
+            <Card variant="outlined">
+              <CardContent>
+                <Box m={1}>
+                  <TextField
+                    id="outlined-basic"
+                    label="Graph Name"
+                    variant="outlined"
+                    size="small"
+                    value={graphName}
+                    onChange={(e: any) => setGraphName(e.target.value)}
+                    fullWidth
+                  />
+                </Box>
+                {graph && (
 
-                <TextField
-                  id="outlined-basic"
-                  label="Note"
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  size="small"
-                  value={graphNote}
-                  onChange={(e: any) => setGraphNote(e.target.value)}
-                  fullWidth
-                />
-              )}
-            </CardContent>
-          </Card>
+                  <TextField
+                    id="outlined-basic"
+                    label="Note"
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                    size="small"
+                    value={graphNote}
+                    onChange={(e: any) => setGraphNote(e.target.value)}
+                    fullWidth
+                  />
+                )}
+              </CardContent>
+            </Card>
 
-        </Grid>
+          </Grid>
+        }        
       </Grid>
     </Container>
   );
