@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { useRef, useEffect, FC } from "react";
+import { useRef, useEffect, Dispatch, SetStateAction } from "react";
 import {
   Container,
   Paper,
@@ -9,7 +9,6 @@ import {
   TextField,
   Card,
   CardContent,
-  Typography,
   ButtonGroup,
 } from "@mui/material";
 import { Graph } from "models";
@@ -22,6 +21,7 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import ShowWarningDialog from "./ShowWarningDialog";
+import SaveGraphDialog from "./SaveGraphDialog";
 import TreeList from "./Tree/TreeList";
 import { Tree, TreeNode, Edge } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -30,13 +30,11 @@ import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
 
 interface UtensilProps {
-  newConcept: boolean;
-  showWarning: boolean;
-  setShowWarning: (value :boolean) => void;
-  setStartNewConcept: (value :boolean) => void;
+  startNewConcept?: boolean;
+  setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
 }
 
-function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewConcept}: UtensilProps) {
+function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
@@ -49,6 +47,7 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
   const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
   const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
+  const [isPrivate, setIsPrivate] = useState(false);
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]); // The list of redo steps, for Redo.
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false); // Whether the user is currently dragging a node or the network. This temporarily disables the undo timer from saving steps.
@@ -62,7 +61,9 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
   const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
-  
+  const [showWarning, setShowWarning] = useState(false);
+  const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+
   const clearSearch = () => {
     setSearchQuery('');
   }
@@ -774,7 +775,8 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
          
     let networkImg = networkRef.current?.dom.childNodes[0].firstChild;
     let newDataUri = await resizedataURL(networkImg.toDataURL(),100,100);
-    console.log('---thumbnail image string format---', newDataUri)
+    console.log('---thumbnail image string format---', newDataUri);
+    console.log('is graph private --- ', isPrivate);
 
     const data = stringifyGraph();
     if (isNew) {
@@ -798,7 +800,12 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
       });         
     }  
     
-    await refreshList();
+    if (startNewConcept) {
+      setStartNewConcept?.(false);
+    } else {
+      await refreshList();
+    }
+       
   };
   
   async function getMetaMaskAccount() {
@@ -814,14 +821,6 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
     saveGraphToDatabase();
   };
 
-  const handleSaveAsNew = async () => {
-    saveGraphToDatabase(true);
-  }
-
-  const handleSaveGraph = () => {
-    console.log('777')
-  }
-
   useEffect(() => {
     refreshList();
     initializeUndoTimer();
@@ -830,7 +829,7 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
   
   return (
     <Container>
-      <Grid container spacing={newConcept ? 2 : 0} >
+      <Grid container spacing={startNewConcept ? 2 : 0} >
         <Grid item >
           <Paper>
             <NetworkButtons
@@ -851,12 +850,17 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
               }}
             >
               <ButtonGroup orientation="vertical">
-                {!newConcept &&
+                {!startNewConcept &&
                   <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
                     Save
                   </Button>
                 }
-                <Button variant="outlined" color="primary" onClick={handleSaveAsNew} sx={{color: newConcept ? 'blue' : '', border: newConcept ? '1px solid blue' : ''}}>
+                <Button 
+                  variant="outlined" 
+                  color="primary" 
+                  onClick={() => setOpenSaveGraphDialog(true)}
+                  sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
+                >
                   Save As New
                 </Button>
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
@@ -895,13 +899,22 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
             <ShowWarningDialog 
               showWarning={showWarning} 
               setShowWarning={setShowWarning} 
-              handleSaveGraph={handleSaveGraph}
+              setOpenSaveGraphDialog={setOpenSaveGraphDialog}
               setStartNewConcept={setStartNewConcept}
             >
-            </ShowWarningDialog>    
-            {/* {showWarning &&
-              <ShowWarningDialog showWarning={showWarning}, setShowWarning, handleSaveGraph/>
-            } */}
+            </ShowWarningDialog>   
+            <SaveGraphDialog
+              openSaveGraphDialog={openSaveGraphDialog} 
+              setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+              setStartNewConcept={setStartNewConcept}
+              graphName={graphName}
+              setGraphName={setGraphName}
+              graphNote={graphNote}
+              setGraphNote={setGraphNote}
+              setIsPrivate={setIsPrivate}
+              saveGraphToDatabase={saveGraphToDatabase}
+            >
+            </SaveGraphDialog>  
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}
@@ -925,7 +938,7 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
             </Box>
           </Paper>
         </Grid>
-        {newConcept && 
+        {startNewConcept && 
           <Grid item xs={1} sx={{"marginLeft": "auto"}}>
             <Button variant="outlined" 
                     sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px',"fontSize": "1rem","color": "#fff", "fontWeight": "900" }}
@@ -935,7 +948,7 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
             </Button>
           </Grid>
         }  
-        {!newConcept && 
+        {!startNewConcept && 
           <Grid item xs={3}>
             <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
             <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
@@ -963,21 +976,20 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
               searchQuery={searchQuery}
               address_is_whitelisted={address_is_whitelisted}
             />
-            <Card variant="outlined">
-              <CardContent>
-                <Box m={1}>
-                  <TextField
-                    id="outlined-basic"
-                    label="Graph Name"
-                    variant="outlined"
-                    size="small"
-                    value={graphName}
-                    onChange={(e: any) => setGraphName(e.target.value)}
-                    fullWidth
-                  />
-                </Box>
-                {graph && (
-
+            {graph && (
+              <Card variant="outlined">
+                <CardContent>
+                  <Box mb={1}>
+                    <TextField
+                      id="outlined-basic"
+                      label="Graph Name"
+                      variant="outlined"
+                      size="small"
+                      InputProps={{readOnly: true}}
+                      value={graphName}
+                      fullWidth
+                    />
+                  </Box>              
                   <TextField
                     id="outlined-basic"
                     label="Note"
@@ -985,13 +997,13 @@ function Utensil({newConcept = false, showWarning, setShowWarning, setStartNewCo
                     rows={4}
                     variant="outlined"
                     size="small"
-                    value={graphNote}
-                    onChange={(e: any) => setGraphNote(e.target.value)}
+                    InputProps={{readOnly: true}}
+                    value={graphNote === "" ? " " : graphNote}
                     fullWidth
                   />
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
           </Grid>
         }        

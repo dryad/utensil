@@ -1,17 +1,17 @@
-import React from 'react';
+import { ReactNode, Dispatch, SetStateAction } from 'react';
 import { Button, Dialog } from "@mui/material";
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 
 interface DialogProps {
-  children: React.ReactNode;
+  children: ReactNode;
   showWarning: boolean;
-  setShowWarning: (value :boolean) => void;
-  handleSaveGraph: (value :boolean) => void;
-  setStartNewConcept: (value :boolean) => void;
+  setShowWarning: Dispatch<SetStateAction<boolean>>;
+  setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
 }
 
 const ShowWarningDialog = (props: DialogProps) => {
-  const { showWarning, setShowWarning, handleSaveGraph, setStartNewConcept } = props;
+  const { showWarning, setShowWarning, setOpenSaveGraphDialog, setStartNewConcept } = props;
   return (
     <Dialog
       open={showWarning}
@@ -27,7 +27,7 @@ const ShowWarningDialog = (props: DialogProps) => {
           variant="contained"
           onClick={() => {
             setShowWarning(false);
-            setStartNewConcept(false);
+            setStartNewConcept?.(false);
           }}
         >
           Exit and do not save
@@ -37,14 +37,11 @@ const ShowWarningDialog = (props: DialogProps) => {
           color="info"
           onClick={() => {
             setShowWarning(false);
-            handleSaveGraph(true);
-            setStartNewConcept(false);
+            setOpenSaveGraphDialog(true);
           }}
         >
           Save
-        </Button>
-
-        
+        </Button>        
       </DialogActions>
     </Dialog>
   );

@@ -1,25 +1,20 @@
-import React, { useRef, useEffect, SyntheticEvent, ReactNode } from "react";
+import React, { useEffect, SyntheticEvent, ReactNode } from "react";
 import useState from 'react-usestateref';
 import axios from "libs/axios";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import {
     Container,
-    Paper,
     Box,
     Button,
     Grid,
-    TextField,
-    Card,
-    CardContent,
     Typography,
-    ButtonGroup,
     Avatar,
     Stack,
     Tabs,
     Tab,
     Drawer 
   } from "@mui/material";
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import "./Profile.css";
 import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
@@ -100,7 +95,6 @@ const theme = createTheme({
 
     typography: {
         fontFamily: 'Calibre,-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji',
-        // fontFamily: 'Montserrat',
         h6: {
             color: "#fff",
         },
@@ -123,6 +117,15 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-columnFooter': {
         color: 'rgba(255,255,255,0.85)',
         fontSize: '0.8rem',
+    },
+    '& .MuiTablePagination-toolbar': {
+        color: 'rgba(255,255,255,0.5)',
+    },
+    '& .MuiTablePagination-selectIcon': {
+        color: 'rgba(255,255,255,0.5)',
+    },
+    '& .Mui-disabled': {
+        color: 'rgba(255,255,255,0.25)',
     },
 
     '& .MuiDataGrid-columnHeaders': {
@@ -149,26 +152,19 @@ function Profile() {
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
     const [startNewConcept, setStartNewConcept] = useState(false);
-    const [showWarning, setShowWarning] = useState(false);
-
+       
     const toggleDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
-        if (!open) {
-            setShowWarning(true);
+       
+        if (
+            event.type === 'keydown' &&
+            ((event as React.KeyboardEvent).key === 'Tab' ||
+              (event as React.KeyboardEvent).key === 'Shift')
+          ) {
+            return;
         }
-        if (!showWarning) {
-            if (
-                event.type === 'keydown' &&
-                ((event as React.KeyboardEvent).key === 'Tab' ||
-                  (event as React.KeyboardEvent).key === 'Shift')
-              ) {
-                return;
-              }
-        }
-      
-      setStartNewConcept(open);
-    
+        setStartNewConcept(open);
     };
 
     const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -207,12 +203,13 @@ function Profile() {
     const can_edit_profile = () => {
         return metaMaskAccount === address.address;
     }
-
+    
     useEffect(() => {
         refreshList();
         getAddress();
         getMetaMaskAccount();
-    }, []);
+    }, [startNewConcept, setStartNewConcept]);
+
     if (addressId === undefined) {
         return <div>No address provided</div>
     }
@@ -269,8 +266,6 @@ function Profile() {
                                 { can_edit_profile() && (
                                     <Button
                                         variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
-                                        
-                                        // color="primary"
                                         onClick={() => {
                                             navigate("/profile/edit");
                                         }}
@@ -302,15 +297,8 @@ function Profile() {
                                         backgroundColor: '#211f24', 
                                         height: '100vh'}}
                                     >
-                                        <Utensil newConcept={true} showWarning={showWarning} setShowWarning={setShowWarning} setStartNewConcept={setStartNewConcept}/>
-                                    </div>
-
-
-                                    
-                                    {/* <div style={{width: '100vw'}}>
-                                    asa f fjsdfdshfhfs hfgiusd ufgh ghus gs hfjkds hfusd hfu hfsi fhusiuf shd ufdshius
-
-                                    </div> */}
+                                        <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept}/>
+                                    </div>  
                                 </Drawer>
                             </Stack>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -338,7 +326,7 @@ function Profile() {
                                         rowsPerPageOptions={[25, 50, 100]}
                                         disableSelectionOnClick
                                         headerHeight={32}
-                                        hideFooter={true}
+                                        // hideFooter={true}
                                     />
                                 </div>
                             </TabPanel>
