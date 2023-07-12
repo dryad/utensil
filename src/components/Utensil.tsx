@@ -21,6 +21,7 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import ShowWarningDialog from "./ShowWarningDialog";
+import ShowGetAccountDialog from "./ShowGetAccountDialog";
 import SaveGraphDialog from "./SaveGraphDialog";
 import TreeList from "./Tree/TreeList";
 import { Tree, TreeNode, Edge } from "models";
@@ -62,6 +63,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
+  const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
 
   const clearSearch = () => {
@@ -777,6 +779,13 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     let newDataUri = await resizedataURL(networkImg.toDataURL(),100,100);
     console.log('---thumbnail image string format---', newDataUri);
     console.log('is graph private --- ', isPrivate);
+    
+    if (isPrivate && !metaMaskAccount) {
+      
+      if (metaMaskAccount === "")
+        setShowGetAccountMessage(true);
+        return;
+    }
 
     const data = stringifyGraph();
     if (isNew) {
@@ -784,6 +793,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
         note: graphNote,
         data: data,
+        private: isPrivate ? metaMaskAccount : ""
       }).then(response => {
           //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
           if (response.data.id) {
@@ -797,6 +807,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName,
         note: graphNote,
         data: data,
+        private: isPrivate ? metaMaskAccount : ""
       });         
     }  
     
@@ -822,9 +833,9 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   };
 
   useEffect(() => {
-    refreshList();
-    initializeUndoTimer();
     getMetaMaskAccount();
+    refreshList();
+    initializeUndoTimer();    
   }, []);
   
   return (
@@ -903,10 +914,14 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               setStartNewConcept={setStartNewConcept}
             >
             </ShowWarningDialog>   
+            <ShowGetAccountDialog 
+              showGetAccountMessage={showGetAccountMessage} 
+              setShowGetAccountMessage={setShowGetAccountMessage} 
+            >
+            </ShowGetAccountDialog> 
             <SaveGraphDialog
               openSaveGraphDialog={openSaveGraphDialog} 
               setOpenSaveGraphDialog={setOpenSaveGraphDialog}
-              setStartNewConcept={setStartNewConcept}
               graphName={graphName}
               setGraphName={setGraphName}
               graphNote={graphNote}

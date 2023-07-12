@@ -46,6 +46,7 @@ def address(request, addressId=None):
 def graphs(request, graphId=None):
     if request.method == 'GET':
         search_query = request.GET.get('q', None)
+        private_query = request.GET.get('private', None)
         if search_query is not None:
             graphs = Graph.objects.filter(
                 Q(name__icontains=search_query) |
@@ -66,14 +67,16 @@ def graphs(request, graphId=None):
             name = json_data['name']
             note = json_data['note']
             data = json_data['data']
+            private = json_data['private']
             if id is not None:
                 graph = Graph.objects.get(id=id)
                 graph.name = name
                 graph.note = note
                 graph.data = data
+                graph.private = private
                 graph.save()
             else:
-                graph = Graph.objects.create(name=name, note=note, data=data)
+                graph = Graph.objects.create(name=name, note=note, data=data, private=private)
             return HttpResponse(json.dumps({'id': graph.id}) ,status=201)
         except KeyError:
             return HttpResponse(status=400) 
@@ -86,3 +89,18 @@ def graphs(request, graphId=None):
             return HttpResponse(status=400)
     else:
         return HttpResponse(status=405)
+
+@csrf_exempt
+def privateGraphs(request):
+    if request.method == 'GET':
+        private_query = request.GET.get('private')
+        graphs = Graph.objects.filter(private__exact=private_query)
+        serializer = GraphSerializer(graphs, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+@csrf_exempt
+def publicGraphs(request):
+    if request.method == 'GET':
+        graphs = Graph.objects.filter(private__in=["", 1])
+        serializer = GraphSerializer(graphs, many=True)
+        return JsonResponse(serializer.data, safe=False)

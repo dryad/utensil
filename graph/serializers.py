@@ -12,7 +12,7 @@ from .models import Graph, Address
 class GraphSerializer(serializers.ModelSerializer):
     class Meta:
         model = Graph
-        fields = ('id', 'name', 'data', 'note')
+        fields = ('id', 'name', 'data', 'note', 'private')
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:

@@ -147,12 +147,19 @@ const columns: GridColDef[] = [
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
-    const [graphs, setGraphs] = useState([]); // The list of graphs
+    const [publicGraphs, setPublicGraphs] = useState([]);
+    const [privateGraphs, setPrivateGraphs] = useState([]);
     const [address, setAddress] = useState<Address>({}); // The address object to display
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
     const [startNewConcept, setStartNewConcept] = useState(false);
-       
+    
+    useEffect(() => {
+        getAddress();
+        getMetaMaskAccount();
+        refreshList();
+    }, [startNewConcept, setStartNewConcept]);
+
     const toggleDrawer =
     (open: boolean) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -172,9 +179,13 @@ function Profile() {
     };
 
     const refreshList = async () => {
-        const { data } = await axios.get(`/api/graphs/`);
-        setGraphs(data);
+        const { data: privateData } = await axios.get(`/api/graphs/private/?private=${addressId}`);
+        setPrivateGraphs(privateData);
+
+        const { data: publicData } = await axios.get(`/api/graphs/public/`);
+        setPublicGraphs(publicData);
     };
+
     const getAddress = async () => {
         const { data } = await axios.get(`/api/address/${addressId}/`);
         setAddress(data);
@@ -204,12 +215,6 @@ function Profile() {
         return metaMaskAccount === address.address;
     }
     
-    useEffect(() => {
-        refreshList();
-        getAddress();
-        getMetaMaskAccount();
-    }, [startNewConcept, setStartNewConcept]);
-
     if (addressId === undefined) {
         return <div>No address provided</div>
     }
@@ -307,34 +312,54 @@ function Profile() {
                                     <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} />
                                 </Tabs>
                             </Box>
-                            <TabPanel value={value} index={0}>
-                                <div style={{ height: '1000px', width: '100%' }}>
-                                    <StyledDataGrid
-                                        sx={{
-                                            '.MuiDataGrid-columnSeparator': {
-                                                display: 'none',
-                                            },
-                                            '&.MuiDataGrid-root': {
-                                                border: '1px solid #2d2d2d',
-                                                borderRadius: '10px',
-                                                marginTop: '20px',
-                                            },
-                                        }}
-                                        rows={graphs}
-                                        columns={columns}
-                                        pageSize={25}
-                                        rowsPerPageOptions={[25, 50, 100]}
-                                        disableSelectionOnClick
-                                        headerHeight={32}
-                                        // hideFooter={true}
-                                    />
-                                </div>
-                            </TabPanel>
-                            <TabPanel value={value} index={1}>
-                                <Box sx={{'color': '#fff', 'pt': 2}}>
-                                    Private concepts
-                                </Box>
-                            </TabPanel>
+                            {publicGraphs && (
+                                <TabPanel value={value} index={0}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                        <StyledDataGrid
+                                            sx={{
+                                                '.MuiDataGrid-columnSeparator': {
+                                                    display: 'none',
+                                                },
+                                                '&.MuiDataGrid-root': {
+                                                    border: '1px solid #2d2d2d',
+                                                    borderRadius: '10px',
+                                                    marginTop: '20px',
+                                                },
+                                            }}
+                                            rows={publicGraphs}
+                                            columns={columns}
+                                            pageSize={25}
+                                            rowsPerPageOptions={[25, 50, 100]}
+                                            disableSelectionOnClick
+                                            headerHeight={32}
+                                        />
+                                    </div>
+                                </TabPanel>
+                            )}
+                            {privateGraphs && (
+                                <TabPanel value={value} index={1}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                        <StyledDataGrid
+                                            sx={{
+                                                '.MuiDataGrid-columnSeparator': {
+                                                    display: 'none',
+                                                },
+                                                '&.MuiDataGrid-root': {
+                                                    border: '1px solid #2d2d2d',
+                                                    borderRadius: '10px',
+                                                    marginTop: '20px',
+                                                },
+                                            }}
+                                            rows={privateGraphs}
+                                            columns={columns}
+                                            pageSize={25}
+                                            rowsPerPageOptions={[25, 50, 100]}
+                                            disableSelectionOnClick
+                                            headerHeight={32}
+                                        />
+                                    </div>
+                                </TabPanel>
+                            )}                            
                         </Grid>
                     </Grid>
 

@@ -7,13 +7,12 @@ interface DialogProps {
   children: React.ReactNode;
   openSaveGraphDialog: boolean;
   setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
-  setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
   graphName: string;
   setGraphName: Dispatch<SetStateAction<string>>;
   graphNote: string;
   setGraphNote: Dispatch<SetStateAction<string>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
-  saveGraphToDatabase: Dispatch<SetStateAction<boolean>>;
+  saveGraphToDatabase: (value: boolean) => void;
 }
 
 const theme = createTheme({
@@ -50,7 +49,7 @@ const theme = createTheme({
 });
 
 const SaveGraphDialog = (props: DialogProps) => {
-  const { openSaveGraphDialog, setOpenSaveGraphDialog, setStartNewConcept, graphName, setGraphName, graphNote, setGraphNote, setIsPrivate, saveGraphToDatabase } = props;
+  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, setIsPrivate, saveGraphToDatabase } = props;
   const [error, setError] = useState(false);
   const [value, setValue] = useState('Public');
 
@@ -59,6 +58,10 @@ const SaveGraphDialog = (props: DialogProps) => {
       setError(false);
     } 
   }, [graphName]);
+
+  useEffect(() => {
+    setIsPrivate(() => {return value === "Private"});
+  }, [value]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -141,7 +144,6 @@ const SaveGraphDialog = (props: DialogProps) => {
               if (graphName === "")  {
                 setError(true);
               } else {
-                setIsPrivate(value === "Private");
                 saveGraphToDatabase(true);
                 setOpenSaveGraphDialog(false);
                 setGraphName("");
