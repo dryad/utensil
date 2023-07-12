@@ -942,7 +942,9 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
           <Grid item xs={1} sx={{"marginLeft": "auto"}}>
             <Button variant="outlined" 
                     sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px',"fontSize": "1rem","color": "#fff", "fontWeight": "900" }}
-                    onClick={() => setShowWarning(true)}
+                    onClick={() => {
+                      networkRef.current?.nodes.get().length === 0 ? setStartNewConcept?.(false) : setShowWarning(true)
+                    }}
             >
               X
             </Button>
