@@ -41,6 +41,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const networkRef = useRef<VisCustomNetwork | null>(null);
 
   const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
+  const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
   const [graph, setGraph] = useState<Graph | null>(null); // The currently loaded graph object.
   const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
@@ -138,6 +139,9 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const refreshList = async () => {
     const { data } = await axios.get(`/api/graphs/?q=${searchQuery}${metaMaskAccount ? `&private=${metaMaskAccount}` : ''}`);
     setGraphs(data);
+
+    const { data: allGraphs } = await axios.get(`/api/graphs/${metaMaskAccount ? `?private=${metaMaskAccount}` : ''}`);
+    setPublicPrivateGraphs(allGraphs);
   };
 
   const testButton = () => {
@@ -947,6 +951,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
               selectedNodes={selectedNodesRef}
               setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+              graphs={publicPrivateGraphs}
             />
             <Box m={5}>
               <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis}/>

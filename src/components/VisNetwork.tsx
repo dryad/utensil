@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef } from "react";
+import React, { useEffect, useRef, memo, forwardRef } from "react";
 import { Node, Edge } from "models";
 import { NODE_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
@@ -6,7 +6,6 @@ import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
-import { memo } from "react";
 
 type INetworkProps = {
   networkRef: any;
@@ -28,9 +27,10 @@ type INetworkProps = {
   setHoveredNodesFromNetwork: Function;
   selectedNodes: any;
   setSelectedNodesFromNetwork: Function;
+  graphs: any;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -482,6 +482,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           onClose={handleNodeDialogClose}
           onOk={handleNodeDialogOk}
           setNodeLabel={setNodeDialogLabel}
+          graphs={graphs}
         />
       </>
     );
