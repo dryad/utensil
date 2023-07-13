@@ -185,6 +185,9 @@ function Profile() {
         const { data: publicData } = await axios.get(`/api/graphs/public/`);
         setPublicGraphs(publicData);
     };
+    
+    console.log('private graphs', privateGraphs)
+    console.log('public graphs', publicGraphs)
 
     const getAddress = async () => {
         const { data } = await axios.get(`/api/address/${addressId}/`);

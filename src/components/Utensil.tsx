@@ -136,7 +136,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     // console.log('set window.isUserDragging to: ', window.isUserDragging);
   }
   const refreshList = async () => {
-    const { data } = await axios.get(`/api/graphs/?q=${searchQuery}`);
+    const { data } = await axios.get(`/api/graphs/?q=${searchQuery}${metaMaskAccount ? `&private=${metaMaskAccount}` : ''}`);
     setGraphs(data);
   };
 

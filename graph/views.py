@@ -1,4 +1,4 @@
-from .serializers import GraphSerializer, AddressSerializer
+from .serializers import GraphSerializer, AddressSerializer, GraphFieldsSerializer
 from .models import Graph, Address
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
@@ -47,14 +47,39 @@ def graphs(request, graphId=None):
     if request.method == 'GET':
         search_query = request.GET.get('q', None)
         private_query = request.GET.get('private', None)
-        if search_query is not None:
-            graphs = Graph.objects.filter(
-                Q(name__icontains=search_query) |
-                Q(data__icontains=search_query) |
-                Q(note__icontains=search_query)
-            )
+        # if search_query is not None:
+        #     graphs = Graph.objects.filter(
+        #         Q(name__icontains=search_query) |
+        #         # Q(data__icontains=search_query) |
+        #         Q(note__icontains=search_query)
+        #     )
+        # else:
+        #     graphs = Graph.objects.all()
+        if private_query is not None:
+            if search_query is not None:
+                graphs = Graph.objects.filter(
+                    Q(private__exact=private_query) |
+                    Q(private__in=['', 1])
+                ).filter(
+                    Q(name__icontains=search_query) |
+                    Q(note__icontains=search_query)
+                )
+            else:
+                graphs = Graph.objects.filter(
+                    Q(private__exact=private_query) |
+                    Q(private__in=['', 1])
+                )
         else:
-            graphs = Graph.objects.all()
+            if search_query is not None:
+                graphs = Graph.objects.filter(
+                    private__in=['', 1]
+                ).filter(
+                    Q(name__icontains=search_query) |
+                    Q(note__icontains=search_query)
+                )
+            else:
+                graphs = Graph.objects.filter(private__in=['', 1])
+
         serializer = GraphSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
@@ -101,6 +126,6 @@ def privateGraphs(request):
 @csrf_exempt
 def publicGraphs(request):
     if request.method == 'GET':
-        graphs = Graph.objects.filter(private__in=["", 1])
-        serializer = GraphSerializer(graphs, many=True)
+        graphs = Graph.objects.filter(private__in=["", 1]).values("id", "name")
+        serializer = GraphFieldsSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)

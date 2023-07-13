@@ -18,3 +18,8 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ('id', 'name', 'about', 'address', 'avatar_url')
+
+class GraphFieldsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Graph
+        fields = ('id', 'name')        
