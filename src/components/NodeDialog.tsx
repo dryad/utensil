@@ -18,6 +18,7 @@ type IDialogProps = {
   onOk: Function;
   setNodeLabel: Function;
   graphs: any;
+  handleGraphImport: Function;
 };
 
 const theme = createTheme({
@@ -60,10 +61,10 @@ const NodeDialog: React.FC<IDialogProps> = ({
   onClose,
   onOk,
   setNodeLabel,
-  graphs
+  graphs,
+  handleGraphImport
 }) => {
   const [filteredGraphs, setFilteredGraphs] = useState([]);
-
   const okButton = useRef(null);
 
   const matchFunction = (node: any) => {
@@ -75,7 +76,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
 
     if (nodeLabel && nodeLabel?.trim().length > 0) {
       const tempGraphs = graphs.filter((el: any) => {
-        console.log(JSON.parse(el.data).nodes)
+        
         if (JSON.parse(el.data).nodes.some(matchFunction)) {
           return el
         }
@@ -138,9 +139,25 @@ const NodeDialog: React.FC<IDialogProps> = ({
                   key={graph.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell 
+                    component="th" 
+                    scope="row"
+                    ref={okButton}
+                  >
                     {graph.name}
                   </TableCell>
+                  <TableCell>
+                    {graph.note}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => {handleGraphImport(graph.id)}}
+                    >
+                      Import
+                    </Button>
+                  </TableCell>                    
                 </TableRow>
               ))}
             </TableBody>

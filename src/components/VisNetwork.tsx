@@ -28,9 +28,10 @@ type INetworkProps = {
   selectedNodes: any;
   setSelectedNodesFromNetwork: Function;
   graphs: any;
+  handleGraphImport: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs, handleGraphImport }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -483,6 +484,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           onOk={handleNodeDialogOk}
           setNodeLabel={setNodeDialogLabel}
           graphs={graphs}
+          handleGraphImport={handleGraphImport}
         />
       </>
     );

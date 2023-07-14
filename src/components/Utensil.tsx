@@ -125,7 +125,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
 
   useEffect(() => {
     refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
-  }, [searchQuery]);
+  }, [searchQuery, metaMaskAccount]);
 
   useEffect(() => {
     console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
@@ -496,6 +496,21 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
       setGraphIdToLoad(id);
       setConfirmGraphLoadOpen(true);
     }
+  };
+
+  const [importGraphToggle, setImportGraphToggle] = useState(false);
+  useEffect(() => {
+    confirmImportGraph();
+  },[importGraphToggle])
+
+  const handleGraphImport = (id: number) => {
+    const graph = publicPrivateGraphs.find((g: Graph) => g.id === id);
+    
+    if (graph) {
+      setGraphToLoad(graph); 
+      setGraphIdToLoad(id);
+      setImportGraphToggle(prev => !prev);
+    }    
   };
 
   const handleGraphDelete = (id: any) => {
@@ -952,6 +967,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               selectedNodes={selectedNodesRef}
               setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
               graphs={publicPrivateGraphs}
+              handleGraphImport={handleGraphImport}
             />
             <Box m={5}>
               <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis}/>
@@ -992,7 +1008,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               </Box>
             </Paper>
             <GraphList
-              graphs={publicPrivateGraphs}
+              graphs={graphs}
               onGraphSelected={handleGraphSelected}
               onGraphDelete={handleGraphDelete}
               searchQuery={searchQuery}
