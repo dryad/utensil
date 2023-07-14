@@ -487,7 +487,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       </>
     );
   }
-// );
 
 export default memo(VisNetwork);
 // export default VisNetwork;

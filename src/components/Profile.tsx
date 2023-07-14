@@ -288,11 +288,13 @@ function Profile() {
                                 <Typography variant="h6">
                                     Concepts
                                 </Typography>
-                                <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
-                                    onClick={toggleDrawer(true)}
-                                >
-                                    Start new concept
-                                </Button>
+                                { can_edit_profile() && (
+                                    <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
+                                        onClick={toggleDrawer(true)}
+                                    >
+                                        Start new concept
+                                    </Button>
+                                )}                                
                                 <Drawer
                                     anchor={"right"}
                                     open={startNewConcept}
@@ -312,7 +314,9 @@ function Profile() {
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                                     <Tab label="Public" {...a11yProps(0)} sx={{color: 'gray'}}  />
-                                    <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} />
+                                    { can_edit_profile() && (
+                                        <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} />
+                                    )}                                    
                                 </Tabs>
                             </Box>
                             {publicGraphs && (
@@ -339,7 +343,7 @@ function Profile() {
                                     </div>
                                 </TabPanel>
                             )}
-                            {privateGraphs && (
+                            { can_edit_profile() && privateGraphs && (
                                 <TabPanel value={value} index={1}>
                                     <div style={{ height: '1000px', width: '100%' }}>
                                         <StyledDataGrid
@@ -362,7 +366,7 @@ function Profile() {
                                         />
                                     </div>
                                 </TabPanel>
-                            )}                            
+                            )}
                         </Grid>
                     </Grid>
 

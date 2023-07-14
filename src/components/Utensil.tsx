@@ -992,7 +992,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               </Box>
             </Paper>
             <GraphList
-              graphs={graphs}
+              graphs={publicPrivateGraphs}
               onGraphSelected={handleGraphSelected}
               onGraphDelete={handleGraphDelete}
               searchQuery={searchQuery}
