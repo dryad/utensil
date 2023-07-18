@@ -52,13 +52,15 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
+      console.log(label)
+      console.log(node)
       node.label = label;
       if (node.hasOwnProperty('name') && node.hasOwnProperty('subGraphData')) {
         node.name = label;
       }
 
       if (node.label && node.label.length > 0) {
-        node.opacity = 1.0;
+        node.opacity = 1;
       }
       else {
         node.opacity = 0;
@@ -80,6 +82,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
       //set graph from nodes and edges, this is needed to update the opacity of the nodes
       const existingGraph = JSON.parse(stringifyGraph());
+      existingGraph.nodes = [node, ...existingGraph.nodes.filter((el: any) => el.id !== node.id)];
       setGraphFromNodesAndEdges(existingGraph.nodes, existingGraph.edges);
       networkRef.current?.setData(existingGraph);
 
