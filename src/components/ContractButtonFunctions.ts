@@ -1,18 +1,14 @@
 import { TreeNode, Edge } from "models";
-import VisCustomNetwork from "libs/vis-custom-network";
 
-export function contractAction(selNode:TreeNode, networkRef: React.MutableRefObject<VisCustomNetwork | null>) {
-
-    const nodes: TreeNode[] = networkRef.current?.nodes.get();
-    const edges: Edge[] = networkRef.current?.edges.get();
+export function contractAction(selNode:TreeNode, nodes: TreeNode[], edges: Edge[]) {
 
     const edgeToSelNode = edges.filter((el: Edge) => el.to === selNode.id); 
     
     let subGraphNodes: Set<TreeNode> = new Set();
     let subGraphEdges: Set<Edge> = new Set();
 
-    const fromNodes = nodes.filter((el) => el.id === edgeToSelNode[0].from || el?.labelOfNode === edgeToSelNode[0].from);
-    const eventualNodes = nodes.filter((el) => el.id === edgeToSelNode[0].eventual || el?.labelOfNode === edgeToSelNode[0].eventual);
+    const fromNodes = edgeToSelNode && nodes.filter((el) => el.id === edgeToSelNode[0]?.from || el?.labelOfNode === edgeToSelNode[0]?.from);
+    const eventualNodes = edgeToSelNode && nodes.filter((el) => el.id === edgeToSelNode[0]?.eventual || el?.labelOfNode === edgeToSelNode[0]?.eventual);
 
     fromNodes.forEach((el) => subGraphNodes.add(el));
     eventualNodes.forEach((el) => subGraphNodes.add(el));

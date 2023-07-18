@@ -3,6 +3,7 @@ import { Button, Dialog, TextField, Table, TableBody, TableCell, TableRow } from
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { SxProps } from "@mui/material";
+import { Graph } from "models";
 
 const sx: SxProps = {
   "& .MuiDialog-container": {
@@ -65,7 +66,10 @@ const NodeDialog: React.FC<IDialogProps> = ({
   handleGraphImport
 }) => {
   const [filteredGraphs, setFilteredGraphs] = useState([]);
-  const okButton = useRef(null);
+  const [showGraphsList, setShowGraphsList] = useState(true);
+  const okButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {setShowGraphsList(true)},[open])
 
   const matchFunction = (node: any) => {
     return node.label.toLowerCase().trim().includes(nodeLabel!.toLowerCase()) || node.name?.toLowerCase().trim().includes(nodeLabel!.toLowerCase())
@@ -75,7 +79,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
     setNodeLabel(nodeLabel);
 
     if (nodeLabel && nodeLabel?.trim().length > 0) {
-      const tempGraphs = graphs.filter((el: any) => {
+      const tempGraphs = graphs.filter((el: Graph) => {
         
         if (JSON.parse(el.data).nodes.some(matchFunction)) {
           return el
@@ -88,6 +92,17 @@ const NodeDialog: React.FC<IDialogProps> = ({
 
   }, [nodeLabel]);
 
+  const handleImportButton = (graphId: any) => {
+    const canBeGraphReplaced = handleGraphImport(graphId); 
+    console.log('canBeGraphReplaced', canBeGraphReplaced);
+
+    if (canBeGraphReplaced) {
+      onClose();
+    } else {
+      setShowGraphsList(false);
+    }
+  }
+  
   return (
     <ThemeProvider theme={theme}>
       <Dialog
@@ -111,7 +126,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
             value={nodeLabel}
             variant="outlined"
             onKeyDown={e => {
-              if (e.key === 'Enter') { okButton.current.click(); }
+              if (e.key === 'Enter') { okButton.current?.click(); }
             }} 
             onChange={(e) => {
               setNodeLabel(e.target.value);
@@ -131,38 +146,43 @@ const NodeDialog: React.FC<IDialogProps> = ({
             </Button>
           </DialogActions>
         </DialogContent>
-        <DialogContent>
-          <Table  aria-label="simple table">
-            <TableBody>
-              {filteredGraphs.map((graph) => (
-                <TableRow
-                  key={graph.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell 
-                    component="th" 
-                    scope="row"
-                    ref={okButton}
+        {showGraphsList && (
+          <DialogContent>
+            <Table  aria-label="simple table">
+              <TableBody>
+                {filteredGraphs.map((graph: Graph) => (
+                  <TableRow
+                    key={graph.id}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    {graph.name}
-                  </TableCell>
-                  <TableCell>
-                    {graph.note}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => {handleGraphImport(graph.id)}}
+                    <TableCell 
+                      component="th" 
+                      scope="row"
+                      ref={okButton}
                     >
-                      Import
-                    </Button>
-                  </TableCell>                    
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </DialogContent>
+                      {graph.name}
+                    </TableCell>
+                    <TableCell>
+                      {graph.note}
+                    </TableCell>
+                    <TableCell align="right">
+                      <DialogActions>
+
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={() => handleImportButton(graph.id)}
+                        >
+                          Import
+                        </Button>
+                      </DialogActions>
+                    </TableCell>                    
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DialogContent>
+        )}
       </Dialog>
     </ThemeProvider>
   );

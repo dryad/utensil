@@ -1,10 +1,3 @@
-export type Graph = {
-  id: number;
-  name: string;
-  data: string;
-  note: string;
-};
-
 export type Node = {
   id: string;
   label: string;
@@ -30,6 +23,15 @@ export type TreeNode = {
   level: number;
   subGraphData: string;
   name?: string;
+};
+
+export type Graph = {
+  id?: number;
+  name: string;
+  data: string;
+  note: string;
+  nodes?: TreeNode[];
+  edges?: Edge[];
 };
 
 export type Tree = {

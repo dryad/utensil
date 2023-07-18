@@ -29,6 +29,7 @@ import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
+import { NODE_COLORS } from "constants/colors";
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -335,8 +336,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
   }
 
-  function mergeGraphs(graph1: any, graph2: any) {
-
+  function mergeGraphs(graph1: any, graph2: any, xValue: number = 0, yValue: number = 0) {
+    
     //calculate min(x), min(y), max(x), max(y) of graph1
     //quick and dirty calculation
     let x_values = [];
@@ -345,10 +346,11 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
       x_values.push(node.x);
       y_values.push(node.y);
     }
-    const min_x = Math.min(...x_values);
-    const min_y = Math.min(...y_values);
-    const max_x = Math.max(...x_values);
-    const max_y = Math.max(...y_values);
+    
+    const min_x = x_values.length === 0 ? 0 : Math.min(...x_values);
+    const min_y = y_values.length === 0 ? 0 : Math.min(...y_values);
+    const max_x = x_values.length === 0 ? xValue : Math.max(...x_values);
+    const max_y = y_values.length === 0 ? yValue : Math.max(...y_values);
 
     console.log('min_x', min_x);
     console.log('min_y', min_y);
@@ -356,6 +358,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     console.log('max_y', max_y);
 
     const fullWidth = (max_x - min_x);
+    const fullHeight = max_y - min_y;
     const halfGraphWidth = fullWidth / 2;
 
     let renamed_nodes: {[index: string]: string} = {}; // old_id: new id
@@ -368,11 +371,12 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         const new_id = uuidv4();
         renamed_nodes[node.id] = new_id;
         if (node.subGraphData) {
-          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData),node.id, new_id, fullWidth);
+          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData), node.id, new_id, fullWidth, fullHeight);
           node.subGraphData = JSON.stringify(newSubgraphData);
         }
         node.id = new_id;
         node.x += fullWidth + 20; // apply offset calculated above
+        node.y += fullHeight + 20;
       }
     }
 
@@ -418,7 +422,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     return newGraph;
   };
 
-  function renameSubgraphIds(graph: any, oldId: string, newId: string, fullWidth: number) {
+  function renameSubgraphIds(graph: any, oldId: string, newId: string, fullWidth: number, fullHeight: number) {
     
     let renamed_nodes: {[index: string]: string} = {};
 
@@ -427,11 +431,12 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         const new_id = node.id === oldId ? newId : uuidv4();
         renamed_nodes[node.id] = new_id;
         if (node.subGraphData) {
-          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData),node.id, new_id, fullWidth);
+          const newSubgraphData = renameSubgraphIds(JSON.parse(node.subGraphData),node.id, new_id, fullWidth, fullHeight);
           node.subGraphData = JSON.stringify(newSubgraphData);
         }
         node.id = new_id;
         node.x += fullWidth + 20;
+        node.y += fullHeight + 20;
       }
     }
 
@@ -459,6 +464,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     if (graphToLoad) {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       const data = JSON.parse(graph.data);
+
       for (let node of data.nodes) {
         if (node.label && node.label.length > 0) {
           node.opacity = 1;
@@ -504,14 +510,105 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   },[importGraphToggle])
 
   const handleGraphImport = (id: number) => {
-    const graph = publicPrivateGraphs.find((g: Graph) => g.id === id);
+    const graphFromDB = publicPrivateGraphs.find((g: Graph) => g.id === id)!;
     
-    if (graph) {
-      setGraphToLoad(graph); 
+    const emptyGraph = graphFromDB && {
+      edges: [],
+      nodes: [],
+      scale: JSON.parse(graphFromDB.data).scale,
+      viewPosition: JSON.parse(graphFromDB.data).viewPosition,
+    }
+
+    const nodesCanvas = networkRef.current?.nodes.get();
+    const edgesCanvas = networkRef.current?.edges.get();
+
+    const replacedNode = nodesCanvas.find((node: any) => node.id === selectedNodes[0]);
+    const replacedLabelNode = nodesCanvas.find((node: any) => node.labelOfNode === replacedNode.id);
+
+    const graphWithNewIds = graphFromDB && mergeGraphs(emptyGraph, JSON.parse(graphFromDB.data), replacedNode.x, replacedNode.y);
+
+    const nodes = graphWithNewIds.nodes;
+    const edges = graphWithNewIds.edges;
+    
+    const maxLevelNode = nodes
+      .filter((el: TreeNode) => {return !el.hasOwnProperty('isLabelNode')})
+      .reduce((prev: TreeNode, current: TreeNode) => (prev.level > current.level) ? prev : current)
+    
+    console.log('node with max level ---', maxLevelNode);
+    
+    const {canBeContracted} = contractAction(maxLevelNode, nodes, edges);
+    
+    console.log('canBeContracted --', canBeContracted);
+    
+    if (graphWithNewIds && canBeContracted && (replacedNode.level === 0 || replacedNode.shape === 'hexagon')) {
+            
+      console.log('labeled node ---',replacedNode, replacedLabelNode);
+
+      changeNodesLevels(replacedNode, maxLevelNode.level, nodesCanvas, edgesCanvas);  
+
+      const updatedEdges = edgesCanvas
+        .concat(edges)
+        .map((el: Edge) => {
+          if (el.from === replacedNode.id) {
+            el.from = maxLevelNode.id;
+          }
+          if (el.eventual === replacedNode.id) {
+            el.eventual = maxLevelNode.id;
+          }
+          return el;
+        });;
+      
+      const viewPosition = networkRef.current?.network.getViewPosition()!;
+      const scale = networkRef.current?.network.getScale();
+      
+      const updatedNodes = nodesCanvas
+        .filter((node: TreeNode) => node.id !== replacedNode.id && node.labelOfNode !== replacedNode.id)
+        .concat(nodes)
+      
+      const newGraph = JSON.parse(stringifyGraph());
+      newGraph.nodes = updatedNodes;
+      newGraph.edges = updatedEdges;
+      networkRef.current?.setData(newGraph);
+      networkRef.current?.network.moveTo({
+        position: { x: viewPosition.x, y: viewPosition.y },
+        scale: scale || 1,
+        animation: false,
+      });
+          
+      return canBeContracted && (replacedNode.level === 0 || replacedNode.shape === 'hexagon')
+    }
+
+    if (graphFromDB && (!canBeContracted || replacedNode.level !== 0)) {
+      setGraphToLoad(graphFromDB); 
       setGraphIdToLoad(id);
       setImportGraphToggle(prev => !prev);
-    }    
+      
+      return !(!canBeContracted || replacedNode.level !== 0)
+    }
+        
   };
+
+  const changeNodesLevels = (node: TreeNode, maxLevel: number, nodes: TreeNode[], edges: Edge[]) => {
+    const tempEdge = edges.find((el) => {
+      return el.from === node.id || el.eventual === node.id
+    });
+    
+    if (tempEdge) {
+      const toNode = nodes.find((el) => el.id === tempEdge.to)!;
+      
+      nodes.map((el) => {
+        if (el.id === toNode.id) {
+          el.level += maxLevel;
+          el.color = NODE_COLORS[el.level];
+        }
+        if (el.labelOfNode === toNode.id) {
+          el.level += maxLevel;
+        }
+        return el;
+      })
+      changeNodesLevels(toNode, maxLevel, nodes, edges);
+    }
+  }
 
   const handleGraphDelete = (id: any) => {
     //set the graph to be potentially deleted
@@ -619,7 +716,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
           foundSelectedNode.isLabelNode !== true && 
           !foundSelectedNode.hasOwnProperty('subGraphData')
         ) {
-          const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode, networkRef);
+          const {canBeContracted, subGraphData, externalGraphData} = contractAction(foundSelectedNode, nodes, edges);
           console.log('contraction data (subGraph, extraGraph): ', subGraphData, externalGraphData);
 
           if (canBeContracted && subGraphData && externalGraphData) {

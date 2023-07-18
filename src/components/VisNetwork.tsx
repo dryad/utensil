@@ -133,7 +133,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                 
                 //get node by id from networkRef.current?.network.body.data.nodes.get()
                 let mergeNodes = [networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[0].id), networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[1].id)];
-                mergeNodes.sort(function (a, b) {
+                mergeNodes && mergeNodes.sort(function (a, b) {
                   return a.level - b.level;
                 });
                 const mergeNode1 = mergeNodes[0]; // the node with the lower level
