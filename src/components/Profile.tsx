@@ -14,7 +14,7 @@ import {
     Tab,
     Drawer 
   } from "@mui/material";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import "./Profile.css";
 import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
@@ -135,6 +135,20 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 }));
 
 const columns: GridColDef[] = [
+    {
+        field: 'preview_url',
+        headerName: 'preview',
+        renderCell: (params: GridRenderCellParams<string>) => (
+            <div style={{background: params.value !== "" ? '#fff' : '', width: '100px', height: '100px'}}>
+                {params.value && 
+                    <img src={`${params.value}`} width='100' height='100' />
+                }                
+            </div>
+        ),
+        width: 120,
+        editable: false,
+        sortable: false,
+    },
     {
         field: 'name',
         headerName: 'Name',
@@ -339,6 +353,7 @@ function Profile() {
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
                                             headerHeight={32}
+                                            rowHeight={100}
                                         />
                                     </div>
                                 </TabPanel>
@@ -363,6 +378,7 @@ function Profile() {
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
                                             headerHeight={32}
+                                            rowHeight={100}
                                         />
                                     </div>
                                 </TabPanel>

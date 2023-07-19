@@ -598,15 +598,15 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
       
       nodes.map((el) => {
         if (el.id === toNode.id) {
-          el.level += maxLevel;
+          el.level = maxLevel + 1;
           el.color = NODE_COLORS[el.level];
         }
         if (el.labelOfNode === toNode.id) {
-          el.level += maxLevel;
+          el.level = maxLevel + 1;
         }
         return el;
       })
-      changeNodesLevels(toNode, maxLevel, nodes, edges);
+      changeNodesLevels(toNode, maxLevel + 1, nodes, edges);
     }
   }
 
@@ -861,7 +861,6 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         node.x = positions[node.id].x;
         node.y = positions[node.id].y;
       }
-
     }
 
     //create viewPosition using the getViewPosition function of vis-network
@@ -909,7 +908,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
         note: graphNote,
         data: data,
-        private: isPrivate ? metaMaskAccount : ""
+        private: isPrivate ? metaMaskAccount : "",
+        preview: newDataUri
       }).then(response => {
           //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
           if (response.data.id) {
@@ -923,7 +923,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName,
         note: graphNote,
         data: data,
-        private: isPrivate ? metaMaskAccount : ""
+        private: isPrivate ? metaMaskAccount : "",
+        preview: newDataUri
       });         
     }  
     

@@ -7,9 +7,18 @@ class Graph(models.Model):
     data = models.TextField()
     note = models.TextField(default="", null=True, blank=True)
     private = models.CharField(max_length=255, default="")
+    preview = models.ImageField(upload_to='previews', null=True, blank=True)
     def __str__(self):
         return self.name
-
+    def preview_url(self):
+        if self.preview:
+            if PRODUCTION:
+                return '/previews/' + self.preview.url.split('/')[2]
+            else:
+                return '/static/' + self.preview.url.split('/')[2]
+        else:
+            return ""
+            
 class Address(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     about = models.TextField(default="", null=True, blank=True)

@@ -155,17 +155,21 @@ const NodeDialog: React.FC<IDialogProps> = ({
                     key={graph.id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell 
-                      component="th" 
-                      scope="row"
-                      ref={okButton}
-                    >
+                    <TableCell sx={{'padding': '0'}}>
+                      {graph.preview_url && 
+                        <img src={`${graph.preview_url}`} width='100' height='100' />
+                      }
+                      {/* {!graph.preview_url && 
+                        <img src={``} width='100' height='100' />
+                      }             */}
+                    </TableCell>
+                    <TableCell sx={{'padding': '0'}}>
                       {graph.name}
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{'padding': '0'}}>
                       {graph.note}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="right" sx={{'padding': '0'}}>
                       <DialogActions>
 
                         <Button
