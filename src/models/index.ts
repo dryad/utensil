@@ -32,6 +32,7 @@ export type Graph = {
   note: string;
   nodes?: TreeNode[];
   edges?: Edge[];
+  private: string;
   preview: string;
   preview_url: string;
 };

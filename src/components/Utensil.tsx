@@ -296,6 +296,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     if (graphToLoad) {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(graph);
+      setIsPrivate(graph.private);
       setGraphId(graphToIdToLoad);
   
       setGraphName(graph.name);
@@ -887,7 +888,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         img.src = datas;
       })
   }
-
+  
   async function saveGraphToDatabase(isNew: boolean = false) {
          
     let networkImg = networkRef.current?.dom.childNodes[0].firstChild;
@@ -901,7 +902,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         setShowGetAccountMessage(true);
         return;
     }
-
+    
     const data = stringifyGraph();
     if (isNew) {
       await axios.post("/api/graphs/", {
@@ -923,7 +924,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName,
         note: graphNote,
         data: data,
-        private: isPrivate ? metaMaskAccount : "",
+        private: isPrivate,
         preview: newDataUri
       });         
     }  
