@@ -19,6 +19,7 @@ import "./Profile.css";
 import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
 import Utensil from "./Utensil";
+import ShowPromptDialog from './ShowPromptDialog';
 
 interface TabPanelProps {
     children?: ReactNode;
@@ -167,6 +168,7 @@ function Profile() {
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
     const [startNewConcept, setStartNewConcept] = useState(false);
+    const [showPrompt, setShowPrompt] = useState(false);
     
     useEffect(() => {
         getAddress();
@@ -328,9 +330,7 @@ function Profile() {
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                                     <Tab label="Public" {...a11yProps(0)} sx={{color: 'gray'}}  />
-                                    { can_edit_profile() && (
-                                        <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} />
-                                    )}                                    
+                                    <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} onClick={() => !can_edit_profile() && setShowPrompt(true)}/>
                                 </Tabs>
                             </Box>
                             {publicGraphs && (
@@ -383,6 +383,18 @@ function Profile() {
                                     </div>
                                 </TabPanel>
                             )}
+                            { !can_edit_profile() && (
+                                <TabPanel value={value} index={1}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                        
+                                    </div>
+                                </TabPanel>
+                            )}
+                            <ShowPromptDialog 
+                                showPrompt={showPrompt} 
+                                setShowPrompt={setShowPrompt} 
+                            >
+                            </ShowPromptDialog>
                         </Grid>
                     </Grid>
 
