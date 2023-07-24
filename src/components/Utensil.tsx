@@ -892,7 +892,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   async function saveGraphToDatabase(isNew: boolean = false) {
          
     let networkImg = networkRef.current?.dom.childNodes[0].firstChild;
-    let newDataUri = await resizedataURL(networkImg.toDataURL(),100,100);
+    let newDataUri = await resizedataURL(networkImg.toDataURL(),200,200);
     console.log('---thumbnail image string format---', newDataUri);
     console.log('is graph private --- ', isPrivate);
     

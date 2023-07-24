@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Dialog, TextField, Table, TableBody, TableCell, TableRow } from "@mui/material";
+import { Button, Dialog, TextField, Table, TableBody, TableRow } from "@mui/material";
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { SxProps } from "@mui/material";
 import { Graph } from "models";
+import GraphItem from "./GraphItem";
 
 const sx: SxProps = {
   "& .MuiDialog-container": {
@@ -155,32 +156,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
                     key={graph.id}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell sx={{'padding': '0'}}>
-                      {graph.preview_url && 
-                        <img src={`${graph.preview_url}`} width='100' height='100' />
-                      }
-                      {/* {!graph.preview_url && 
-                        <img src={``} width='100' height='100' />
-                      }             */}
-                    </TableCell>
-                    <TableCell sx={{'padding': '0'}}>
-                      {graph.name}
-                    </TableCell>
-                    <TableCell sx={{'padding': '0'}}>
-                      {graph.note}
-                    </TableCell>
-                    <TableCell align="right" sx={{'padding': '0'}}>
-                      <DialogActions>
-
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => handleImportButton(graph.id)}
-                        >
-                          Import
-                        </Button>
-                      </DialogActions>
-                    </TableCell>                    
+                    <GraphItem graph={graph} handleImportButton={handleImportButton}/>
                   </TableRow>
                 ))}
               </TableBody>
