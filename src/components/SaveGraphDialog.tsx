@@ -11,6 +11,8 @@ interface DialogProps {
   setGraphName: Dispatch<SetStateAction<string>>;
   graphNote: string;
   setGraphNote: Dispatch<SetStateAction<string>>;
+  prevGraphName: string;
+  prevGraphNote: string;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: (value: boolean) => void;
 }
@@ -49,10 +51,10 @@ const theme = createTheme({
 });
 
 const SaveGraphDialog = (props: DialogProps) => {
-  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, setIsPrivate, saveGraphToDatabase } = props;
+  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, setIsPrivate, saveGraphToDatabase } = props;
   const [error, setError] = useState(false);
   const [value, setValue] = useState('Public');
-
+  
   useEffect(() => {
     if (graphName !== "")  {
       setError(false);
@@ -128,8 +130,8 @@ const SaveGraphDialog = (props: DialogProps) => {
             color="secondary"
             variant="contained"
             onClick={() => {
-              setGraphName("");
-              setGraphNote("");
+              setGraphName(prevGraphName);
+              setGraphNote(prevGraphNote);
               setError(false);
               setValue('Public');
               setOpenSaveGraphDialog(false);              
@@ -146,8 +148,8 @@ const SaveGraphDialog = (props: DialogProps) => {
               } else {
                 saveGraphToDatabase(true);
                 setOpenSaveGraphDialog(false);
-                setGraphName("");
-                setGraphNote("");
+                // setGraphName("");
+                // setGraphNote("");
               }
             }}
           >

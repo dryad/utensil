@@ -954,7 +954,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
             >
               <ButtonGroup orientation="vertical">
                 {!startNewConcept &&
-                  <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null}>
+                  <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1}>
                     Save
                   </Button>
                 }
@@ -1009,6 +1009,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
             <ShowGetAccountDialog 
               showGetAccountMessage={showGetAccountMessage} 
               setShowGetAccountMessage={setShowGetAccountMessage} 
+              setIsPrivate={setIsPrivate}
             >
             </ShowGetAccountDialog> 
             <SaveGraphDialog
@@ -1018,6 +1019,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               setGraphName={setGraphName}
               graphNote={graphNote}
               setGraphNote={setGraphNote}
+              prevGraphName={graphToLoad ? graphToLoad.name : ''}
+              prevGraphNote={graphToLoad ? graphToLoad.note : ''}
               setIsPrivate={setIsPrivate}
               saveGraphToDatabase={saveGraphToDatabase}
             >

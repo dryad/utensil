@@ -6,14 +6,15 @@ interface DialogProps {
   children: ReactNode;
   showGetAccountMessage: boolean;
   setShowGetAccountMessage: Dispatch<SetStateAction<boolean>>;
+  setIsPrivate: Dispatch<SetStateAction<boolean>>;
 }
 
 const ShowGetAccountDialog = (props: DialogProps) => {
-  const { showGetAccountMessage, setShowGetAccountMessage } = props;
+  const { showGetAccountMessage, setShowGetAccountMessage, setIsPrivate } = props;
   return (
     <Dialog
       open={showGetAccountMessage}
-      onClose={() => setShowGetAccountMessage(false)}
+      onClose={() => {setShowGetAccountMessage(false); setIsPrivate(false)}}
       aria-labelledby="show-warning-dialog"
     >
       <DialogTitle id="show-warning-dialog" sx={{color: '#999', display: 'flex', justifyContent: 'center'}}>WARNING </DialogTitle>
@@ -24,7 +25,8 @@ const ShowGetAccountDialog = (props: DialogProps) => {
           color="secondary"
           variant="contained"
           onClick={() => {
-            setShowGetAccountMessage(false);            
+            setShowGetAccountMessage(false);
+            setIsPrivate(false);           
           }}
         >
           OK
