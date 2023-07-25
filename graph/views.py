@@ -1,4 +1,4 @@
-from .serializers import GraphSerializer, AddressSerializer, GraphFieldsSerializer
+from .serializers import GraphSerializer, AddressSerializer
 from .models import Graph, Address
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
@@ -93,22 +93,16 @@ def graphs(request, graphId=None):
             note = json_data['note']
             data = json_data['data']
             private = json_data['private']
-            preview = json_data['preview']
-            format, imgstr = preview.split(';base64,') 
-            ext = format.split('/')[-1] 
-            data_img = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
+            
             if id is not None:
                 graph = Graph.objects.get(id=id)
                 graph.name = name
                 graph.note = note
                 graph.data = data
                 graph.private = private
-                graph.preview.save(str(graph.id) + '.png', data_img, save=True)
                 graph.save()
             else:
                 graph = Graph.objects.create(name=name, note=note, data=data, private=private)
-                graph.preview.save(str(graph.id) + '.png', data_img, save=True)
             return HttpResponse(json.dumps({'id': graph.id}) ,status=201)
         except KeyError:
             return HttpResponse(status=400) 
@@ -127,12 +121,12 @@ def privateGraphs(request):
     if request.method == 'GET':
         private_query = request.GET.get('private')
         graphs = Graph.objects.filter(private__exact=private_query)
-        serializer = GraphFieldsSerializer(graphs, many=True)
+        serializer = GraphSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 @csrf_exempt
 def publicGraphs(request):
     if request.method == 'GET':
         graphs = Graph.objects.filter(private__in=["", 1])
-        serializer = GraphFieldsSerializer(graphs, many=True)
+        serializer = GraphSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)

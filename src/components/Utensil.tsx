@@ -11,7 +11,6 @@ import {
   CardContent,
   ButtonGroup,
 } from "@mui/material";
-import { Graph } from "models";
 import axios from "libs/axios";
 import VisCustomNetwork from "libs/vis-custom-network";
 import VisNetwork from "./VisNetwork";
@@ -24,7 +23,7 @@ import ShowWarningDialog from "./ShowWarningDialog";
 import ShowGetAccountDialog from "./ShowGetAccountDialog";
 import SaveGraphDialog from "./SaveGraphDialog";
 import TreeList from "./Tree/TreeList";
-import { Tree, TreeNode, Edge } from "models";
+import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
@@ -43,7 +42,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
 
   const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
   const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
-  const [graph, setGraph] = useState<Graph | null>(null); // The currently loaded graph object.
+  const [graph, setGraph] = useState<GraphData | null>(null); // The currently loaded graph object.
   const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
   const [graphToLoad, setGraphToLoad] = useState<Graph | null | undefined>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
@@ -272,7 +271,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     if (graph !== null) {
      
       //load json into graph instance
-      const newGraph : Graph = JSON.parse(graph);
+      const newGraph : GraphData = JSON.parse(graph);
 
       setGraph(newGraph);
       networkRef.current?.setData(newGraph);
@@ -295,8 +294,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const confirmReplaceGraph = () => {
     if (graphToLoad) {
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
-      setGraph(graph);
-      setIsPrivate(graph.private);
+      setGraph(JSON.parse(graph.data));
+      setIsPrivate(graph.private !== '');
       setGraphId(graphToIdToLoad);
   
       setGraphName(graph.name);
@@ -871,31 +870,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   
   };
 
-  function resizedataURL(datas:any, width: any, height:any){
-    return new Promise(async function(resolve,reject){
-
-        let img = document.createElement('img');
-        img.onload = function()
-        {        
-            let canvas = document.createElement('canvas');
-            let ctx = canvas.getContext('2d');
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(this, 0, 0, width, height);
-            let dataURI = canvas.toDataURL();
-            resolve(dataURI);
-        };
-        img.src = datas;
-      })
-  }
-  
   async function saveGraphToDatabase(isNew: boolean = false) {
          
-    let networkImg = networkRef.current?.dom.childNodes[0].firstChild;
-    let newDataUri = await resizedataURL(networkImg.toDataURL(),200,200);
-    console.log('---thumbnail image string format---', newDataUri);
-    console.log('is graph private --- ', isPrivate);
-    
     if (isPrivate && !metaMaskAccount) {
       
       if (metaMaskAccount === "")
@@ -910,7 +886,6 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         note: graphNote,
         data: data,
         private: isPrivate ? metaMaskAccount : "",
-        preview: newDataUri
       }).then(response => {
           //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
           if (response.data.id) {
@@ -924,8 +899,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
         name: graphName,
         note: graphNote,
         data: data,
-        private: isPrivate,
-        preview: newDataUri
+        private: isPrivate ? metaMaskAccount : "",
       });         
     }  
     

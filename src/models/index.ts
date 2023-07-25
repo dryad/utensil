@@ -33,8 +33,16 @@ export type Graph = {
   nodes?: TreeNode[];
   edges?: Edge[];
   private: string;
-  preview: string;
-  preview_url: string;
+};
+
+export type GraphData = {
+  edges?: Edge[];
+  nodes?: TreeNode[];
+  viewPosition: {
+    x: number,
+    y: number
+  }
+  scale?: number
 };
 
 export type Tree = {

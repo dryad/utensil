@@ -20,6 +20,7 @@ import {useParams, useNavigate} from "react-router-dom";
 import MetaMaskButton from "./MetaMaskButton";
 import Utensil from "./Utensil";
 import ShowPromptDialog from './ShowPromptDialog';
+import ProfileGraphItem from './ProfileGraphItem';
 
 interface TabPanelProps {
     children?: ReactNode;
@@ -110,6 +111,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-cell': {
         color: 'rgba(255,255,255,0.85)',
         borderBottom: '#2d2d2d solid 1px !important',
+        padding: '0'
       },
     '& .MuiDataGrid-columnHeader': {
         color: 'rgba(255,255,255,0.85)',
@@ -137,22 +139,27 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 
 const columns: GridColDef[] = [
     {
-        field: 'preview_url',
+        field: 'data',
         headerName: 'preview',
-        renderCell: (params: GridRenderCellParams<string>) => (
-            <div style={{background: params.value !== "" ? '#fff' : '', width: '100px', height: '100px'}}>
-                {params.value && 
-                    <img src={`${params.value}`} width='100' height='100' />
-                }                
-            </div>
-        ),
-        width: 120,
+        renderCell: (params: GridRenderCellParams<string>) => {
+            return (
+                <ProfileGraphItem graphData={params.value}/>
+            )
+        },
+        width: 100,
         editable: false,
         sortable: false,
     },
     {
         field: 'name',
         headerName: 'Name',
+        renderCell: (params: GridRenderCellParams<string>) => {
+            return (
+                <div style={{padding: '12px'}}>
+                    {params.value}
+                </div>
+            )
+        },
         width: 500,
         editable: false,
         sortable: false,
