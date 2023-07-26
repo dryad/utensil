@@ -13,6 +13,7 @@ interface DialogProps {
   setGraphNote: Dispatch<SetStateAction<string>>;
   prevGraphName: string;
   prevGraphNote: string;
+  prevGraphPrivate: boolean;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: (value: boolean) => void;
 }
@@ -51,7 +52,7 @@ const theme = createTheme({
 });
 
 const SaveGraphDialog = (props: DialogProps) => {
-  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, setIsPrivate, saveGraphToDatabase } = props;
+  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, setIsPrivate, saveGraphToDatabase } = props;
   const [error, setError] = useState(false);
   const [value, setValue] = useState('Public');
   
@@ -62,8 +63,12 @@ const SaveGraphDialog = (props: DialogProps) => {
   }, [graphName]);
 
   useEffect(() => {
-    setIsPrivate(() => {return value === "Private"});
+    openSaveGraphDialog && setIsPrivate(() => {return value === "Private"});
   }, [value]);
+
+  useEffect(() => {
+    setValue('Public'); 
+  },[openSaveGraphDialog])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -130,11 +135,11 @@ const SaveGraphDialog = (props: DialogProps) => {
             color="secondary"
             variant="contained"
             onClick={() => {
+              setIsPrivate(() => prevGraphPrivate); 
               setGraphName(prevGraphName);
               setGraphNote(prevGraphNote);
               setError(false);
-              setValue('Public');
-              setOpenSaveGraphDialog(false);              
+              setOpenSaveGraphDialog(false); 
             }}
           >
             Cancel
@@ -148,8 +153,6 @@ const SaveGraphDialog = (props: DialogProps) => {
               } else {
                 saveGraphToDatabase(true);
                 setOpenSaveGraphDialog(false);
-                // setGraphName("");
-                // setGraphNote("");
               }
             }}
           >

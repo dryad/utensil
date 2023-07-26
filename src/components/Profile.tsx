@@ -12,7 +12,8 @@ import {
     Stack,
     Tabs,
     Tab,
-    Drawer 
+    Drawer,
+    Tooltip    
   } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import "./Profile.css";
@@ -111,8 +112,8 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-cell': {
         color: 'rgba(255,255,255,0.85)',
         borderBottom: '#2d2d2d solid 1px !important',
-        padding: '0'
-      },
+        padding: '0',
+    },
     '& .MuiDataGrid-columnHeader': {
         color: 'rgba(255,255,255,0.85)',
         fontSize: '0.8rem',
@@ -140,7 +141,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 const columns: GridColDef[] = [
     {
         field: 'data',
-        headerName: 'preview',
+        headerName: 'Preview',
         renderCell: (params: GridRenderCellParams<string>) => {
             return (
                 <ProfileGraphItem graphData={params.value}/>
@@ -155,12 +156,52 @@ const columns: GridColDef[] = [
         headerName: 'Name',
         renderCell: (params: GridRenderCellParams<string>) => {
             return (
-                <div style={{padding: '12px'}}>
-                    {params.value}
-                </div>
+                <>
+                    {params.value && params.value.length >= 50 && 
+                        <Tooltip title={ <React.Fragment>
+                            {params.value}
+                        </React.Fragment>}>
+                            <div style={{padding: '12px'}}>
+                                { params.value.slice(0, 50)} ...
+                            </div>
+                        </Tooltip>
+                    }
+                    {params.value && params.value.length < 50 && 
+                        <div style={{padding: '12px'}}>
+                            { params.value}
+                        </div>
+                    }
+                </>  
             )
         },
-        width: 500,
+        width: 400,
+        editable: false,
+        sortable: false,
+    },
+    {
+        field: 'note',
+        headerName: 'Note',
+        renderCell: (params: GridRenderCellParams<string>) => {
+            return (
+                <>
+                    {params.value && params.value.length >= 50 && 
+                        <Tooltip title={ <React.Fragment>
+                            {params.value}
+                        </React.Fragment>}>
+                            <div style={{padding: '12px'}}>
+                                { params.value.slice(0, 50)} ...
+                            </div>
+                        </Tooltip>
+                    }
+                    {params.value && params.value.length < 50 && 
+                        <div style={{padding: '12px'}}>
+                            { params.value}
+                        </div>
+                    }
+                </>                    
+            )
+        },
+        flex: 1,
         editable: false,
         sortable: false,
     },
@@ -251,7 +292,7 @@ function Profile() {
                     <Grid
                         container
                         spacing={2}
-                        align="center"
+                        textAlign="center"
                         style={{ borderBottom: '1px solid ##2d2d2d' }}
                         marginTop={1}
                         marginBottom={4}
@@ -271,7 +312,7 @@ function Profile() {
                     <Grid
                         container
                         spacing={2}
-                        align="center"
+                        textAlign="center"
                     >
                         <Grid
                             item

@@ -49,7 +49,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
   const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
   const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(graphToLoad ? graphToLoad.private !== '' : false);
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]); // The list of redo steps, for Redo.
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false); // Whether the user is currently dragging a node or the network. This temporarily disables the undo timer from saving steps.
@@ -853,7 +853,6 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const stringifyGraph = () => { //used in both handeSave and addHistoryBack
     const edges = networkRef.current?.edges.get();
     const nodes = networkRef.current?.nodes.get();
-    //console.log('nodes', nodes);
     const positions = networkRef.current?.network.getPositions();
 
     if (nodes) {
@@ -869,7 +868,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     return JSON.stringify({ edges, nodes, viewPosition, scale });
   
   };
-
+  
   async function saveGraphToDatabase(isNew: boolean = false) {
          
     if (isPrivate && !metaMaskAccount) {
@@ -961,7 +960,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
                 <Button 
                   variant="outlined" 
                   color="primary" 
-                  onClick={() => setOpenSaveGraphDialog(true)}
+                  onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
                   sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
                 >
                   Save As New
@@ -1021,6 +1020,7 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               setGraphNote={setGraphNote}
               prevGraphName={graphToLoad ? graphToLoad.name : ''}
               prevGraphNote={graphToLoad ? graphToLoad.note : ''}
+              prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
               setIsPrivate={setIsPrivate}
               saveGraphToDatabase={saveGraphToDatabase}
             >
