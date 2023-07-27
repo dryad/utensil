@@ -14,12 +14,10 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({
   useEffect(() => {
     const data = JSON.parse(graphData);
     networkRef.current?.setData(data);
-  },[])
+  },[graphData])
   
   return (
-    <>
-        <SmallNetwork networkRef={networkRef} />   
-    </>
+      <SmallNetwork networkRef={networkRef} /> 
     );
 };
 

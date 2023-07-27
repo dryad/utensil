@@ -8,10 +8,12 @@ interface DialogProps {
   setShowWarning: Dispatch<SetStateAction<boolean>>;
   setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
   setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
+  isSelectedGraph: boolean;
+  handleSave: Function;
 }
 
 const ShowWarningDialog = (props: DialogProps) => {
-  const { showWarning, setShowWarning, setOpenSaveGraphDialog, setStartNewConcept } = props;
+  const { showWarning, setShowWarning, setOpenSaveGraphDialog, setStartNewConcept, isSelectedGraph, handleSave } = props;
   return (
     <Dialog
       open={showWarning}
@@ -37,7 +39,7 @@ const ShowWarningDialog = (props: DialogProps) => {
           color="info"
           onClick={() => {
             setShowWarning(false);
-            setOpenSaveGraphDialog(true);
+            isSelectedGraph ? handleSave() : setOpenSaveGraphDialog(true);
           }}
         >
           Save

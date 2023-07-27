@@ -33,9 +33,10 @@ import { NODE_COLORS } from "constants/colors";
 interface UtensilProps {
   startNewConcept?: boolean;
   setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
+  selectedGraph?: Graph | null | undefined;
 }
 
-function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
+function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: UtensilProps) {
   const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
@@ -66,6 +67,17 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+
+  useEffect(() => {
+    if (selectedGraph) {
+      const data = JSON.parse(selectedGraph.data);
+      networkRef.current?.setData(data);
+      setGraphName(selectedGraph.name);
+      setGraphNote(selectedGraph.note);
+      setGraphId(selectedGraph.id!);
+      setIsPrivate(selectedGraph.private !== '');
+    }
+  },[selectedGraph])
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -923,16 +935,33 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
     saveGraphToDatabase();
   };
 
+  const handleCloseButton = () => {
+    const currentGraph = stringifyGraph();
+    
+    if (selectedGraph) {
+      if (JSON.stringify(JSON.parse(selectedGraph.data).edges) === JSON.stringify(JSON.parse(currentGraph).edges) 
+        && JSON.stringify(JSON.parse(selectedGraph.data).nodes) === JSON.stringify(JSON.parse(currentGraph).nodes)
+        && selectedGraph.name === graphName && selectedGraph.note === graphNote) {
+          setStartNewConcept?.(false);
+          return;
+      } else {
+        setShowWarning(true);
+        return;
+      }
+    }
+    networkRef.current?.nodes.get().length === 0 ? setStartNewConcept?.(false) : setShowWarning(true);
+  }
+
   useEffect(() => {
     getMetaMaskAccount();
     refreshList();
     initializeUndoTimer();    
   }, []);
-  
+
   return (
     <Container>
       <Grid container spacing={startNewConcept ? 2 : 0} >
-        <Grid item >
+        <Grid item xs={selectedGraph ? 2 : 'auto'}>
           <Paper>
             <NetworkButtons
               networkRef={networkRef}
@@ -946,25 +975,34 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
             <Box
               sx={{
                 display: 'flex',
+                justifyContent: 'center',
                 '& > *': {
                   m: 0,
                 },
               }}
             >
               <ButtonGroup orientation="vertical">
-                {!startNewConcept &&
-                  <Button variant="outlined" color="primary" onClick={handleSave} sx={{ 'margin-bottom': 'unset' }} disabled={graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1}>
+                {(!startNewConcept || (startNewConcept && selectedGraph)) &&
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    onClick={handleSave} 
+                    sx={{ 'margin-bottom': 'unset' }} 
+                    disabled={graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1}
+                  >
                     Save
                   </Button>
                 }
-                <Button 
-                  variant="outlined" 
-                  color="primary" 
-                  onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
-                  sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
-                >
-                  Save As New
-                </Button>
+                {(!startNewConcept || (startNewConcept && !selectedGraph)) &&
+                  <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
+                    sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
+                  >
+                    Save As New
+                  </Button>
+                }
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
                   Clear Graph
                 </Button> */}
@@ -1003,6 +1041,8 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
               setShowWarning={setShowWarning} 
               setOpenSaveGraphDialog={setOpenSaveGraphDialog}
               setStartNewConcept={setStartNewConcept}
+              isSelectedGraph={Boolean(selectedGraph)}
+              handleSave={handleSave}
             >
             </ShowWarningDialog>   
             <ShowGetAccountDialog 
@@ -1050,22 +1090,70 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
             </Box>
           </Paper>
         </Grid>
-        {startNewConcept && 
-          <Grid item xs={1} sx={{"marginLeft": "auto"}}>
-            <Button variant="outlined" 
-                    sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px',"fontSize": "1rem","color": "#fff", "fontWeight": "900" }}
-                    onClick={() => {
-                      networkRef.current?.nodes.get().length === 0 ? setStartNewConcept?.(false) : setShowWarning(true)
-                    }}
+        {startNewConcept && (
+          <>
+            <Grid item xs 
+              sx={{
+                'display': 'flex', 
+                'flexDirection' : 'column', 
+              }}
             >
-              X
-            </Button>
-          </Grid>
+              <Button 
+                variant="outlined" 
+                sx={{ 
+                  'borderColor': '#6d6d6d', 
+                  'borderRadius': '10px',
+                  "fontSize": "1rem",
+                  "color": "#fff", 
+                  "fontWeight": "900",
+                  "marginBottom": '1rem',
+                  'marginLeft': selectedGraph ? '' : 'auto' 
+                }}
+                onClick={handleCloseButton}
+              >
+                X
+              </Button>
+            {selectedGraph && (
+              <Card variant="outlined">
+                <CardContent>
+                  <Box mb={1}>
+                    <TextField
+                      id="outlined-basic"
+                      label="Graph Name"
+                      variant="outlined"
+                      size="small"
+                      value={graphName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setGraphName(event.target.value);
+                      }}
+                      fullWidth
+                    />
+                  </Box>              
+                  <TextField
+                    id="outlined-basic"
+                    label="Note"
+                    multiline
+                    rows={4}
+                    variant="outlined"
+                    size="small"
+                    value={graphNote === "" ? " " : graphNote}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setGraphNote(event.target.value);
+                    }}
+                    fullWidth
+                  />
+                </CardContent>
+              </Card>
+            )}
+            </Grid>            
+          </>
+          
+          )
         }  
         {!startNewConcept && 
-          <Grid item xs={3}>
+          <Grid item xs={3}>  
             <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
-            <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
+              <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
             </Paper>
             <Paper>
               <Box m={1}>
@@ -1099,8 +1187,10 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
                       label="Graph Name"
                       variant="outlined"
                       size="small"
-                      InputProps={{readOnly: true}}
                       value={graphName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setGraphName(event.target.value);
+                      }}
                       fullWidth
                     />
                   </Box>              
@@ -1111,16 +1201,17 @@ function Utensil({startNewConcept = false, setStartNewConcept}: UtensilProps) {
                     rows={4}
                     variant="outlined"
                     size="small"
-                    InputProps={{readOnly: true}}
                     value={graphNote === "" ? " " : graphNote}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      setGraphNote(event.target.value);
+                    }}
                     fullWidth
                   />
                 </CardContent>
               </Card>
             )}
-
           </Grid>
-        }        
+        }  
       </Grid>
     </Container>
   );

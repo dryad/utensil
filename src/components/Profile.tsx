@@ -1,5 +1,6 @@
 import React, { useEffect, SyntheticEvent, ReactNode } from "react";
 import useState from 'react-usestateref';
+import {useParams, useNavigate} from "react-router-dom";
 import axios from "libs/axios";
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import {
@@ -17,7 +18,7 @@ import {
   } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import "./Profile.css";
-import {useParams, useNavigate} from "react-router-dom";
+import { Graph } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import Utensil from "./Utensil";
 import ShowPromptDialog from './ShowPromptDialog';
@@ -108,6 +109,24 @@ const theme = createTheme({
     },
 });
 
+const utensilTheme = createTheme({
+    palette: {
+        background: {
+            default: "#ffffff"
+          },
+        primary: {
+            main: "#1976d2",
+            contrastText: "#fff",
+        },
+        secondary: {
+            main: "#f44336",
+            contrastText: "#fff",
+        },
+        contrastThreshold: 3,
+        tonalOffset: 0.2,
+    },
+});
+
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-cell': {
         color: 'rgba(255,255,255,0.85)',
@@ -138,75 +157,6 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 
 }));
 
-const columns: GridColDef[] = [
-    {
-        field: 'data',
-        headerName: 'Preview',
-        renderCell: (params: GridRenderCellParams<string>) => {
-            return (
-                <ProfileGraphItem graphData={params.value}/>
-            )
-        },
-        width: 100,
-        editable: false,
-        sortable: false,
-    },
-    {
-        field: 'name',
-        headerName: 'Name',
-        renderCell: (params: GridRenderCellParams<string>) => {
-            return (
-                <>
-                    {params.value && params.value.length >= 50 && 
-                        <Tooltip title={ <React.Fragment>
-                            {params.value}
-                        </React.Fragment>}>
-                            <div style={{padding: '12px'}}>
-                                { params.value.slice(0, 50)} ...
-                            </div>
-                        </Tooltip>
-                    }
-                    {params.value && params.value.length < 50 && 
-                        <div style={{padding: '12px'}}>
-                            { params.value}
-                        </div>
-                    }
-                </>  
-            )
-        },
-        width: 400,
-        editable: false,
-        sortable: false,
-    },
-    {
-        field: 'note',
-        headerName: 'Note',
-        renderCell: (params: GridRenderCellParams<string>) => {
-            return (
-                <>
-                    {params.value && params.value.length >= 50 && 
-                        <Tooltip title={ <React.Fragment>
-                            {params.value}
-                        </React.Fragment>}>
-                            <div style={{padding: '12px'}}>
-                                { params.value.slice(0, 50)} ...
-                            </div>
-                        </Tooltip>
-                    }
-                    {params.value && params.value.length < 50 && 
-                        <div style={{padding: '12px'}}>
-                            { params.value}
-                        </div>
-                    }
-                </>                    
-            )
-        },
-        flex: 1,
-        editable: false,
-        sortable: false,
-    },
-];
-
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
@@ -217,6 +167,87 @@ function Profile() {
     const [value, setValue] = useState(0);
     const [startNewConcept, setStartNewConcept] = useState(false);
     const [showPrompt, setShowPrompt] = useState(false);
+    const [selectedGraph, setSelectedGraph] = useState<Graph | null | undefined>(null);
+
+    const columns: GridColDef[] = [
+        {
+            field: 'data',
+            headerName: 'Preview',
+            renderCell: (params: GridRenderCellParams<string>) => {
+                return (
+                    <div 
+                        style={{cursor: 'pointer'}} 
+                        onClick={toggleDrawer(true, params.row)}
+                    >
+                        <ProfileGraphItem graphData={params.value}/>
+                    </div>                    
+                )
+            },
+            width: 100,
+            editable: false,
+            sortable: false,
+        },
+        {
+            field: 'name',
+            headerName: 'Name',
+            renderCell: (params: GridRenderCellParams<string>) => {
+                return (
+                    <>
+                        {params.value && params.value.length >= 50 && 
+                            <Tooltip title={ <React.Fragment>
+                                {params.value}
+                            </React.Fragment>}>
+                                <div 
+                                    style={{padding: '12px', cursor: 'pointer'}} 
+                                    onClick={toggleDrawer(true, params.row)}
+                                >
+                                    { params.value.slice(0, 50)} ...
+                                </div>
+                            </Tooltip>
+                        }
+                        {params.value && params.value.length < 50 && 
+                            <div 
+                                style={{padding: '12px', cursor: 'pointer'}} 
+                                onClick={toggleDrawer(true, params.row)}
+                            >
+                                { params.value}
+                            </div>
+                        }
+                    </>  
+                )
+            },
+            width: 400,
+            editable: false,
+            sortable: false,
+        },
+        {
+            field: 'note',
+            headerName: 'Note',
+            renderCell: (params: GridRenderCellParams<string>) => {
+                return (
+                    <>
+                        {params.value && params.value.length >= 50 && 
+                            <Tooltip title={ <React.Fragment>
+                                {params.value}
+                            </React.Fragment>}>
+                                <div style={{padding: '12px'}}>
+                                    { params.value.slice(0, 50)} ...
+                                </div>
+                            </Tooltip>
+                        }
+                        {params.value && params.value.length < 50 && 
+                            <div style={{padding: '12px'}}>
+                                { params.value}
+                            </div>
+                        }
+                    </>                    
+                )
+            },
+            flex: 1,
+            editable: false,
+            sortable: false,
+        },
+    ];
     
     useEffect(() => {
         getAddress();
@@ -225,7 +256,7 @@ function Profile() {
     }, [startNewConcept, setStartNewConcept]);
 
     const toggleDrawer =
-    (open: boolean) =>
+    (open: boolean, graph: Graph | null) =>
     (event: React.KeyboardEvent | React.MouseEvent) => {
        
         if (
@@ -235,6 +266,7 @@ function Profile() {
           ) {
             return;
         }
+        setSelectedGraph(graph);
         setStartNewConcept(open);
     };
 
@@ -243,11 +275,11 @@ function Profile() {
     };
 
     const refreshList = async () => {
-        const { data: privateData } = await axios.get(`/api/graphs/private/?private=${addressId}`);
-        setPrivateGraphs(privateData);
-
         const { data: publicData } = await axios.get(`/api/graphs/public/`);
         setPublicGraphs(publicData);
+
+        const { data: privateData } = await axios.get(`/api/graphs/private/?private=${addressId}`);
+        setPrivateGraphs(privateData);
     };
     
     console.log('private graphs', privateGraphs)
@@ -354,26 +386,28 @@ function Profile() {
                                 </Typography>
                                 { can_edit_profile() && (
                                     <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
-                                        onClick={toggleDrawer(true)}
+                                        onClick={toggleDrawer(true, null)}
                                     >
                                         Start new concept
                                     </Button>
-                                )}                                
-                                <Drawer
-                                    anchor={"right"}
-                                    open={startNewConcept}
-                                    onClose={toggleDrawer(false)}
-                                    hideBackdrop={true}
-                                >
-                                    <div style={{
-                                        width: '84vw', 
-                                        padding: '2rem',
-                                        backgroundColor: '#211f24', 
-                                        height: '100vh'}}
+                                )}    
+                                <ThemeProvider theme={utensilTheme}>
+                                    <Drawer
+                                        anchor={"right"}
+                                        open={startNewConcept}
+                                        onClose={toggleDrawer(false, null)}
+                                        hideBackdrop={true}
                                     >
-                                        <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept}/>
-                                    </div>  
-                                </Drawer>
+                                        <div style={{
+                                            width: '84vw', 
+                                            padding: '2rem',
+                                            backgroundColor: '#211f24', 
+                                            height: '100vh'}}
+                                        >
+                                            <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept} selectedGraph={selectedGraph}/>
+                                        </div>  
+                                    </Drawer>
+                                </ThemeProvider>                            
                             </Stack>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
