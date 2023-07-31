@@ -16,7 +16,7 @@ import {
     Drawer,
     Tooltip    
   } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams, GridEventListener } from '@mui/x-data-grid';
 import "./Profile.css";
 import { Graph } from "models";
 import MetaMaskButton from "./MetaMaskButton";
@@ -154,7 +154,17 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-columnHeaders': {
         borderBottom: '1px solid rgba(255,255,255,0.15)',
     },
-
+    '& .MuiDataGrid-row': {
+        cursor: 'pointer'
+    },
+    '.MuiDataGrid-columnSeparator': {
+        display: 'none',
+    },
+    '&.MuiDataGrid-root': {
+        border: '1px solid #2d2d2d',
+        borderRadius: '10px',
+        marginTop: '20px',
+    },
 }));
 
 function Profile() {
@@ -175,12 +185,7 @@ function Profile() {
             headerName: 'Preview',
             renderCell: (params: GridRenderCellParams<string>) => {
                 return (
-                    <div 
-                        style={{cursor: 'pointer'}} 
-                        onClick={toggleDrawer(true, params.row)}
-                    >
-                        <ProfileGraphItem graphData={params.value}/>
-                    </div>                    
+                    <ProfileGraphItem graphData={params.value}/>                   
                 )
             },
             width: 100,
@@ -197,19 +202,14 @@ function Profile() {
                             <Tooltip title={ <React.Fragment>
                                 {params.value}
                             </React.Fragment>}>
-                                <div 
-                                    style={{padding: '12px', cursor: 'pointer'}} 
-                                    onClick={toggleDrawer(true, params.row)}
-                                >
+                                <div style={{padding: '12px'}} >
                                     { params.value.slice(0, 50)} ...
                                 </div>
                             </Tooltip>
                         }
                         {params.value && params.value.length < 50 && 
                             <div 
-                                style={{padding: '12px', cursor: 'pointer'}} 
-                                onClick={toggleDrawer(true, params.row)}
-                            >
+                                style={{padding: '12px'}} >
                                 { params.value}
                             </div>
                         }
@@ -313,6 +313,11 @@ function Profile() {
     const can_edit_profile = () => {
         return metaMaskAccount === address.address;
     }
+
+    const handleRowClick: GridEventListener<'rowClick'> = (params) => {
+        setSelectedGraph(params.row);
+        setStartNewConcept(true);
+      };
     
     if (addressId === undefined) {
         return <div>No address provided</div>
@@ -415,60 +420,47 @@ function Profile() {
                                     <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} onClick={() => !can_edit_profile() && setShowPrompt(true)}/>
                                 </Tabs>
                             </Box>
-                            {publicGraphs && (
+                            {publicGraphs.length > 0 && (
                                 <TabPanel value={value} index={0}>
                                     <div style={{ height: '1000px', width: '100%' }}>
                                         <StyledDataGrid
-                                            sx={{
-                                                '.MuiDataGrid-columnSeparator': {
-                                                    display: 'none',
-                                                },
-                                                '&.MuiDataGrid-root': {
-                                                    border: '1px solid #2d2d2d',
-                                                    borderRadius: '10px',
-                                                    marginTop: '20px',
-                                                },
-                                            }}
                                             rows={publicGraphs}
                                             columns={columns}
                                             pageSize={25}
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
+                                            onRowClick={handleRowClick}
                                             headerHeight={32}
                                             rowHeight={100}
                                         />
                                     </div>
                                 </TabPanel>
                             )}
-                            { can_edit_profile() && privateGraphs && (
+                            {publicGraphs.length === 0 && (
+                                <TabPanel value={value} index={0}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                    </div>
+                                </TabPanel>
+                            )}
+                            { can_edit_profile() && privateGraphs.length > 0 && (
                                 <TabPanel value={value} index={1}>
                                     <div style={{ height: '1000px', width: '100%' }}>
                                         <StyledDataGrid
-                                            sx={{
-                                                '.MuiDataGrid-columnSeparator': {
-                                                    display: 'none',
-                                                },
-                                                '&.MuiDataGrid-root': {
-                                                    border: '1px solid #2d2d2d',
-                                                    borderRadius: '10px',
-                                                    marginTop: '20px',
-                                                },
-                                            }}
                                             rows={privateGraphs}
                                             columns={columns}
                                             pageSize={25}
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
+                                            onRowClick={handleRowClick}
                                             headerHeight={32}
                                             rowHeight={100}
                                         />
                                     </div>
                                 </TabPanel>
                             )}
-                            { !can_edit_profile() && (
+                            { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
                                 <TabPanel value={value} index={1}>
                                     <div style={{ height: '1000px', width: '100%' }}>
-                                        
                                     </div>
                                 </TabPanel>
                             )}
