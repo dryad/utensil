@@ -40,7 +40,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
-
   const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
   const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
   const [graph, setGraph] = useState<GraphData | null>(null); // The currently loaded graph object.
@@ -993,16 +992,14 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
                     Save
                   </Button>
                 }
-                {(!startNewConcept || (startNewConcept && !selectedGraph)) &&
-                  <Button 
-                    variant="outlined" 
-                    color="primary" 
-                    onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
-                    sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
-                  >
-                    Save As New
-                  </Button>
-                }
+                <Button 
+                  variant="outlined" 
+                  color="primary" 
+                  onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
+                  sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
+                >
+                  Save As New
+                </Button>
                 {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
                   Clear Graph
                 </Button> */}

@@ -49,7 +49,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const toggleNodeDialog = () => {
       setNodeDialogOpen(!nodeDialogOpen);
     }
-
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
       console.log(label)
@@ -474,7 +473,6 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       });
 
     }, [networkRef]);
-
 
     return (
       <>

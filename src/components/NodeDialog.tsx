@@ -72,17 +72,12 @@ const NodeDialog: React.FC<IDialogProps> = ({
 
   useEffect(() => {setShowGraphsList(true)},[open])
 
-  const matchFunction = (node: any) => {
-    return node.label.toLowerCase().trim().includes(nodeLabel!.toLowerCase()) || node.name?.toLowerCase().trim().includes(nodeLabel!.toLowerCase())
-  }
-
   useEffect(() => {
     setNodeLabel(nodeLabel);
 
     if (nodeLabel && nodeLabel?.trim().length > 0) {
       const tempGraphs = graphs.filter((el: Graph) => {
-        
-        if (JSON.parse(el.data).nodes.some(matchFunction)) {
+        if (el.name.toLowerCase().trim().includes(nodeLabel.toLowerCase())) {
           return el
         }
       })
