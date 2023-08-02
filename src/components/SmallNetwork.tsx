@@ -1,5 +1,5 @@
 import { useEffect, useRef, memo } from "react";
-import VisCustomNetwork from "libs/vis-custom-network";
+import SmallVisCustomNetwork from "libs/small-vis-custom-network";
 
 type INetworkProps = {
   networkRef: any;
@@ -10,10 +10,10 @@ const SmallNetwork = ({ networkRef }: INetworkProps) => {
 
     useEffect(() => {
       if (!networkRef.current && domRef.current) {
-        networkRef.current = new VisCustomNetwork(domRef.current);
+        networkRef.current = new SmallVisCustomNetwork(domRef.current);
       }
     }, [networkRef]);
-
+    
     return (
       <div ref={domRef} style={{ height: `100px`, width: `100px`, background: '#fff' }} />
     );
