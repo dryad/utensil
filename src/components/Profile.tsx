@@ -277,10 +277,16 @@ function Profile() {
     const refreshList = async () => {
         const { data: publicData } = await axios.get(`/api/graphs/public/`);
         setPublicGraphs(publicData);
-
-        const { data: privateData } = await axios.get(`/api/graphs/private/?private=${addressId}`);
-        setPrivateGraphs(privateData);
     };
+
+    useEffect(() => {
+        if (can_edit_profile()) {
+            axios.get(`/api/graphs/private/?private=${addressId}`).then((response) => {
+                const { data: privateData } = response;
+                setPrivateGraphs(privateData);
+            })          
+        } 
+    },[metaMaskAccount, address, startNewConcept, setStartNewConcept])
     
     console.log('private graphs', privateGraphs)
     console.log('public graphs', publicGraphs)
@@ -403,11 +409,14 @@ function Profile() {
                                         onClose={toggleDrawer(false, null)}
                                         hideBackdrop={true}
                                     >
-                                        <div style={{
-                                            width: '84vw', 
-                                            padding: '2rem',
-                                            backgroundColor: '#211f24', 
-                                            height: '100vh'}}
+                                        <div 
+                                            style={{
+                                                width: '84vw', 
+                                                padding: '2rem',
+                                                backgroundColor: '#211f24', 
+                                                height: '100vh',
+                                                overflowY: 'auto'
+                                            }}
                                         >
                                             <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept} selectedGraph={selectedGraph}/>
                                         </div>  
