@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { IconButton, Box, Stack } from "@mui/material";
-import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff, ChangeHistory } from "@mui/icons-material";
+import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff, ChangeHistory, Functions } from "@mui/icons-material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
@@ -99,6 +99,11 @@ export default function NetworkButtons(props: any) {
                         <ToggleButton value="contraction" aria-label="contraction" classes={{ selected: classes.selected }}>
                             <IconButton aria-label="Contraction">
                                 <ChangeHistory style={{ 'transform': 'rotate(90deg)' }} />
+                            </IconButton>
+                        </ToggleButton>
+                        <ToggleButton value="functions" aria-label="functions" classes={{ selected: classes.selected }}>
+                            <IconButton aria-label="Functions">
+                                <Functions />
                             </IconButton>
                         </ToggleButton>
                     </ToggleButtonGroup>

@@ -28,6 +28,7 @@ import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
+import { computeFunction } from "../functions/computeFunction";
 import { NODE_COLORS } from "constants/colors";
 
 interface UtensilProps {
@@ -706,6 +707,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           networkRef.current?.network.disableEditMode();
           setSelectedNodesFromNetwork([]);
           break;    
+        case "functions":
+          networkRef.current?.network.disableEditMode();
+          setSelectedNodesFromNetwork([]);
+          break;  
       }
       
   };
@@ -852,6 +857,56 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       }
     }
   },[selectedNodes, buttonMode]) 
+
+  useEffect(() => {
+    if (buttonMode === "functions") {
+      if (selectedNodes.length === 1) {
+        const nodes = networkRef.current?.nodes.get();
+        const edges = networkRef.current?.edges.get();
+        
+        console.log('all nodes: ',nodes)
+        console.log('all edges', edges)
+        
+        const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
+        console.log('selected node ---',foundSelectedNode)
+
+        const viewPosition = networkRef.current?.network.getViewPosition()!;
+        const scale = networkRef.current?.network.getScale();
+
+        const inputGraphData = { 
+          edges: edges, 
+          nodes: nodes, 
+          viewPosition: viewPosition, 
+          scale: scale 
+        };
+        
+        if (
+          foundSelectedNode?.level > 0 && 
+          foundSelectedNode.isLabelNode !== true && 
+          foundSelectedNode.opacity === 1 && 
+          !foundSelectedNode.hasOwnProperty('subGraphData') &&
+          edges.length === 1
+        ) {
+          
+          const {canBeComputed, outputGraphData} = computeFunction(foundSelectedNode, inputGraphData);
+          
+          if (canBeComputed && outputGraphData) {
+           
+            const externalGraph = JSON.parse(stringifyGraph());
+
+            externalGraph.nodes = outputGraphData.nodes;
+            externalGraph.edges = outputGraphData?.edges;
+            networkRef.current?.setData(externalGraph);
+            networkRef.current?.network.moveTo({
+              position: { x: viewPosition.x, y: viewPosition.y },
+              scale: scale || 1,
+              animation: false,
+            });
+          }
+        }
+      }
+    }
+  }, [selectedNodes, buttonMode]);
 
   const addNodeComplete = () => {
     networkRef.current?.network.addNodeMode(); // Makes adding nodes continual

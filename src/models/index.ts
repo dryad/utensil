@@ -16,13 +16,18 @@ export type TreeNode = {
   id: string;
   color: string;
   label: string;
-  isLabelNode: boolean;
-  labelOfNode: string;
+  isLabelNode?: boolean | undefined;
+  labelOfNode?: string | undefined;
   x: number;
   y: number;
   level: number;
-  subGraphData: string;
-  name?: string;
+  subGraphData?: string | undefined;
+  name?: string | undefined;
+  opacity: number;
+  shape?: string | undefined;
+  font?: {
+    color: string
+  }
 };
 
 export type Graph = {
