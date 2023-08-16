@@ -23,6 +23,7 @@ export type TreeNode = {
   level: number;
   subGraphData?: string | undefined;
   name?: string | undefined;
+  subGraphId?: number | undefined;
   opacity: number;
   shape?: string | undefined;
   font?: {

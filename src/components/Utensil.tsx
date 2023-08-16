@@ -177,7 +177,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
     const edges = networkRef.current?.edges.get(); // get all edges from the network.
     const positions = networkRef.current?.network.getPositions();
-    console.log('all nodes: ',nodes)
+    console.log('all nodes: ', nodes)
+    console.log('all edges: ', edges)
     const to_traverse = [];
     const id_to_edge: any = {};
     const id_to_node: any = {};
@@ -304,7 +305,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   };
 
   const confirmReplaceGraph = () => {
-    if (graphToLoad) {
+    if (graphToLoad) {      
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.
       setGraph(JSON.parse(graph.data));
       setIsPrivate(graph.private !== '');
@@ -314,6 +315,16 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setGraphNote(graph.note);
       const data = JSON.parse(graph.data);
   
+      const nodesLevels = data.nodes.map((el: TreeNode) => el.level);
+      const maxLevelOfNodes = Math.max(...nodesLevels);
+
+      data.nodes.map((el: TreeNode) => {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+          el.subGraphId = graphToLoad.id;
+        }
+        return el;
+      })
+
       for (let node of data.nodes) {
         if (node.label && node.label.length > 0) {
           node.opacity = 1;
@@ -486,6 +497,16 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         }
       }
 
+      const nodesLevels = data.nodes.map((el: TreeNode) => el.level);
+      const maxLevelOfNodes = Math.max(...nodesLevels);
+
+      data.nodes.map((el: TreeNode) => {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+          el.subGraphId = graphToLoad.id;
+        }
+        return el;
+      })
+      
       let existingGraph = JSON.parse(stringifyGraph());
       console.log('existing graph', existingGraph);
       console.log('graph to load', JSON.parse(graphToLoad.data));
