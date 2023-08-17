@@ -101,8 +101,8 @@ export default function NetworkButtons(props: any) {
                                 <ChangeHistory style={{ 'transform': 'rotate(90deg)' }} />
                             </IconButton>
                         </ToggleButton>
-                        <ToggleButton value="functions" aria-label="functions" classes={{ selected: classes.selected }}>
-                            <IconButton aria-label="Functions">
+                        <ToggleButton value="addition" aria-label="addition" classes={{ selected: classes.selected }}>
+                            <IconButton aria-label="Addition">
                                 <Functions />
                             </IconButton>
                         </ToggleButton>

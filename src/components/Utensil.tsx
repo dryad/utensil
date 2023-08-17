@@ -28,7 +28,7 @@ import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
-import { computeFunction } from "../functions/computeFunction";
+import { addition } from "../functions/addition";
 import { NODE_COLORS } from "constants/colors";
 
 interface UtensilProps {
@@ -880,50 +880,31 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   },[selectedNodes, buttonMode]) 
 
   useEffect(() => {
-    if (buttonMode === "functions") {
+    if (buttonMode === "addition") {
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
         const edges = networkRef.current?.edges.get();
-        
-        console.log('all nodes: ',nodes)
-        console.log('all edges', edges)
-        
+                
         const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
-        console.log('selected node ---',foundSelectedNode)
-
-        const viewPosition = networkRef.current?.network.getViewPosition()!;
-        const scale = networkRef.current?.network.getScale();
-
-        const inputGraphData = { 
-          edges: edges, 
-          nodes: nodes, 
-          viewPosition: viewPosition, 
-          scale: scale 
-        };
-        
+       
         if (
           foundSelectedNode?.level > 0 && 
           foundSelectedNode.isLabelNode !== true && 
           foundSelectedNode.opacity === 1 && 
-          !foundSelectedNode.hasOwnProperty('subGraphData') &&
-          edges.length === 1
+          !foundSelectedNode.hasOwnProperty('subGraphData') 
         ) {
-          
-          const {canBeComputed, outputGraphData} = computeFunction(foundSelectedNode, inputGraphData);
-          
-          if (canBeComputed && outputGraphData) {
-           
-            const externalGraph = JSON.parse(stringifyGraph());
+          const edgeToSelNode = edges.find((el: Edge) => el.to === foundSelectedNode.id);
 
-            externalGraph.nodes = outputGraphData.nodes;
-            externalGraph.edges = outputGraphData?.edges;
-            networkRef.current?.setData(externalGraph);
-            networkRef.current?.network.moveTo({
-              position: { x: viewPosition.x, y: viewPosition.y },
-              scale: scale || 1,
-              animation: false,
-            });
-          }
+          const fromNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.from || el?.labelOfNode === edgeToSelNode.from);
+          const eventualNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);
+          const toNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.to || el?.labelOfNode === edgeToSelNode.to);
+
+          const inputGraphData = { 
+            edges: edgeToSelNode, 
+            nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
+          };
+         
+          addition(foundSelectedNode, inputGraphData);
         }
       }
     }
