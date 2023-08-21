@@ -29,6 +29,10 @@ import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
 import { addition } from "../functions/addition";
+import { multiplication } from '../functions/multiplication';
+import { subtraction } from '../functions/subtraction';
+import { exponentiation } from '../functions/exponentiation'; 
+import { division } from '../functions/division';
 import { NODE_COLORS } from "constants/colors";
 
 interface UtensilProps {
@@ -67,6 +71,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+  const functionMode = ['addition', 'subtraction', 'multiplication', 'division', 'exponentiation'];
 
   useEffect(() => {
     if (selectedGraph) {
@@ -880,7 +885,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   },[selectedNodes, buttonMode]) 
 
   useEffect(() => {
-    if (buttonMode === "addition") {
+    if (functionMode.includes(buttonMode)) {
       if (selectedNodes.length === 1) {
         const nodes = networkRef.current?.nodes.get();
         const edges = networkRef.current?.edges.get();
@@ -903,8 +908,26 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             edges: edgeToSelNode, 
             nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
           };
-         
-          addition(foundSelectedNode, inputGraphData);
+          if (!edgeToSelNode.directed) {
+            console.log('Graph is undirected. Subtraction, exponentiation and division are not possible.')
+          }
+          switch (buttonMode) {
+            case 'addition': 
+              addition(foundSelectedNode, inputGraphData);
+              break;
+            case 'subtraction': 
+              edgeToSelNode.directed && subtraction(foundSelectedNode, inputGraphData);
+              break;   
+            case 'exponentiation': 
+              edgeToSelNode.directed && exponentiation(foundSelectedNode, inputGraphData);
+              break;
+            case 'multiplication': 
+              multiplication(foundSelectedNode, inputGraphData);
+              break;
+            case 'division': 
+              edgeToSelNode.directed && division(foundSelectedNode, inputGraphData);
+              break;
+          };
         }
       }
     }

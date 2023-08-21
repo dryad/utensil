@@ -67,6 +67,8 @@ export default function NetworkButtons(props: any) {
         setAnchorEl(null);
     };
 
+    const isFunctionMode = !['pan', 'node', 'directed-edge', 'edge', 'delete', 'expansion', 'contraction'].includes(props.buttonMode);
+
     return(
         <div>
             <Stack direction="column" spacing={1}>
@@ -140,15 +142,17 @@ export default function NetworkButtons(props: any) {
                             aria-controls={open ? 'long-menu' : undefined}
                             aria-expanded={open ? 'true' : undefined}
                             aria-haspopup="true"
-                            selected={!['pan', 'node', 'directed-edge', 'edge', 'delete', 'expansion', 'contraction'].includes(props.buttonMode)}
+                            selected={isFunctionMode}
                             classes={{ selected: classes.selected }}
                         >
                             <IconButton aria-label="Functions">
                                 <Functions />
                             </IconButton>
-                            <div style={{position: 'absolute', top: '0', right: '0'}}>
-                                {icons[functionIconIdx]}
-                            </div>                            
+                            {isFunctionMode && 
+                                <div style={{position: 'absolute', top: '0', right: '0'}}>
+                                    {icons[functionIconIdx]}
+                                </div>   
+                            }                                                     
                         </ToggleButton>
                         <Menu
                             id="long-menu"
