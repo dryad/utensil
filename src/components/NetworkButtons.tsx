@@ -4,25 +4,13 @@ import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff, Cha
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
-
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { FUNCTION_MODES, FUNCTION_ICONS } from '../functions/functionModes';
 
-const options = [
-  'addition',
-  'subtraction',
-  'multiplication',
-  'division',
-  'exponentiation',  
-];
-
-const icons = [
-    <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>+</Icon>,
-    <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>-</Icon>,
-    <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>*</Icon>,
-    <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>/</Icon>,
-    <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>^</Icon>,  
-  ];
+const icons = FUNCTION_ICONS.map((icon) => {
+    return <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{icon}</Icon>
+});
 
 const ITEM_HEIGHT = 48;
 
@@ -67,7 +55,7 @@ export default function NetworkButtons(props: any) {
         setAnchorEl(null);
     };
 
-    const isFunctionMode = !['pan', 'node', 'directed-edge', 'edge', 'delete', 'expansion', 'contraction'].includes(props.buttonMode);
+    const isFunctionMode = FUNCTION_MODES.includes(props.buttonMode);
 
     return(
         <div>
@@ -164,13 +152,13 @@ export default function NetworkButtons(props: any) {
                             onClose={handleClose}
                             anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                             PaperProps={{
-                            style: {
-                                maxHeight: ITEM_HEIGHT * 4.5,
-                                margin: '0 0 0 0.2rem'
-                            },
+                                style: {
+                                    maxHeight: ITEM_HEIGHT * 4.5,
+                                    margin: '0 0 0 0.2rem',
+                                },
                             }}
                         >
-                            {options.map((option, index) => (
+                            {FUNCTION_MODES.map((option, index) => (
                                 <MenuItem 
                                     key={option} 
                                     sx={{display: 'flex', justifyContent: 'space-between'}}

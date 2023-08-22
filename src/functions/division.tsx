@@ -3,6 +3,11 @@ import { TreeNode, Edge, GraphData } from "../models";
 export function division(selNode:TreeNode, inputGraphData: any) {
  
     const edgeToSelNode = inputGraphData.edges;
+
+    if (!edgeToSelNode.directed) {
+        console.log('Graph is undirected. Division is not possible.');
+        return;
+    }
     
     const fromNodes = inputGraphData.nodes!.filter((el: TreeNode) => el.id === edgeToSelNode.from || el?.labelOfNode === edgeToSelNode.from);
     const eventualNodes = inputGraphData.nodes!.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);

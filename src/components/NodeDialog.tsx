@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import dayjs, { Dayjs } from 'dayjs';
 import { Button, Dialog, TextField, Table, TableBody, TableRow } from "@mui/material";
+import { Box, Radio, RadioGroup, FormControl, FormLabel, FormControlLabel } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DialogTitle, DialogContent, DialogActions } from "./Dialog";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { SxProps } from "@mui/material";
@@ -68,9 +73,12 @@ const NodeDialog: React.FC<IDialogProps> = ({
 }) => {
   const [filteredGraphs, setFilteredGraphs] = useState([]);
   const [showGraphsList, setShowGraphsList] = useState(true);
+  const [inputValue, setInputValue] = useState('text');
   const okButton = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {setShowGraphsList(true)},[open])
+  useEffect(() => {setShowGraphsList(true)},[open]);
+
+  useEffect(() => {setInputValue('text')},[open]);
 
   useEffect(() => {
     setNodeLabel(nodeLabel);
@@ -98,6 +106,10 @@ const NodeDialog: React.FC<IDialogProps> = ({
       setShowGraphsList(false);
     }
   }
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue((event.target as HTMLInputElement).value);
+  };
   
   return (
     <ThemeProvider theme={theme}>
@@ -113,34 +125,123 @@ const NodeDialog: React.FC<IDialogProps> = ({
         <DialogTitle id="customized-dialog-title" onClose={onClose}>
           {title}
         </DialogTitle>
-        <DialogContent dividers sx={{'display': 'flex', 'justifyContent':'space-between', 'alignItems':'center', 'gap':'1rem', 'max-height': '7rem', 'min-height': '7rem'}}>
-          <TextField
-            autoFocus
-            fullWidth
-            id="label"
-            label="Label"
-            value={nodeLabel}
-            variant="outlined"
-            onKeyDown={e => {
-              if (e.key === 'Enter') { okButton.current?.click(); }
-            }} 
-            onChange={(e) => {
-              setNodeLabel(e.target.value);
+        <DialogContent dividers 
+          sx={{
+            'padding': '0 1rem',
+            'max-height': '7rem', 
+            'min-height': '8.5rem',
+          }}
+        >
+          <FormControl 
+            sx={{
+              'display': 'flex',
+              'flexDirection': 'row',
+              'gap': '1rem',
+              'fontSize': '0.5rem', 
+              'alignItems':'center', 
+              'padding': '0'
             }}
-            onFocus={event => {
-              event.target.select();
-            }}
-          />
-          <DialogActions>
-            <Button
-              ref={okButton}
-              variant="outlined"
-              color="primary"
-              onClick={onOk(nodeLabel)}
+          >
+            <FormLabel id="radio-buttons-group" sx={{'fontSize': '0.8rem'}}>Input type: </FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="radio-buttons-group"
+              name="controlled-radio-buttons-group"
+              value={inputValue}
+              onChange={handleChange}
             >
-              OK
-            </Button>
-          </DialogActions>
+              <FormControlLabel 
+                value="text" 
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontSize: '0.8rem',
+                  },
+                }}
+                control={
+                  <Radio 
+                    size="small" 
+                    sx={{
+                      '& .MuiSvgIcon-root': {
+                        fontSize: 16,
+                      },
+                    }}
+                  />
+                } 
+                label="text" 
+              />
+              <FormControlLabel 
+                value="date" 
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontSize: '0.8rem',
+                  },
+                }}
+                control={
+                  <Radio 
+                    size="small" 
+                    sx={{
+                      '& .MuiSvgIcon-root': {
+                        fontSize: 16,
+                      },
+                    }}
+                  />
+                } 
+                label="date time" 
+              />
+            </RadioGroup>
+          </FormControl>
+          <DialogContent 
+            sx={{
+              'display': 'flex', 
+              'justifyContent':'space-between', 
+              'alignItems':'center', 
+              'gap':'1rem', 
+              'max-height': '7rem', 
+              'min-height': '6rem',
+              'padding': '0'
+            }}
+          >
+            {inputValue === 'text' 
+            ? 
+              <TextField
+                autoFocus
+                fullWidth
+                id="label"
+                label="Label"
+                value={nodeLabel}
+                variant="outlined"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { okButton.current?.click(); }
+                }} 
+                onChange={(e) => {
+                  setNodeLabel(e.target.value);
+                }}
+                onFocus={event => {
+                  event.target.select();
+                }}
+              />
+            : (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker 
+                  label="Date time picker" 
+                  value={dayjs(nodeLabel, 'LLL', true).isValid() ? dayjs(nodeLabel) : dayjs()}
+                  onChange={(newValue) => {setNodeLabel(dayjs(newValue).format('LLL'))}}
+                />
+              </LocalizationProvider>
+            )
+            }
+            
+            <DialogActions>
+              <Button
+                ref={okButton}
+                variant="outlined"
+                color="primary"
+                onClick={onOk(nodeLabel)}
+              >
+                OK
+              </Button>
+            </DialogActions>
+          </DialogContent>
         </DialogContent>
         {showGraphsList && (
           <DialogContent>

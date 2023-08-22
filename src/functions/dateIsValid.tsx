@@ -1,11 +1,12 @@
 import { TreeNode, Edge, GraphData } from "../models";
+import dayjs from 'dayjs';
 
-export function subtraction(selNode:TreeNode, inputGraphData: any) {
+export function dateIsValid(selNode:TreeNode, inputGraphData: any) {
  
     const edgeToSelNode = inputGraphData.edges;
     
     if (!edgeToSelNode.directed) {
-        console.log('Graph is undirected. Subtraction is not possible.');
+        console.log('Graph is undirected. DateIsValid is not possible.');
         return;
     }
 
@@ -16,29 +17,28 @@ export function subtraction(selNode:TreeNode, inputGraphData: any) {
 
     // define if Graph can be computed
 
-    const checkIfNotNumber = (string: string) => {
-        if (string === '') {return true} 
-        else {return isNaN(Number(string))}        
+    const checkIfNotDate = (text: string) => {
+        return !dayjs(text, 'LLL', true).isValid() 
     }
 
     if (
-        checkIfNotNumber(fromNodes[0].label.trim()) ||
-        checkIfNotNumber(eventualNodes[0].label.trim()) || 
+        checkIfNotDate(fromNodes[0].label.trim()) ||
+        checkIfNotDate(eventualNodes[0].label.trim()) || 
         !selNode.subGraphId
     ) {
         canBeComputed = false;
     };
 
-    let rezult: number | null = null;
+    let rezult: boolean | null = null;
     
     if (canBeComputed) {
                
-        const firstNumber = Number(fromNodes[0].label.trim());
-        const secondNumber = Number(eventualNodes[0].label.trim());
+        const firstDate = dayjs(fromNodes[0].label.trim());
+        const secondDate = dayjs(eventualNodes[0].label.trim());
                 
-        rezult = firstNumber - secondNumber;
+        rezult = secondDate.diff(firstDate) > 0;
     }
-    console.log('SUBTRACTION function rezult: ', rezult);  
+    console.log('DATE_IS_VALID function rezult: ', rezult);  
   }
 
   
