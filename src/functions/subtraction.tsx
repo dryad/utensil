@@ -29,16 +29,16 @@ export function subtraction(selNode:TreeNode, inputGraphData: any) {
         canBeComputed = false;
     };
 
-    let rezult: number | null = null;
+    let result: number | null = null;
     
     if (canBeComputed) {
                
         const firstNumber = Number(fromNodes[0].label.trim());
         const secondNumber = Number(eventualNodes[0].label.trim());
                 
-        rezult = firstNumber - secondNumber;
+        result = firstNumber - secondNumber;
     }
-    console.log('SUBTRACTION function rezult: ', rezult);  
+    console.log('SUBTRACTION function result: ', result);  
   }
 
   

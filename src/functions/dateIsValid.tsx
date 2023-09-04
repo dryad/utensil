@@ -29,16 +29,16 @@ export function dateIsValid(selNode:TreeNode, inputGraphData: any) {
         canBeComputed = false;
     };
 
-    let rezult: boolean | null = null;
+    let result: boolean | null = null;
     
     if (canBeComputed) {
                
         const firstDate = dayjs(fromNodes[0].label.trim());
         const secondDate = dayjs(eventualNodes[0].label.trim());
                 
-        rezult = secondDate.diff(firstDate) > 0;
+        result = secondDate.diff(firstDate) > 0;
     }
-    console.log('DATE_IS_VALID function rezult: ', rezult);  
+    console.log('DATE_IS_VALID function rezult: ', result);  
   }
 
   

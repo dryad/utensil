@@ -29,16 +29,16 @@ export function dateIsExpired(selNode:TreeNode, inputGraphData: any) {
         canBeComputed = false;
     };
 
-    let rezult: boolean | null = null;
+    let result: boolean | null = null;
     
     if (canBeComputed) {
                
         const firstDate = dayjs(fromNodes[0].label.trim());
         const secondDate = dayjs(eventualNodes[0].label.trim());
                 
-        rezult = firstDate.diff(secondDate) > 0;
+        result = firstDate.diff(secondDate) > 0;
     }
-    console.log('DATE_IS_EXPIRED function rezult: ', rezult);  
+    console.log('DATE_IS_EXPIRED function result: ', result);  
   }
 
   

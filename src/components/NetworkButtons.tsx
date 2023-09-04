@@ -1,18 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { IconButton, Box, Stack, Icon } from "@mui/material";
-import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff, ChangeHistory, Functions } from "@mui/icons-material";
+import React, { useCallback, useEffect } from "react";
+import { IconButton, Box, Stack } from "@mui/material";
+import { Undo, Redo, PanTool, Circle, ArrowRightAlt, Minimize, HighlightOff, ChangeHistory } from "@mui/icons-material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import makeStyles from '@mui/styles/makeStyles';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { FUNCTION_MODES, FUNCTION_ICONS } from '../functions/functionModes';
-
-const icons = FUNCTION_ICONS.map((icon) => {
-    return <Icon sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{icon}</Icon>
-});
-
-const ITEM_HEIGHT = 48;
 
 export default function NetworkButtons(props: any) {
     
@@ -44,18 +35,6 @@ export default function NetworkButtons(props: any) {
         };
     }, []);
     const classes = useStyles();
-
-    const [functionIconIdx, setFunctionIconIdx] = useState(-10);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const isFunctionMode = FUNCTION_MODES.includes(props.buttonMode);
 
     return(
         <div>
@@ -123,52 +102,6 @@ export default function NetworkButtons(props: any) {
                                 <ChangeHistory style={{ 'transform': 'rotate(90deg)' }} />
                             </IconButton>
                         </ToggleButton>
-                        <ToggleButton 
-                            onClick={handleClick} 
-                            value="functions" 
-                            aria-label="functions" 
-                            aria-controls={open ? 'long-menu' : undefined}
-                            aria-expanded={open ? 'true' : undefined}
-                            aria-haspopup="true"
-                            selected={isFunctionMode}
-                            classes={{ selected: classes.selected }}
-                        >
-                            <IconButton aria-label="Functions">
-                                <Functions />
-                            </IconButton>
-                            {isFunctionMode && 
-                                <div style={{position: 'absolute', top: '0', right: '0'}}>
-                                    {icons[functionIconIdx]}
-                                </div>   
-                            }                                                     
-                        </ToggleButton>
-                        <Menu
-                            id="long-menu"
-                            MenuListProps={{
-                            'aria-labelledby': 'long-button',
-                            }}
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
-                            PaperProps={{
-                                style: {
-                                    maxHeight: ITEM_HEIGHT * 4.5,
-                                    margin: '0 0 0 0.2rem',
-                                },
-                            }}
-                        >
-                            {FUNCTION_MODES.map((option, index) => (
-                                <MenuItem 
-                                    key={option} 
-                                    sx={{display: 'flex', justifyContent: 'space-between'}}
-                                    onClick={(event) => {handleChange(event, option); setFunctionIconIdx(index); handleClose()}}
-                                >
-                                    {option}
-                                    {icons[index]}
-                                </MenuItem>
-                            ))}
-                        </Menu>
                     </ToggleButtonGroup>
                 </Box>
             </Stack>

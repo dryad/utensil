@@ -30,16 +30,16 @@ export function division(selNode:TreeNode, inputGraphData: any) {
         canBeComputed = false;
     };
 
-    let rezult: number | null = null;
+    let result: number | null = null;
     
     if (canBeComputed) {
                
         const firstNumber = Number(fromNodes[0].label.trim());
         const secondNumber = Number(eventualNodes[0].label.trim());
                 
-        rezult = firstNumber / secondNumber;
+        result = firstNumber / secondNumber;
     }
-    console.log('DIVISION function rezult: ', rezult);  
+    console.log('DIVISION function result: ', result);  
   }
 
   

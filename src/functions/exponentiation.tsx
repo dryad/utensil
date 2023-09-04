@@ -29,16 +29,16 @@ export function exponentiation(selNode:TreeNode, inputGraphData: any) {
         canBeComputed = false;
     };
 
-    let rezult: number | null = null;
+    let result: number | null = null;
     
     if (canBeComputed) {
                
         const firstNumber = Number(fromNodes[0].label.trim());
         const secondNumber = Number(eventualNodes[0].label.trim());
                 
-        rezult = Math.pow(firstNumber, secondNumber);
+        result = Math.pow(firstNumber, secondNumber);
     }
-    console.log('EXPONENTIATION function rezult: ', rezult);  
+    console.log('EXPONENTIATION function result: ', result);  
   }
 
   

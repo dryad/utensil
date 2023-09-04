@@ -28,9 +28,8 @@ import MetaMaskButton from "./MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "./WhitelistedAddresses";
 import { contractAction } from "./ContractButtonFunctions";
-import * as functions from '../functions';
-import { FUNCTION_MODES } from '../functions/functionModes';
 import { NODE_COLORS } from "constants/colors";
+import { useComputeFunctionalGraph } from '../hooks/useComputeFunctionalGraph';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -79,6 +78,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setIsPrivate(selectedGraph.private !== '');
     }
   },[selectedGraph])
+
+  useComputeFunctionalGraph(networkRef);
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -729,12 +730,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           networkRef.current?.network.disableEditMode();
           setSelectedNodesFromNetwork([]);
           break;    
-        case "functions":
-          networkRef.current?.network.disableEditMode();
-          setSelectedNodesFromNetwork([]);
-          break;  
-      }
-      
+      }      
   };
 
   useEffect(() => {
@@ -880,37 +876,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     }
   },[selectedNodes, buttonMode]) 
 
-  useEffect(() => {
-    if (FUNCTION_MODES.includes(buttonMode)) {
-      if (selectedNodes.length === 1) {
-        const nodes = networkRef.current?.nodes.get();
-        const edges = networkRef.current?.edges.get();
-                
-        const foundSelectedNode = nodes.find((node: any) => node.id === selectedNodes[0]);
-       
-        if (
-          foundSelectedNode?.level > 0 && 
-          foundSelectedNode.isLabelNode !== true && 
-          foundSelectedNode.opacity === 1 && 
-          !foundSelectedNode.hasOwnProperty('subGraphData') 
-        ) {
-          const edgeToSelNode = edges.find((el: Edge) => el.to === foundSelectedNode.id);
-
-          const fromNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.from || el?.labelOfNode === edgeToSelNode.from);
-          const eventualNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);
-          const toNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.to || el?.labelOfNode === edgeToSelNode.to);
-
-          const inputGraphData = { 
-            edges: edgeToSelNode, 
-            nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
-          };
-                           
-          functions[buttonMode as keyof typeof functions](foundSelectedNode, inputGraphData);
-        }
-      }
-    }
-  }, [selectedNodes, buttonMode]);
-
   const addNodeComplete = () => {
     networkRef.current?.network.addNodeMode(); // Makes adding nodes continual
   }
@@ -934,8 +899,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     //create viewPosition using the getViewPosition function of vis-network
     const viewPosition = networkRef.current?.network.getViewPosition();
     const scale = networkRef.current?.network.getScale();
-    return JSON.stringify({ edges, nodes, viewPosition, scale });
-  
+    return JSON.stringify({ edges, nodes, viewPosition, scale });  
   };
   
   async function saveGraphToDatabase(isNew: boolean = false) {
