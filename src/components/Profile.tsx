@@ -14,7 +14,7 @@ import {
     Tabs,
     Tab,
     Drawer,
-    Tooltip    
+    Tooltip
   } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams, GridEventListener } from '@mui/x-data-grid';
 import "./Profile.css";
@@ -23,6 +23,8 @@ import MetaMaskButton from "./MetaMaskButton";
 import Utensil from "./Utensil";
 import ShowPromptDialog from './ShowPromptDialog';
 import ProfileGraphItem from './ProfileGraphItem';
+import ShareIcon from '@mui/icons-material/ShareOutlined';
+import ShareGraphDialog from "./ShareGraphDialog";
 
 interface TabPanelProps {
     children?: ReactNode;
@@ -167,6 +169,8 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     },
 }));
 
+
+
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
@@ -178,6 +182,9 @@ function Profile() {
     const [startNewConcept, setStartNewConcept] = useState(false);
     const [showPrompt, setShowPrompt] = useState(false);
     const [selectedGraph, setSelectedGraph] = useState<Graph | null | undefined>(null);
+    const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
+    const [graphName, setGraphName] = useState('');
+    const [graphIdToShare, setGraphIdToShare] = useState('');
 
     const columns: GridColDef[] = [
         {
@@ -244,6 +251,64 @@ function Profile() {
                 )
             },
             flex: 1,
+            editable: false,
+            sortable: false,
+        },
+        {
+            field: 'creator',
+            headerName: 'Creator',
+            renderCell: (params: GridRenderCellParams<string>) => {
+                return (
+                    <>
+                        {params.value && params.value.length >= 50 && 
+                            <Tooltip title={ <React.Fragment>
+                                {params.value}
+                            </React.Fragment>}>
+                                <div style={{padding: '12px'}}>
+                                    {/* { params.value.slice(0, 50)} ... */}
+                                    {/* {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq')} */}
+                                    vb
+                                </div>
+                            </Tooltip>
+                        }
+                        {params.value && params.value.length < 50 && 
+                            <div style={{padding: '12px'}}>
+                                nm
+                                {/* { params.value} */}
+                                {/* {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq')} */}
+                            </div>
+                        }
+                        <Tooltip title={ <React.Fragment>
+                            wqqqqqqqqqqqqqqqqqqqqqqqq456
+                            </React.Fragment>}>
+                                <div style={{padding: '12px'}}>
+                                    {/* { params.value.slice(0, 50)} ... */}
+                                    {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq456')}
+                                    {/* vb */}
+                                </div>
+                            </Tooltip>
+                    </>                    
+                )
+            },
+            width: 120,
+            editable: false,
+            sortable: false,
+        },
+        {
+            field: 'id',
+            headerName: '',
+            renderCell: (params: GridRenderCellParams<string>) => {
+                return (
+                    <ShareIcon 
+                        onClick={() => {
+                            setGraphName(params.row.name); 
+                            setGraphIdToShare(params.row.id); 
+                            setOpenShareGraphDialog(true);
+                        }}
+                    />
+                )
+            },
+            width: 10,
             editable: false,
             sortable: false,
         },
@@ -320,10 +385,18 @@ function Profile() {
         return metaMaskAccount === address.address;
     }
 
-    const handleRowClick: GridEventListener<'rowClick'> = (params) => {
-        setSelectedGraph(params.row);
-        setStartNewConcept(true);
-      };
+    const handleRowClick: GridEventListener<'cellClick'> = (params) => {
+        if (params.field === 'data' || params.field === 'name' || params.field === 'note') {
+            setSelectedGraph(params.row);
+            setStartNewConcept(true);
+        }
+    };
+
+    const saveSharedGraphToDatabase = (addressToShare: string) => {
+        console.log(graphIdToShare, addressToShare);
+
+        
+    }
     
     if (addressId === undefined) {
         return <div>No address provided</div>
@@ -427,6 +500,7 @@ function Profile() {
                                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                                     <Tab label="Public" {...a11yProps(0)} sx={{color: 'gray'}}  />
                                     <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} onClick={() => !can_edit_profile() && setShowPrompt(true)}/>
+                                    <Tab label="Shared" {...a11yProps(0)} sx={{color: 'gray'}}  />
                                 </Tabs>
                             </Box>
                             {publicGraphs.length > 0 && (
@@ -438,7 +512,7 @@ function Profile() {
                                             pageSize={25}
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
-                                            onRowClick={handleRowClick}
+                                            onCellClick={handleRowClick}
                                             headerHeight={32}
                                             rowHeight={100}
                                         />
@@ -460,7 +534,7 @@ function Profile() {
                                             pageSize={25}
                                             rowsPerPageOptions={[25, 50, 100]}
                                             disableSelectionOnClick
-                                            onRowClick={handleRowClick}
+                                            onCellClick={handleRowClick}
                                             headerHeight={32}
                                             rowHeight={100}
                                         />
@@ -480,7 +554,20 @@ function Profile() {
                             </ShowPromptDialog>
                         </Grid>
                     </Grid>
-
+                    <ShareGraphDialog
+                        openShareGraphDialog={openShareGraphDialog} 
+                        setOpenShareGraphDialog={setOpenShareGraphDialog}
+                        graphName={graphName}
+                        // setGraphName={setGraphName}
+                        // graphNote={graphNote}
+                        // setGraphNote={setGraphNote}
+                        // prevGraphName={graphToLoad ? graphToLoad.name : ''}
+                        // prevGraphNote={graphToLoad ? graphToLoad.note : ''}
+                        // prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
+                        // setIsPrivate={setIsPrivate}
+                        saveSharedGraphToDatabase={saveSharedGraphToDatabase}
+                        >
+                    </ShareGraphDialog>                     
                 </Container>
             </ThemeProvider>
         );
