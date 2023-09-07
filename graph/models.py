@@ -6,6 +6,7 @@ class Graph(models.Model):
     name = models.CharField(max_length=255)
     data = models.TextField()
     note = models.TextField(default="", null=True, blank=True)
+    creator = models.CharField(max_length=255, default="")
     private = models.CharField(max_length=255, default="")
     def __str__(self):
         return self.name

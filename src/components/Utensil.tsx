@@ -917,6 +917,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
         note: graphNote,
         data: data,
+        creator: metaMaskAccount,
         private: isPrivate ? metaMaskAccount : "",
       }).then(response => {
           //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
@@ -931,6 +932,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         name: graphName,
         note: graphNote,
         data: data,
+        creator: metaMaskAccount,
         private: isPrivate ? metaMaskAccount : "",
       });         
     }  

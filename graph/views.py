@@ -93,6 +93,7 @@ def graphs(request, graphId=None):
             name = json_data['name']
             note = json_data['note']
             data = json_data['data']
+            creator = json_data['creator']
             private = json_data['private']
             
             if id is not None:
@@ -100,10 +101,11 @@ def graphs(request, graphId=None):
                 graph.name = name
                 graph.note = note
                 graph.data = data
+                graph.creator = creator
                 graph.private = private
                 graph.save()
             else:
-                graph = Graph.objects.create(name=name, note=note, data=data, private=private)
+                graph = Graph.objects.create(name=name, note=note, data=data, creator=creator, private=private)
             return HttpResponse(json.dumps({'id': graph.id}) ,status=201)
         except KeyError:
             return HttpResponse(status=400) 

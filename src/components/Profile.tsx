@@ -262,10 +262,10 @@ function Profile() {
                 return (
                     <>
                         <Tooltip title={ <React.Fragment>
-                            wqqqqqqqqqqqqqqqqqqqqqqqq456
+                            {params.value === '' ? null : params.value}
                             </React.Fragment>}>
                                 <div style={{padding: '12px'}}>
-                                    {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq456')}
+                                    {params.value === '' ? null : shortenAddress(`${params.value}`)}
                                 </div>
                         </Tooltip>
                     </>                    
