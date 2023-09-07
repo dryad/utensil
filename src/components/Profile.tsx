@@ -176,6 +176,7 @@ function Profile() {
     const { addressId } = useParams() // the addressId parameter from the URL
     const [publicGraphs, setPublicGraphs] = useState([]);
     const [privateGraphs, setPrivateGraphs] = useState([]);
+    const [sharedGraphs, setSharedGraphs] = useState([]);
     const [address, setAddress] = useState<Address>({}); // The address object to display
     const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
     const [value, setValue] = useState(0);
@@ -260,33 +261,13 @@ function Profile() {
             renderCell: (params: GridRenderCellParams<string>) => {
                 return (
                     <>
-                        {params.value && params.value.length >= 50 && 
-                            <Tooltip title={ <React.Fragment>
-                                {params.value}
-                            </React.Fragment>}>
-                                <div style={{padding: '12px'}}>
-                                    {/* { params.value.slice(0, 50)} ... */}
-                                    {/* {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq')} */}
-                                    vb
-                                </div>
-                            </Tooltip>
-                        }
-                        {params.value && params.value.length < 50 && 
-                            <div style={{padding: '12px'}}>
-                                nm
-                                {/* { params.value} */}
-                                {/* {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq')} */}
-                            </div>
-                        }
                         <Tooltip title={ <React.Fragment>
                             wqqqqqqqqqqqqqqqqqqqqqqqq456
                             </React.Fragment>}>
                                 <div style={{padding: '12px'}}>
-                                    {/* { params.value.slice(0, 50)} ... */}
                                     {shortenAddress('wqqqqqqqqqqqqqqqqqqqqqqqq456')}
-                                    {/* vb */}
                                 </div>
-                            </Tooltip>
+                        </Tooltip>
                     </>                    
                 )
             },
@@ -349,12 +330,22 @@ function Profile() {
             axios.get(`/api/graphs/private/?private=${addressId}`).then((response) => {
                 const { data: privateData } = response;
                 setPrivateGraphs(privateData);
-            })          
+            })  
         } 
     },[metaMaskAccount, address, startNewConcept, setStartNewConcept])
+
+    useEffect(() => {
+        if (can_edit_profile()) {
+            axios.get(`/api/graphs/shared/?address=${addressId}`).then((response) => {
+                const { data: sharedData } = response;
+                setSharedGraphs(sharedData);
+            })         
+        } 
+    },[metaMaskAccount, address, openShareGraphDialog, setOpenShareGraphDialog])
     
-    console.log('private graphs', privateGraphs)
-    console.log('public graphs', publicGraphs)
+    console.log('private graphs', privateGraphs);
+    console.log('public graphs', publicGraphs);
+    console.log('shared graphs', sharedGraphs);
 
     const getAddress = async () => {
         const { data } = await axios.get(`/api/address/${addressId}/`);
@@ -392,10 +383,16 @@ function Profile() {
         }
     };
 
-    const saveSharedGraphToDatabase = (addressToShare: string) => {
-        console.log(graphIdToShare, addressToShare);
-
+    const saveSharedGraphToDatabase = async(addressToShare: string) => {
         
+        await axios.post("api/graphs/shared/", {
+            address: addressToShare, 
+            graphId: graphIdToShare,
+          }).then(response => {
+              if (response.data.id) {
+                console.log('Saved info to the database with this id: ', response.data.id);
+              }
+            });    
     }
     
     if (addressId === undefined) {
@@ -543,6 +540,28 @@ function Profile() {
                             )}
                             { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
                                 <TabPanel value={value} index={1}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                    </div>
+                                </TabPanel>
+                            )}
+                            { can_edit_profile() && sharedGraphs.length > 0 && (
+                                <TabPanel value={value} index={2}>
+                                    <div style={{ height: '1000px', width: '100%' }}>
+                                        <StyledDataGrid
+                                            rows={sharedGraphs}
+                                            columns={columns}
+                                            pageSize={25}
+                                            rowsPerPageOptions={[25, 50, 100]}
+                                            disableSelectionOnClick
+                                            onCellClick={handleRowClick}
+                                            headerHeight={32}
+                                            rowHeight={100}
+                                        />
+                                    </div>
+                                </TabPanel>
+                            )}
+                            { (!can_edit_profile() || (can_edit_profile() && sharedGraphs.length === 0)) && (
+                                <TabPanel value={value} index={2}>
                                     <div style={{ height: '1000px', width: '100%' }}>
                                     </div>
                                 </TabPanel>

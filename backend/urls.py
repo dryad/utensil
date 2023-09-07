@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/graphs/', views.graphs),
     path('api/graphs/private/', views.privateGraphs),
     path('api/graphs/public/', views.publicGraphs),
+    path('api/graphs/shared/', views.sharedGraphs),
     path('api/graphs/<int:graphId>/', views.graphs),
     path('api/address/<str:addressId>/', views.address),
     re_path('.*', TemplateView.as_view(template_name='index.html')),

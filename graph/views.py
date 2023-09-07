@@ -1,11 +1,12 @@
-from .serializers import GraphSerializer, AddressSerializer
-from .models import Graph, Address
+from .serializers import GraphSerializer, AddressSerializer, SharedGraphsSerializer
+from .models import Graph, Address, SharedGraphs
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 import json, base64
 from django.core.files.base import ContentFile
+from django.core.exceptions import ObjectDoesNotExist
 
 @csrf_exempt
 def address(request, addressId=None):
@@ -130,3 +131,24 @@ def publicGraphs(request):
         graphs = Graph.objects.filter(private__in=["", 1])
         serializer = GraphSerializer(graphs, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+@csrf_exempt
+def sharedGraphs(request):
+    if request.method == 'GET':
+        address_query = request.GET.get('address')
+        graph_ids = SharedGraphs.objects.filter(address__exact=address_query).values_list('graphId', flat=True)
+        shared_graphs = Graph.objects.filter(id__in=graph_ids)
+        serializer = GraphSerializer(shared_graphs, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'POST':
+        json_data = json.loads(request.body)
+        try:
+            address = json_data['address']
+            graphId = json_data['graphId']
+            ob = SharedGraphs.objects.get(address=address, graphId=graphId)            
+        except ObjectDoesNotExist:
+            sharedGraph = SharedGraphs.objects.create(address=address, graphId=graphId)
+            return HttpResponse(json.dumps({'id': sharedGraph.id}) ,status=201)
+        return HttpResponse(status=202)
+    else:
+        return HttpResponse(status=405)

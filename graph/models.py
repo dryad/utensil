@@ -9,6 +9,12 @@ class Graph(models.Model):
     private = models.CharField(max_length=255, default="")
     def __str__(self):
         return self.name
+
+class SharedGraphs(models.Model):
+    address = models.TextField()
+    graphId = models.IntegerField()
+    def __str__(self):
+        return self.address
             
 class Address(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
