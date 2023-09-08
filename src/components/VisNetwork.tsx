@@ -433,6 +433,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           
         nodeRef.current = node;
 
+        if (node.hasOwnProperty('isUneditable') && node.isUneditable) {
+          return;
+        }
+
         setNodeDialogTitle("Edit Node");
         setNodeDialogLabel(node.label);
         setNodeDialogOpen(true);

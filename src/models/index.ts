@@ -24,6 +24,7 @@ export type TreeNode = {
   subGraphData?: string | undefined;
   name?: string | undefined;
   subGraphId?: number | undefined;
+  isUneditable?: boolean;
   opacity: number;
   shape?: string | undefined;
   font?: {

@@ -79,6 +79,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         if (el.level === maxLevelOfNodes && !el.isLabelNode) {
           el.subGraphId = selectedGraph.id;
         }
+        if (el.opacity === 1) {
+          el.isUneditable = true;
+        }
+        
         return el;
       })
       
@@ -335,6 +339,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         if (el.level === maxLevelOfNodes && !el.isLabelNode) {
           el.subGraphId = graphToLoad.id;
         }
+        if (el.opacity === 1) {
+          el.isUneditable = true;
+        }
+
         return el;
       })
 
@@ -517,6 +525,11 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         if (el.level === maxLevelOfNodes && !el.isLabelNode) {
           el.subGraphId = graphToLoad.id;
         }
+
+        if (el.opacity === 1) {
+          el.isUneditable = true;
+        }
+
         return el;
       })
       
