@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import VisCustomNetwork from "../libs/vis-custom-network";
-import { TreeNode, Edge } from "models";
+import { TreeNode, Edge, Graph } from "models";
 import * as functions from '../functions';
 import functionalGraphData from "../functions/functionalGraphIds.json"; 
 
@@ -26,7 +26,7 @@ export const useComputeFunctionalGraph = (networkRef: React.MutableRefObject<Vis
                     };
 
                     let functionName = functionalGraphData[node.subGraphId?.toString() as keyof typeof functionalGraphData];
-                                                     
+                                                   
                     functionName && functions[functionName as keyof typeof functions](node, inputGraphData);
                 }    
             }

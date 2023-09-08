@@ -5,6 +5,8 @@ import { exponentiation } from './exponentiation';
 import { division } from './division';
 import { dateIsExpired } from './dateIsExpired';
 import { dateIsValid } from './dateIsValid';
+import { logarithm }  from './logarithm';
+import { naturalLogarithm } from './naturalLogarithm';
 
 export {
     addition,
@@ -14,4 +16,6 @@ export {
     division,
     dateIsExpired,
     dateIsValid,
+    logarithm,
+    naturalLogarithm
 };

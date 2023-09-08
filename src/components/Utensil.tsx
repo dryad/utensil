@@ -71,6 +71,17 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   useEffect(() => {
     if (selectedGraph) {
       const data = JSON.parse(selectedGraph.data);
+      
+      const nodesLevels = data.nodes.map((el: TreeNode) => el.level);
+      const maxLevelOfNodes = Math.max(...nodesLevels);
+
+      data.nodes.map((el: TreeNode) => {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+          el.subGraphId = selectedGraph.id;
+        }
+        return el;
+      })
+      
       networkRef.current?.setData(data);
       setGraphName(selectedGraph.name);
       setGraphNote(selectedGraph.note);
@@ -305,7 +316,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       }
     }
   };
-
+  
   const confirmReplaceGraph = () => {
     if (graphToLoad) {      
       const graph = graphToLoad; // graphToLoad is a React state string of the graph to be loaded. It is set before the confirm box is opened.

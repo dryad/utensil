@@ -5,5 +5,7 @@
     "169": "exponentiation",
     "170": "division",
     "171": "dateIsExpired",
-    "172": "dateIsValid"
+    "172": "dateIsValid",
+    "178": "logarithm",
+    "179": "naturalLogarithm"
 }

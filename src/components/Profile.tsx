@@ -577,13 +577,6 @@ function Profile() {
                         openShareGraphDialog={openShareGraphDialog} 
                         setOpenShareGraphDialog={setOpenShareGraphDialog}
                         graphName={graphName}
-                        // setGraphName={setGraphName}
-                        // graphNote={graphNote}
-                        // setGraphNote={setGraphNote}
-                        // prevGraphName={graphToLoad ? graphToLoad.name : ''}
-                        // prevGraphNote={graphToLoad ? graphToLoad.note : ''}
-                        // prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
-                        // setIsPrivate={setIsPrivate}
                         saveSharedGraphToDatabase={saveSharedGraphToDatabase}
                         >
                     </ShareGraphDialog>                     
