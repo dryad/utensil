@@ -1006,7 +1006,45 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   }, []);
 
   return (
-    <Container>
+    <>
+      <div 
+        style={{
+          display:'flex',alignItems:'center', height: '100%'
+        }}
+      >
+        <NetworkButtons
+          networkRef={networkRef}
+          onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
+          undoDisabled={historyListBack.length <= 1}
+          redoDisabled={historyListForward.length === 0}
+          onUndo={onUndo}
+          onRedo={onRedo}
+          buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
+        />
+        <VisNetwork
+          networkRef={networkRef}
+          addNodeComplete={addNodeComplete}
+          addEdgeComplete={addEdgeComplete}
+          historyListBack={historyListBack}
+          historyListForward={historyListForward}
+          historyListBackRef={historyListBackRef}
+          setIsUserDragging={setIsUserDraggingGlobal}
+          stringifyGraph={stringifyGraph}
+          deleteIfDeleteMode={deleteIfDeleteMode}
+          setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
+          addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+          buttonModeRef={buttonModeRef}
+          hoveredNodes={hoveredNodesRef}
+          setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+          selectedNodes={selectedNodesRef}
+          setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+          graphs={publicPrivateGraphs}
+          handleGraphImport={handleGraphImport}
+        />
+      </div>
+    
+    
+    {/* <Container>
       <Grid container spacing={startNewConcept ? 2 : 0} >
         <Grid item xs={selectedGraph ? 2 : 'auto'}>
           <Paper>
@@ -1019,48 +1057,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
               onRedo={onRedo}
               buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
             />
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                '& > *': {
-                  m: 0,
-                },
-              }}
-            >
-              <ButtonGroup orientation="vertical">
-                {(!startNewConcept || (startNewConcept && selectedGraph)) &&
-                  <Button 
-                    variant="outlined" 
-                    color="primary" 
-                    onClick={handleSave} 
-                    sx={{ 'margin-bottom': 'unset' }} 
-                    disabled={graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1}
-                  >
-                    Save
-                  </Button>
-                }
-                <Button 
-                  variant="outlined" 
-                  color="primary" 
-                  onClick={() => {setIsPrivate(false); setOpenSaveGraphDialog(true)}}
-                  sx={{color: startNewConcept ? '#1976d2' : '', border: startNewConcept ? '1px solid #1976d2' : ''}}
-                >
-                  Save As New
-                </Button>
-                {/* <Button variant="outlined" color="primary" onClick={handleClearGraph}>
-                  Clear Graph
-                </Button> */}
-                { address_is_whitelisted() && (
-                  <>
-                  <Button variant="outlined" color="primary" onClick={testButton}>
-                    Test
-                  </Button>
-                  Graph ID: {graphId}
-                  </>
-                )}                
-              </ButtonGroup>
-            </Box>
           </Paper>
         </Grid>
         <Grid item xs={7}>
@@ -1258,7 +1254,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           </Grid>
         }  
       </Grid>
-    </Container>
+    </Container> */}
+    </>
   );
 }
 

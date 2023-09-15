@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { HomeIcon, FileIcon } from '../assets/icons/svg';
+import { THEME_COLORS } from "constants/colors";
 
 function PageSwitcher() {
     let navigate = useNavigate();
@@ -26,7 +27,7 @@ function PageSwitcher() {
                 width:'106px', 
                 height:'55px', 
                 borderRadius: '45px', 
-                background:'white',
+                background: THEME_COLORS.get("white"),
                 display:'flex',
                 justifyContent:'center',
                 alignItems:'center',
@@ -41,8 +42,8 @@ function PageSwitcher() {
                     display:'flex',
                     justifyContent:'center',
                     alignItems:'center',
-                    background: page === '/profile' ? '#4b5563' : 'white',
-                    color: page === '/profile' ? 'white' : '#191919'
+                    background: page === '/profile' ? THEME_COLORS.get("darkGray") : THEME_COLORS.get("white"),
+                    color: page === '/profile' ? THEME_COLORS.get("white") : THEME_COLORS.get("black")
                 }}
                 onClick={(e) => togglePage(e, '/profile')}
             >
@@ -56,8 +57,8 @@ function PageSwitcher() {
                     display:'flex',
                     justifyContent:'center',
                     alignItems:'center',
-                    background: page === '/utensil' ? '#4b5563' : 'white',
-                    color: page === '/utensil' ? 'white' : '#191919'
+                    background: page === '/utensil' ? THEME_COLORS.get("darkGray") : THEME_COLORS.get("white"),
+                    color: page === '/utensil' ? THEME_COLORS.get("white") : THEME_COLORS.get("black")
                 }}
                 onClick={(e) => togglePage(e, '/utensil')}
             >

@@ -9,3 +9,12 @@ export const NODE_COLORS = [
     blue.A200, // 5
     purple.A200 // 6
 ]
+
+export const THEME_COLORS = new Map([
+    ["darkGray", '#4b5563'],
+    ["blue", '#3b82f6'],
+    ["black", '#191919'],
+    ["lightGray", '#d9d9d9'],
+    ["totalBlack", '#000'],
+    ["white", '#fff']
+  ]);
