@@ -30,6 +30,8 @@ import WhitelistedAddresses from "../components/WhitelistedAddresses";
 import { contractAction } from "../components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
 import { useComputeFunctionalGraph } from '../hooks/useComputeFunctionalGraph';
+import EmptyStatePopUp from '../components/EmptyStatePopUp';
+import ZoomActions from '../components/ZoomActions';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -67,6 +69,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+  const [isEmptyState, setIsEmptyState] = useState(true);
+  const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   
   useEffect(() => {
     if (selectedGraph) {
@@ -143,10 +147,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     return WhitelistedAddresses.includes(metaMaskAccount);
   }
 
-  useEffect(() => {
-    // console.log('new historyListBack', historyListBack);
-    treeTraversal(); // run treeTraversal every time an Undo step is added.
-  }, [historyListBack]);
+  // useEffect(() => {
+  //   // console.log('new historyListBack', historyListBack);
+  //   treeTraversal(); // run treeTraversal every time an Undo step is added.
+  // }, [historyListBack]);
 
   useEffect(() => {
     // console.log('new historyListForward', historyListForward);
@@ -1005,6 +1009,13 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     initializeUndoTimer();    
   }, []);
 
+  useEffect(() => {
+      
+      if (isAddShapeButtonClicked && !isEmptyState) {
+          onButton('node');
+      }
+  }, [isAddShapeButtonClicked, isEmptyState])
+
   return (
     <>
       <div 
@@ -1021,26 +1032,60 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onRedo={onRedo}
           buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
         />
-        <VisNetwork
-          networkRef={networkRef}
-          addNodeComplete={addNodeComplete}
-          addEdgeComplete={addEdgeComplete}
-          historyListBack={historyListBack}
-          historyListForward={historyListForward}
-          historyListBackRef={historyListBackRef}
-          setIsUserDragging={setIsUserDraggingGlobal}
-          stringifyGraph={stringifyGraph}
-          deleteIfDeleteMode={deleteIfDeleteMode}
-          setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
-          addEdgeDirectedOrNot={addEdgeDirectedOrNot}
-          buttonModeRef={buttonModeRef}
-          hoveredNodes={hoveredNodesRef}
-          setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
-          selectedNodes={selectedNodesRef}
-          setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
-          graphs={publicPrivateGraphs}
-          handleGraphImport={handleGraphImport}
-        />
+        {isEmptyState &&
+          <div 
+            style={{display:'flex', justifyContent:'center', width: '100%'}}
+          >
+            <EmptyStatePopUp 
+              setIsEmptyState={setIsEmptyState}
+              setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
+            />
+          </div>
+          
+        }
+        {!isEmptyState && 
+          <VisNetwork
+            networkRef={networkRef}
+            addNodeComplete={addNodeComplete}
+            addEdgeComplete={addEdgeComplete}
+            historyListBack={historyListBack}
+            historyListForward={historyListForward}
+            historyListBackRef={historyListBackRef}
+            setIsUserDragging={setIsUserDraggingGlobal}
+            stringifyGraph={stringifyGraph}
+            deleteIfDeleteMode={deleteIfDeleteMode}
+            setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
+            addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+            buttonModeRef={buttonModeRef}
+            hoveredNodes={hoveredNodesRef}
+            setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+            selectedNodes={selectedNodesRef}
+            setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+            graphs={publicPrivateGraphs}
+            handleGraphImport={handleGraphImport}
+          />
+        }
+        <ZoomActions />
+        {/* <VisNetwork
+            networkRef={networkRef}
+            addNodeComplete={addNodeComplete}
+            addEdgeComplete={addEdgeComplete}
+            historyListBack={historyListBack}
+            historyListForward={historyListForward}
+            historyListBackRef={historyListBackRef}
+            setIsUserDragging={setIsUserDraggingGlobal}
+            stringifyGraph={stringifyGraph}
+            deleteIfDeleteMode={deleteIfDeleteMode}
+            setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
+            addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+            buttonModeRef={buttonModeRef}
+            hoveredNodes={hoveredNodesRef}
+            setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+            selectedNodes={selectedNodesRef}
+            setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+            graphs={publicPrivateGraphs}
+            handleGraphImport={handleGraphImport}
+          /> */}
       </div>
     
     

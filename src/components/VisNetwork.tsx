@@ -476,9 +476,11 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
     }, [networkRef]);
 
+    const canvasHeight = (window.innerHeight - 80).toString() + 'px';
+
     return (
       <>
-        <div ref={domRef} style={{ height: `480px`, width: `100%` }} />
+        <div ref={domRef} style={{ height: canvasHeight, width: `100%` }} />
         <NodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}

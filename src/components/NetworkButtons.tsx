@@ -50,38 +50,6 @@ export default function NetworkButtons(props: Props) {
         },       
     }))
 
-    // const StyledActionToggleButton = styled(ToggleButton)(({ theme }) => ({
-    //     height: '47px',
-    //     width: '47px',
-    //     background: 'white', 
-    //     color: THEME_COLORS.get("darkGray"),
-    //     border: 'none',
-    //     borderRadius: '4px',
-    //     padding: '5px',
-    //     ':hover': {
-    //         border: 'none',
-    //         borderRadius: '4px',
-    //         background: THEME_COLORS.get("blue"),
-    //         color: 'white'
-    //     },
-    //     ':hover&.Mui-selected': {
-    //         border: 'none',
-    //         borderRadius: '4px',
-    //         backgroundColor: THEME_COLORS.get("blue"),
-    //         color: 'white'
-    //     },
-    //     '&.Mui-selected': {
-    //         border: 'none',
-    //         borderRadius: '4px',
-    //         backgroundColor: THEME_COLORS.get("blue"),
-    //         color: 'white'
-    //     },  
-    //     '&.Mui-disabled': {
-    //         border: 'none',
-    //         borderRadius: '4px',
-    //     },       
-    // }))
-
     const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
         padding: '4px',
         backgroundColor: 'white',
@@ -100,12 +68,6 @@ export default function NetworkButtons(props: Props) {
         backgroundColor: 'white',
         display: 'flex',
         gap: '2px',
-        // '.MuiToggleButtonGroup-grouped:not(:last-of-type)': {
-        //     borderRadius: '4px',
-        // },
-        // '.MuiToggleButtonGroup-grouped:not(:first-of-type)': {
-        //     borderRadius: '4px',
-        // },
     }));
 
     const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
