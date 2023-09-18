@@ -30,6 +30,7 @@ import WhitelistedAddresses from "../components/WhitelistedAddresses";
 import { contractAction } from "../components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
 import { useComputeFunctionalGraph } from '../hooks/useComputeFunctionalGraph';
+import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
 import EmptyStatePopUp from '../components/EmptyStatePopUp';
 import ZoomActions from '../components/ZoomActions';
 
@@ -1014,7 +1015,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       if (isAddShapeButtonClicked && !isEmptyState) {
           onButton('node');
       }
-  }, [isAddShapeButtonClicked, isEmptyState])
+  }, [isAddShapeButtonClicked, isEmptyState]);
+
+  // useKeyDownHandler(onButton);
 
   return (
     <>

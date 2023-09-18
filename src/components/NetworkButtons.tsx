@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import { Stack, Tooltip, TooltipProps, tooltipClasses } from "@mui/material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -6,6 +6,7 @@ import VisCustomNetwork from "libs/vis-custom-network";
 import { THEME_COLORS } from "constants/colors";
 import { HandIcon, CursorIcon, CircleIcon, ArrowTopRightIcon, TextIcon, ContractionIcon, ExpansionIcon, UndoIcon, RedoIcon } from '../assets/icons/svg';
 import { styled } from '@mui/material/styles';
+import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
 
 type Props = {
     networkRef: React.MutableRefObject<VisCustomNetwork | null>;
@@ -87,27 +88,13 @@ export default function NetworkButtons(props: Props) {
         },       
     });
     
-    const escFunction = useCallback((event) => {
-        if(event.keyCode === 27) { //Escape key
-            setPanMode();
-        }
-    }, []);
-    const setPanMode = () => {
-        props.onButton('pan');
-    }
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
         if (nextMode !== null) { //disallow unselecting an item. 
             props.onButton(nextMode); // Tell Utensil.tsx to change the button mode
         }
     };
    
-    useEffect(() => {
-        document.addEventListener("keydown", escFunction, false);
-    
-        return () => {
-          document.removeEventListener("keydown", escFunction, false);
-        };
-    }, []);
+    useKeyDownHandler(props.onButton);
 
     const Wire = ({ children, ...props }: any) => children(props);
 

@@ -159,3 +159,8 @@ div.vis-network button.vis-close {
   -ms-user-select: none;
   user-select: none;
 }
+
+.canvasWindow div:focus-visible {
+  outline: none;
+  border: none;
+}

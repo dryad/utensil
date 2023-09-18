@@ -480,7 +480,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
     return (
       <>
-        <div ref={domRef} style={{ height: canvasHeight, width: `100%` }} />
+        <div ref={domRef} style={{ height: canvasHeight, width: `100%` }} className="canvasWindow"/>
         <NodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}
