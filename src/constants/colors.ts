@@ -1,7 +1,7 @@
 import { red, orange, yellow, green, blue, purple } from '@mui/material/colors';
 
 export const NODE_COLORS = [
-    "#333", // 0
+    "#4b5563", // 0
     red.A200, // 1
     orange.A200, // 2
     yellow.A200, // 3
@@ -16,5 +16,8 @@ export const THEME_COLORS = new Map([
     ["black", '#191919'],
     ["lightGray", '#d9d9d9'],
     ["totalBlack", '#000'],
-    ["white", '#fff']
+    ["white", '#fff'],
+    ["gray", '#9ca3af']
   ]);
+
+  

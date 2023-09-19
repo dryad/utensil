@@ -4,7 +4,7 @@ import UtensilNavbar from './UtensilNavbar';
 import Logo from '../components/Logo';
 import PageSwitcher from '../components/PageSwitcher';
 
-function Navbar() {
+function Navbar(props: any) {
   const location = useLocation();
 	const path = location.pathname.split('/')[1];
 
@@ -23,7 +23,10 @@ function Navbar() {
           <PageSwitcher />
       </div>
       <div >
-          {path === 'profile' ? <ProfileNavbar /> : <UtensilNavbar />}
+          {path === 'profile' 
+            ? <ProfileNavbar /> 
+            : <UtensilNavbar getMetaMaskAccount={props.getMetaMaskAccount}/>
+          }
       </div>
     </div>
   )

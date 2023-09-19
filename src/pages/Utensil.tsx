@@ -33,6 +33,7 @@ import { useComputeFunctionalGraph } from '../hooks/useComputeFunctionalGraph';
 import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
 import EmptyStatePopUp from '../components/EmptyStatePopUp';
 import ZoomActions from '../components/ZoomActions';
+import Navbar from "layout/Navbar";
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -113,7 +114,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         let newHistory : string = stringifyGraph();
         let newHistoryObject = JSON.parse(newHistory);
         let lastHistory : string = historyListBackRef.current[0];
-        
         //remove isUndoStep field from lastHistory JSON string, because for the first comparison we just want to see if the graph has changed.
         if (lastHistory) {
           let lastHistoryObject = JSON.parse(lastHistory);
@@ -148,10 +148,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     return WhitelistedAddresses.includes(metaMaskAccount);
   }
 
-  // useEffect(() => {
-  //   // console.log('new historyListBack', historyListBack);
-  //   treeTraversal(); // run treeTraversal every time an Undo step is added.
-  // }, [historyListBack]);
+  useEffect(() => {
+    // console.log('new historyListBack', historyListBack);
+    treeTraversal(); // run treeTraversal every time an Undo step is added.
+  }, [historyListBack]);
 
   useEffect(() => {
     // console.log('new historyListForward', historyListForward);
@@ -194,10 +194,16 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   }
 
   const treeTraversal = async () => {
-
+    
     let treeText = "";
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
-    const edges = networkRef.current?.edges.get(); // get all edges from the network.
+    let edges = networkRef.current?.edges.get(); // get all edges from the network.
+    // if (!nodes) {
+    //   nodes = []
+    // };
+    // if (!edges) {
+    //   edges = []
+    // };
     const positions = networkRef.current?.network.getPositions();
     console.log('all nodes: ', nodes)
     console.log('all edges: ', edges)
@@ -683,8 +689,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     } 
   };
 
-
   const onUndo = () => {
+    
     if (historyListBack.length > 1) {
       const newHistoryForward : string = stringifyGraph();
 
@@ -794,8 +800,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             };
             const subGraph = JSON.stringify(subGraphObject);
             const nodeName = foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';
-                        
+                          
             const updatedNodes = externalGraphData.nodes.map((el: any) => {
+              
               if (el.id === externalGraphData.nodeId) {
                 el.label = nodeName;
                 el.font = {color: "#fff"};
@@ -1021,32 +1028,26 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
 
   return (
     <>
-      <div 
-        style={{
-          display:'flex',alignItems:'center', height: '100%'
-        }}
-      >
-        <NetworkButtons
-          networkRef={networkRef}
-          onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
-          undoDisabled={historyListBack.length <= 1}
-          redoDisabled={historyListForward.length === 0}
-          onUndo={onUndo}
-          onRedo={onRedo}
-          buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
+      <nav>
+        <Navbar 
+          getMetaMaskAccount={getMetaMaskAccount}
         />
-        {isEmptyState &&
-          <div 
-            style={{display:'flex', justifyContent:'center', width: '100%'}}
-          >
-            <EmptyStatePopUp 
-              setIsEmptyState={setIsEmptyState}
-              setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
-            />
-          </div>
-          
-        }
-        {!isEmptyState && 
+      </nav>
+      <main style={{ width: '100%', flex: '1 1 auto' }}>
+        <div 
+          style={{
+            display:'flex',alignItems:'center', height: '100%'
+          }}
+        >
+          <NetworkButtons
+            networkRef={networkRef}
+            onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
+            undoDisabled={historyListBack.length <= 1}
+            redoDisabled={historyListForward.length === 0}
+            onUndo={onUndo}
+            onRedo={onRedo}
+            buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
+          />
           <VisNetwork
             networkRef={networkRef}
             addNodeComplete={addNodeComplete}
@@ -1067,8 +1068,86 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             graphs={publicPrivateGraphs}
             handleGraphImport={handleGraphImport}
           />
-        }
-        <ZoomActions />
+          {isEmptyState &&
+            <div 
+              style={{position:'absolute', left:'50%', top:'50%', transform: 'translate(-50%, -50%)'}}
+            >
+              <EmptyStatePopUp 
+                setIsEmptyState={setIsEmptyState}
+                setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
+              />
+            </div>
+          }
+          <ZoomActions />
+        </div>
+      </main>
+      {/* <div 
+        style={{
+          display:'flex',alignItems:'center', height: '100%'
+        }}
+      >
+        <NetworkButtons
+          networkRef={networkRef}
+          onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
+          undoDisabled={historyListBack.length <= 1}
+          redoDisabled={historyListForward.length === 0}
+          onUndo={onUndo}
+          onRedo={onRedo}
+          buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
+        />
+        <VisNetwork
+          networkRef={networkRef}
+          addNodeComplete={addNodeComplete}
+          addEdgeComplete={addEdgeComplete}
+          historyListBack={historyListBack}
+          historyListForward={historyListForward}
+          historyListBackRef={historyListBackRef}
+          setIsUserDragging={setIsUserDraggingGlobal}
+          stringifyGraph={stringifyGraph}
+          deleteIfDeleteMode={deleteIfDeleteMode}
+          setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
+          addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+          buttonModeRef={buttonModeRef}
+          hoveredNodes={hoveredNodesRef}
+          setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+          selectedNodes={selectedNodesRef}
+          setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+          graphs={publicPrivateGraphs}
+          handleGraphImport={handleGraphImport}
+        />
+        {isEmptyState &&
+          <div 
+            style={{position:'absolute', left:'50%', top:'50%', transform: 'translate(-50%, -50%)'}}
+          >
+            <EmptyStatePopUp 
+              setIsEmptyState={setIsEmptyState}
+              setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
+            />
+          </div>
+        } */}
+        {/* {!isEmptyState && 
+          <VisNetwork
+            networkRef={networkRef}
+            addNodeComplete={addNodeComplete}
+            addEdgeComplete={addEdgeComplete}
+            historyListBack={historyListBack}
+            historyListForward={historyListForward}
+            historyListBackRef={historyListBackRef}
+            setIsUserDragging={setIsUserDraggingGlobal}
+            stringifyGraph={stringifyGraph}
+            deleteIfDeleteMode={deleteIfDeleteMode}
+            setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
+            addEdgeDirectedOrNot={addEdgeDirectedOrNot}
+            buttonModeRef={buttonModeRef}
+            hoveredNodes={hoveredNodesRef}
+            setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
+            selectedNodes={selectedNodesRef}
+            setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
+            graphs={publicPrivateGraphs}
+            handleGraphImport={handleGraphImport}
+          />
+        } */}
+        {/* <ZoomActions /> */}
         {/* <VisNetwork
             networkRef={networkRef}
             addNodeComplete={addNodeComplete}
@@ -1089,7 +1168,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             graphs={publicPrivateGraphs}
             handleGraphImport={handleGraphImport}
           /> */}
-      </div>
+      {/* </div> */}
     
     
     {/* <Container>

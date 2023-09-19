@@ -6,6 +6,7 @@ import NodeDialog from "./NodeDialog";
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
+import Circle from '../assets/icons/circle.svg';
 
 type INetworkProps = {
   networkRef: any;
@@ -393,9 +394,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           nodeRef.current = node;
           if (!node.level) {
             node.level = 0;
-            node.color = NODE_COLORS[node.level];
+            node.shape = 'image';
+            node.image = Circle;
             node.font = { color: "#fff" };
-            node.opacity = 0;
+            node.opacity = 1;
           }
           node.label = "";          
           networkRef.current?.triggerEvent("node-added", {

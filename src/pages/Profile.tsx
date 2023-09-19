@@ -25,6 +25,7 @@ import ShowPromptDialog from '../components/ShowPromptDialog';
 import ProfileGraphItem from '../components/ProfileGraphItem';
 import ShareIcon from '@mui/icons-material/ShareOutlined';
 import ShareGraphDialog from "../components/ShareGraphDialog";
+import Navbar from "layout/Navbar";
 
 interface TabPanelProps {
     children?: ReactNode;
@@ -394,196 +395,207 @@ function Profile() {
               }
             });    
     }
-    
-    if (addressId === undefined) {
-        return <div>No address provided</div>
-    }
-    else {
-        return (
-            <ThemeProvider theme={theme}>
-                <Container maxWidth="xl">
-                    <Grid
-                        container
-                        spacing={2}
-                        textAlign="center"
-                        style={{ borderBottom: '1px solid ##2d2d2d' }}
-                        marginTop={1}
-                        marginBottom={4}
-                    >
-                        <Grid item xs={2}>
-                            <Typography variant="h6" onClick={() => navigate("/")} sx={{cursor: 'pointer'}}>
-                                dryad
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={8}>
-
-                        </Grid>
-                        <Grid item xs={2}>
-                            <MetaMaskButton />
-                        </Grid>
-                    </Grid>
-                    <Grid
-                        container
-                        spacing={2}
-                        textAlign="center"
-                    >
+    return (
+        <ThemeProvider theme={theme}>
+            <nav>
+                <Navbar />
+            </nav>
+            <main style={{ width: '100%', flex: '1 1 auto' }}>
+                <div 
+                style={{
+                    display:'flex',alignItems:'center', height: '100%'
+                }}
+                >
+                    {addressId === undefined && 
+                        <div>No address provided</div>
+                    }
+                    {addressId &&
+                        <Container maxWidth="xl">
                         <Grid
-                            item
-                            xs={2}
-                            style={{ border: '1px solid #2d2d2d', borderRadius: '10px' }}
+                            container
+                            spacing={2}
+                            textAlign="center"
+                            style={{ borderBottom: '1px solid ##2d2d2d' }}
+                            marginTop={1}
+                            marginBottom={4}
                         >
-                            <Stack alignItems={"center"} spacing={0.5}>
-                                {address.avatar_url && 
-                                    <Avatar src={`${address.avatar_url}`} sx={{ width: 100, height: 100 }} />
-                                }
-                                {!address.avatar_url &&
-                                    <Avatar sx={{ width: 100, height: 100 }} />
-                                }
-                                <Typography variant="h6">
-                                    { address.name == undefined ? 'unnamed' : address.name}
+                            <Grid item xs={2}>
+                                <Typography variant="h6" onClick={() => navigate("/")} sx={{cursor: 'pointer'}}>
+                                    dryad
                                 </Typography>
-                                <Typography variant="h8">
-                                    { address.address && (shortenAddress(address.address))}
-                                </Typography>
-                                <Typography variant="h8" sx={{'color': '#888', 'wordBreak': 'break-all', 'pt': 2, 'pb': 2}}>
-                                    { address.about ? address.about : ''}
-                                </Typography>
-                                { can_edit_profile() && (
-                                    <Button
-                                        variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
-                                        onClick={() => {
-                                            navigate("/profile/edit");
-                                        }}
-                                    >
-                                        Edit Profile
-                                    </Button>
-                                )}
-                            </Stack>
+                            </Grid>
+                            <Grid item xs={8}>
+    
+                            </Grid>
+                            <Grid item xs={2}>
+                                <MetaMaskButton />
+                            </Grid>
                         </Grid>
-                        <Grid item xs={10}>
-                            <Stack direction="row" display="flex" justifyContent="space-between">
-                                <Typography variant="h6">
-                                    Concepts
-                                </Typography>
-                                { can_edit_profile() && (
-                                    <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
-                                        onClick={toggleDrawer(true, null)}
-                                    >
-                                        Start new concept
-                                    </Button>
-                                )}    
-                                <ThemeProvider theme={utensilTheme}>
-                                    <Drawer
-                                        anchor={"right"}
-                                        open={startNewConcept}
-                                        onClose={toggleDrawer(false, null)}
-                                        hideBackdrop={true}
-                                    >
-                                        <div 
-                                            style={{
-                                                width: '84vw', 
-                                                padding: '2rem',
-                                                backgroundColor: '#211f24', 
-                                                height: '100vh',
-                                                overflowY: 'auto'
+                        <Grid
+                            container
+                            spacing={2}
+                            textAlign="center"
+                        >
+                            <Grid
+                                item
+                                xs={2}
+                                style={{ border: '1px solid #2d2d2d', borderRadius: '10px' }}
+                            >
+                                <Stack alignItems={"center"} spacing={0.5}>
+                                    {address.avatar_url && 
+                                        <Avatar src={`${address.avatar_url}`} sx={{ width: 100, height: 100 }} />
+                                    }
+                                    {!address.avatar_url &&
+                                        <Avatar sx={{ width: 100, height: 100 }} />
+                                    }
+                                    <Typography variant="h6">
+                                        { address.name == undefined ? 'unnamed' : address.name}
+                                    </Typography>
+                                    <Typography variant="h8">
+                                        { address.address && (shortenAddress(address.address))}
+                                    </Typography>
+                                    <Typography variant="h8" sx={{'color': '#888', 'wordBreak': 'break-all', 'pt': 2, 'pb': 2}}>
+                                        { address.about ? address.about : ''}
+                                    </Typography>
+                                    { can_edit_profile() && (
+                                        <Button
+                                            variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
+                                            onClick={() => {
+                                                navigate("/profile/edit");
                                             }}
                                         >
-                                            <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept} selectedGraph={selectedGraph}/>
-                                        </div>  
-                                    </Drawer>
-                                </ThemeProvider>                            
-                            </Stack>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                                    <Tab label="Public" {...a11yProps(0)} sx={{color: 'gray'}}  />
-                                    <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} onClick={() => !can_edit_profile() && setShowPrompt(true)}/>
-                                    <Tab label="Shared" {...a11yProps(0)} sx={{color: 'gray'}}  />
-                                </Tabs>
-                            </Box>
-                            {publicGraphs.length > 0 && (
-                                <TabPanel value={value} index={0}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                        <StyledDataGrid
-                                            rows={publicGraphs}
-                                            columns={columns}
-                                            pageSize={25}
-                                            rowsPerPageOptions={[25, 50, 100]}
-                                            disableSelectionOnClick
-                                            onCellClick={handleRowClick}
-                                            headerHeight={32}
-                                            rowHeight={100}
-                                        />
-                                    </div>
-                                </TabPanel>
-                            )}
-                            {publicGraphs.length === 0 && (
-                                <TabPanel value={value} index={0}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                    </div>
-                                </TabPanel>
-                            )}
-                            { can_edit_profile() && privateGraphs.length > 0 && (
-                                <TabPanel value={value} index={1}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                        <StyledDataGrid
-                                            rows={privateGraphs}
-                                            columns={columns}
-                                            pageSize={25}
-                                            rowsPerPageOptions={[25, 50, 100]}
-                                            disableSelectionOnClick
-                                            onCellClick={handleRowClick}
-                                            headerHeight={32}
-                                            rowHeight={100}
-                                        />
-                                    </div>
-                                </TabPanel>
-                            )}
-                            { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
-                                <TabPanel value={value} index={1}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                    </div>
-                                </TabPanel>
-                            )}
-                            { can_edit_profile() && sharedGraphs.length > 0 && (
-                                <TabPanel value={value} index={2}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                        <StyledDataGrid
-                                            rows={sharedGraphs}
-                                            columns={columns}
-                                            pageSize={25}
-                                            rowsPerPageOptions={[25, 50, 100]}
-                                            disableSelectionOnClick
-                                            onCellClick={handleRowClick}
-                                            headerHeight={32}
-                                            rowHeight={100}
-                                        />
-                                    </div>
-                                </TabPanel>
-                            )}
-                            { (!can_edit_profile() || (can_edit_profile() && sharedGraphs.length === 0)) && (
-                                <TabPanel value={value} index={2}>
-                                    <div style={{ height: '1000px', width: '100%' }}>
-                                    </div>
-                                </TabPanel>
-                            )}
-                            <ShowPromptDialog 
-                                showPrompt={showPrompt} 
-                                setShowPrompt={setShowPrompt} 
-                            >
-                            </ShowPromptDialog>
+                                            Edit Profile
+                                        </Button>
+                                    )}
+                                </Stack>
+                            </Grid>
+                            <Grid item xs={10}>
+                                <Stack direction="row" display="flex" justifyContent="space-between">
+                                    <Typography variant="h6">
+                                        Concepts
+                                    </Typography>
+                                    { can_edit_profile() && (
+                                        <Button variant="outlined" sx={{ 'borderColor': '#2d2d2d', 'borderRadius': '10px' }}
+                                            onClick={toggleDrawer(true, null)}
+                                        >
+                                            Start new concept
+                                        </Button>
+                                    )}    
+                                    <ThemeProvider theme={utensilTheme}>
+                                        <Drawer
+                                            anchor={"right"}
+                                            open={startNewConcept}
+                                            onClose={toggleDrawer(false, null)}
+                                            hideBackdrop={true}
+                                        >
+                                            <div 
+                                                style={{
+                                                    width: '84vw', 
+                                                    padding: '2rem',
+                                                    backgroundColor: '#211f24', 
+                                                    height: '100vh',
+                                                    overflowY: 'auto'
+                                                }}
+                                            >
+                                                <Utensil startNewConcept={true} setStartNewConcept={setStartNewConcept} selectedGraph={selectedGraph}/>
+                                            </div>  
+                                        </Drawer>
+                                    </ThemeProvider>                            
+                                </Stack>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                    <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+                                        <Tab label="Public" {...a11yProps(0)} sx={{color: 'gray'}}  />
+                                        <Tab label="Private" {...a11yProps(1)} sx={{color: 'gray'}} onClick={() => !can_edit_profile() && setShowPrompt(true)}/>
+                                        <Tab label="Shared" {...a11yProps(0)} sx={{color: 'gray'}}  />
+                                    </Tabs>
+                                </Box>
+                                {publicGraphs.length > 0 && (
+                                    <TabPanel value={value} index={0}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                            <StyledDataGrid
+                                                rows={publicGraphs}
+                                                columns={columns}
+                                                pageSize={25}
+                                                rowsPerPageOptions={[25, 50, 100]}
+                                                disableSelectionOnClick
+                                                onCellClick={handleRowClick}
+                                                headerHeight={32}
+                                                rowHeight={100}
+                                            />
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                {publicGraphs.length === 0 && (
+                                    <TabPanel value={value} index={0}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                { can_edit_profile() && privateGraphs.length > 0 && (
+                                    <TabPanel value={value} index={1}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                            <StyledDataGrid
+                                                rows={privateGraphs}
+                                                columns={columns}
+                                                pageSize={25}
+                                                rowsPerPageOptions={[25, 50, 100]}
+                                                disableSelectionOnClick
+                                                onCellClick={handleRowClick}
+                                                headerHeight={32}
+                                                rowHeight={100}
+                                            />
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
+                                    <TabPanel value={value} index={1}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                { can_edit_profile() && sharedGraphs.length > 0 && (
+                                    <TabPanel value={value} index={2}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                            <StyledDataGrid
+                                                rows={sharedGraphs}
+                                                columns={columns}
+                                                pageSize={25}
+                                                rowsPerPageOptions={[25, 50, 100]}
+                                                disableSelectionOnClick
+                                                onCellClick={handleRowClick}
+                                                headerHeight={32}
+                                                rowHeight={100}
+                                            />
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                { (!can_edit_profile() || (can_edit_profile() && sharedGraphs.length === 0)) && (
+                                    <TabPanel value={value} index={2}>
+                                        <div style={{ height: '1000px', width: '100%' }}>
+                                        </div>
+                                    </TabPanel>
+                                )}
+                                <ShowPromptDialog 
+                                    showPrompt={showPrompt} 
+                                    setShowPrompt={setShowPrompt} 
+                                >
+                                </ShowPromptDialog>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                    <ShareGraphDialog
-                        openShareGraphDialog={openShareGraphDialog} 
-                        setOpenShareGraphDialog={setOpenShareGraphDialog}
-                        graphName={graphName}
-                        saveSharedGraphToDatabase={saveSharedGraphToDatabase}
-                        >
-                    </ShareGraphDialog>                     
-                </Container>
-            </ThemeProvider>
-        );
-    }
+                        <ShareGraphDialog
+                            openShareGraphDialog={openShareGraphDialog} 
+                            setOpenShareGraphDialog={setOpenShareGraphDialog}
+                            graphName={graphName}
+                            saveSharedGraphToDatabase={saveSharedGraphToDatabase}
+                            >
+                        </ShareGraphDialog>                     
+                    </Container>
+                    }
+                </div>
+            </main>
+            
+        </ThemeProvider>
+    );
 }
 
 export default Profile;

@@ -13,12 +13,7 @@ function Layout() {
         flexDirection:'column', 
       }}
     >
-      <nav>
-        <Navbar />
-      </nav>
-      <main style={{ width: '100%', flex: '1 1 auto' }}>
-        <Outlet />
-      </main>
+      <Outlet />
     </div>
   )
 }

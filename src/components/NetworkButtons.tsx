@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Stack, Tooltip, TooltipProps, tooltipClasses } from "@mui/material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -19,6 +19,7 @@ type Props = {
 }
 
 export default function NetworkButtons(props: Props) {
+
     const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
         height: '47px',
         width: '47px',
@@ -93,8 +94,8 @@ export default function NetworkButtons(props: Props) {
             props.onButton(nextMode); // Tell Utensil.tsx to change the button mode
         }
     };
-   
-    useKeyDownHandler(props.onButton);
+
+    useKeyDownHandler(props.onButton, props.onUndo, props.onRedo);
 
     const Wire = ({ children, ...props }: any) => children(props);
 
@@ -265,12 +266,14 @@ export default function NetworkButtons(props: Props) {
                                     </div>
                                 }
                             >
-                                <StyledToggleButton 
-                                    aria-label="Undo" 
-                                    {...props}
-                                >
-                                    <UndoIcon />
-                                </StyledToggleButton>
+                                <span>
+                                    <StyledToggleButton 
+                                        aria-label="Undo" 
+                                        {...props}
+                                    >
+                                        <UndoIcon />
+                                    </StyledToggleButton>
+                                </span>                                
                             </StyledTooltip>
                         )}
                     </Wire>
@@ -286,12 +289,14 @@ export default function NetworkButtons(props: Props) {
                                     </div>
                                 }
                             >
-                                <StyledToggleButton 
-                                    aria-label="Redo" 
-                                    {...props}
-                                >
-                                    <RedoIcon />
-                                </StyledToggleButton>
+                                <span>
+                                    <StyledToggleButton 
+                                        aria-label="Redo" 
+                                        {...props}
+                                    >
+                                        <RedoIcon />
+                                    </StyledToggleButton>
+                                </span>                                
                             </StyledTooltip>
                         )}
                     </Wire>
