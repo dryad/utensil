@@ -25,7 +25,10 @@ function Navbar(props: any) {
       <div >
           {path === 'profile' 
             ? <ProfileNavbar /> 
-            : <UtensilNavbar getMetaMaskAccount={props.getMetaMaskAccount}/>
+            : <UtensilNavbar 
+                getMetaMaskAccount={props.getMetaMaskAccount} 
+                metaMaskAccount={props.metaMaskAccount}
+              />
           }
       </div>
     </div>

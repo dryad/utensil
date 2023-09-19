@@ -1024,13 +1024,12 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       }
   }, [isAddShapeButtonClicked, isEmptyState]);
 
-  // useKeyDownHandler(onButton);
-
   return (
     <>
       <nav>
         <Navbar 
           getMetaMaskAccount={getMetaMaskAccount}
+          metaMaskAccount={metaMaskAccount}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>

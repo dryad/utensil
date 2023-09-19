@@ -1,19 +1,44 @@
 import { InputAdornment, TextField } from '@mui/material';
 import { CloseIcon, SearchIcon } from 'assets/icons/svg';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
+import {useDebounce} from '../hooks/useDebounce';
+import axios from "libs/axios";
 
 type Props = {
   setNavbarMode: Dispatch<SetStateAction<string | null>>;
+  metaMaskAccount: string;
 }
 
-function SearchGraphBar({setNavbarMode}: Props) {
+function SearchGraphBar({setNavbarMode, metaMaskAccount}: Props) {
 
+  const [graphs, setGraphs] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchQuery, 700);
+
+console.log('graphs search: ', graphs);
+
+  useEffect(() => {
+		if (debouncedSearchTerm) {
+			setSearchTerm(debouncedSearchTerm);
+		} else {
+			setSearchTerm(debouncedSearchTerm);
+		}
+	}, [debouncedSearchTerm]);
 
   const clearSearch = () => {
     setSearchQuery('');
   }
+
+  const refreshList = async () => {
+    const { data } = await axios.get(`/api/graphs/?q=${searchTerm}${metaMaskAccount ? `&private=${metaMaskAccount}` : ''}`);
+    setGraphs(data);  
+  };
+
+  useEffect(() => {
+    refreshList(); 
+  }, [searchTerm, metaMaskAccount]);
 
   return (
     <div 

@@ -91,16 +91,16 @@ function UtensilNavbar(props: any) {
           exclusive
           onChange={handleChange}
         >
-          <StyledToggleButton aria-label="search" {...props} value='search'>
+          <StyledToggleButton aria-label="search" value='search'>
             <SearchIcon />
           </StyledToggleButton>
-          <StyledToggleButton aria-label="concepts" {...props} value='concepts'>
+          <StyledToggleButton aria-label="concepts" value='concepts'>
             <ConceptsIcon />
           </StyledToggleButton>
         </StyledToggleButtonGroup>
 
         {navbarMode === 'search' &&
-          <SearchGraphBar setNavbarMode={setNavbarMode}/>
+          <SearchGraphBar setNavbarMode={setNavbarMode} metaMaskAccount={props.metaMaskAccount}/>
         }
         {/* {navbarMode === 'concepts' &&
           <ConceptsBar />
