@@ -1030,6 +1030,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         <Navbar 
           getMetaMaskAccount={getMetaMaskAccount}
           metaMaskAccount={metaMaskAccount}
+          trees={trees} 
+          hoveredNodes={hoveredNodesRef} 
+          selectedNodes={selectedNodesRef} 
+          setHoveredChipToVis={setHoveredChipToVis}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>
@@ -1078,6 +1082,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             </div>
           }
           <ZoomActions />
+          
         </div>
       </main>
       {/* <div 

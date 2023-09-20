@@ -211,6 +211,7 @@ const NodeDialog: React.FC<IDialogProps> = ({
                 value={nodeLabel}
                 variant="outlined"
                 onKeyDown={e => {
+                  e.stopPropagation();
                   if (e.key === 'Enter') { okButton.current?.click(); }
                 }} 
                 onChange={(e) => {

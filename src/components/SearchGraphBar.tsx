@@ -1,16 +1,16 @@
 import { InputAdornment, TextField } from '@mui/material';
 import { CloseIcon, SearchIcon } from 'assets/icons/svg';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
 import {useDebounce} from '../hooks/useDebounce';
 import axios from "libs/axios";
 
 type Props = {
-  setNavbarMode: Dispatch<SetStateAction<string | null>>;
+  closeBar: () => void;
   metaMaskAccount: string;
 }
 
-function SearchGraphBar({setNavbarMode, metaMaskAccount}: Props) {
+function SearchGraphBar({closeBar, metaMaskAccount}: Props) {
 
   const [graphs, setGraphs] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); 
@@ -44,7 +44,7 @@ console.log('graphs search: ', graphs);
     <div 
       style={{
         position:'absolute', 
-        top:'70px', 
+        top:'71px', 
         right:'16px', 
         zIndex:'10',
         width: '295px',
@@ -60,7 +60,7 @@ console.log('graphs search: ', graphs);
           top:'1rem',
           right: "1rem"
         }}
-        onClick={() => {setNavbarMode(null)}}
+        onClick={closeBar}
       >
         <CloseIcon />
       </div>

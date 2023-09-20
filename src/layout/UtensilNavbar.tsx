@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ConceptsIcon, SearchIcon } from 'assets/icons/svg';
 import MetaMaskButton from 'components/MetaMaskButton';
 import { THEME_COLORS } from "constants/colors";
@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchGraphBar from '../components/SearchGraphBar';
+import ConceptsBar from '../components/ConceptsBar';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   height: '47px',
@@ -55,16 +56,29 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 function UtensilNavbar(props: any) {
 
   const [navbarMode, setNavbarMode] = useState<string | null>(null);
+  const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
   
   const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
     setNavbarMode(nextMode);
   };
+
+  const closeBar = () => {
+    setNavbarMode(null);
+  }
+
+  useEffect(() => {
+    if (props.trees.length > 0 && isConceptsModeFirstOpened) {
+      setNavbarMode('concepts');
+      setIsConceptsModeFirstOpened(false);
+    }
+  },[props.trees])
 
   return (
     <div>
       {/* <NewGraphMenu /> */}
       <div
         style={{
+          minWidth:'295px',
           display: 'flex',
           justifyContent:'space-between',
           gap:'8px'
@@ -100,12 +114,20 @@ function UtensilNavbar(props: any) {
         </StyledToggleButtonGroup>
 
         {navbarMode === 'search' &&
-          <SearchGraphBar setNavbarMode={setNavbarMode} metaMaskAccount={props.metaMaskAccount}/>
+          <SearchGraphBar 
+            closeBar={closeBar} 
+            metaMaskAccount={props.metaMaskAccount}
+          />
         }
-        {/* {navbarMode === 'concepts' &&
-          <ConceptsBar />
-        } */}
-       
+        {navbarMode === 'concepts' &&
+          <ConceptsBar 
+            closeBar={closeBar} 
+            trees={props.trees} 
+            hoveredNodes={props.hoveredNodes} 
+            selectedNodes={props.selectedNodes} 
+            setHoveredChipToVis={props.setHoveredChipToVis}
+          />
+        }       
       </div>
     </div>
   )

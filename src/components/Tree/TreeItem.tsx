@@ -1,16 +1,8 @@
 import React from "react";
-import {
-  Paper,
-  TextField,
-  Chip,
-  Stack,
-  StackItem,
-  Typography,
-  Divider,
-  Box
-} from "@mui/material";
+import { Box } from "@mui/material";
 import { Tree } from "models";
 import TreeLine from "./TreeLine";
+
 type IGraphListProps = {
     tree: Tree;
     hoveredNodes: string[];
@@ -20,17 +12,7 @@ type IGraphListProps = {
 
 const TreeItem: React.FC<IGraphListProps> = (props) => {
   const tree = props.tree;
-
-  const onClick = (node) => {
-    // console.log('Clicked', node);
-  }
-  const onHover = (node) => {
-    // console.log('Hover', node);
-  }
-  const onLeave = (node) => {
-    // console.log('Left', node);
-  }
-
+  
   //split tree into arrays of three nodes each
   const treeLines = [];
   let treeLine = [];
@@ -45,17 +27,34 @@ const TreeItem: React.FC<IGraphListProps> = (props) => {
     treeLines.push(treeLine);
   }
 
-
   return (
     <>
-    <Stack spacing={0} justifyContent="center">
-    {treeLines !== undefined && treeLines.map((line, lineIndex) => {
-      return (
-          <TreeLine key={lineIndex} line={line} lineIndex={lineIndex} lineLength={treeLines.length} hoveredNodes={props.hoveredNodes} selectedNodes={props.selectedNodes} setHoveredChipToVis={props.setHoveredChipToVis} />
-      )
-      
-    })}
-    </Stack>
+      <Box 
+        sx={{ 
+          display:'flex',
+          flexWrap: 'wrap',
+          gap: '10px',
+          width: 'fit-content',
+          background: 'white',
+          padding: '10px',
+          borderRadius:'4px',
+          border: '1px solid #f5f5f5',
+          boxShadow: '0 0 8px 0 rgba(85, 85, 85, 0.1)',
+        }}
+      >
+        {treeLines !== undefined && treeLines.map((line, lineIndex) => {
+          return (
+              <TreeLine 
+                key={lineIndex} 
+                line={line} 
+                hoveredNodes={props.hoveredNodes} 
+                selectedNodes={props.selectedNodes} 
+                setHoveredChipToVis={props.setHoveredChipToVis} 
+              />
+          )
+          
+        })}
+      </Box>
     </>
   );
 };

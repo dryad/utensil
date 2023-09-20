@@ -28,6 +28,10 @@ function Navbar(props: any) {
             : <UtensilNavbar 
                 getMetaMaskAccount={props.getMetaMaskAccount} 
                 metaMaskAccount={props.metaMaskAccount}
+                trees={props.trees} 
+                hoveredNodes={props.hoveredNodes} 
+                selectedNodes={props.selectedNodes} 
+                setHoveredChipToVis={props.setHoveredChipToVis}
               />
           }
       </div>

@@ -1,50 +1,40 @@
 import React from "react";
-import {
-  Paper,
-  TextField,
-  Chip,
-  Stack,
-  Typography,
-  Divider,
-  Box
-} from "@mui/material";
 import { Tree } from "models";
 import TreeItem from "./TreeItem";
 
 type IGraphListProps = {
-    Trees: Tree[];
+    trees: Tree[];
     hoveredNodes: string[];
     selectedNodes: string[];
     setHoveredChipToVis: Function;
 };
 
 const TreeList: React.FC<IGraphListProps> = (props) => {
-  const trees = props.Trees;
-  const onClick = (node) => {
-    // console.log('Clicked', node);
-  }
-  const onHover = (node) => {
-    // console.log('Hover', node);
-  }
-  const onLeave = (node) => {
-    // console.log('Left', node);
-  }
+  const trees = props.trees;
+ 
   return (
-    <Box sx={{ p: 2, border: '1px solid grey', borderRadius: '16px' }}>
-      <Stack
-        direction="column"
-        spacing={1}
-      >
-        {trees.map((tree, index) => {
-          return (
-            <Stack key={index} direction="row" spacing={1} justifyContent="center">
-              <TreeItem tree={tree} hoveredNodes={props.hoveredNodes} selectedNodes={props.selectedNodes} setHoveredChipToVis={props.setHoveredChipToVis}/>
-            </Stack>
-          )
-
-        })}
-      </Stack>
-    </Box>
+    <>
+      {trees && trees.map((tree, index) => {
+        return (
+          <div 
+            key={index} 
+            style={{
+              display:'flex',
+              flexDirection:'column',
+              justifyContent:'flex-start',
+              margin:'8px 0 0'
+            }}
+          >
+            <TreeItem 
+              tree={tree} 
+              hoveredNodes={props.hoveredNodes} 
+              selectedNodes={props.selectedNodes} 
+              setHoveredChipToVis={props.setHoveredChipToVis}
+            />
+          </div>
+        )
+      })}
+    </>
   );
 };
 
