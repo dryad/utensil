@@ -52,7 +52,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
   const [graphToLoad, setGraphToLoad] = useState<Graph | null | undefined>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
-  const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
+  const [graphName, setGraphName] = useState("New graph"); // The name of the graph, used by the text box for Graph Name
   const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
   const [isPrivate, setIsPrivate] = useState(graphToLoad ? graphToLoad.private !== '' : false);
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
@@ -1034,6 +1034,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           hoveredNodes={hoveredNodesRef} 
           selectedNodes={selectedNodesRef} 
           setHoveredChipToVis={setHoveredChipToVis}
+          graphName={graphName}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>

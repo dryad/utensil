@@ -22,7 +22,7 @@ function Navbar(props: any) {
           <Logo />
           <PageSwitcher />
       </div>
-      <div >
+      <div style={{flex:'1'}}>
           {path === 'profile' 
             ? <ProfileNavbar /> 
             : <UtensilNavbar 
@@ -32,6 +32,7 @@ function Navbar(props: any) {
                 hoveredNodes={props.hoveredNodes} 
                 selectedNodes={props.selectedNodes} 
                 setHoveredChipToVis={props.setHoveredChipToVis}
+                graphName={props.graphName}
               />
           }
       </div>

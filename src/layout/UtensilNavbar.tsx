@@ -7,6 +7,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchGraphBar from '../components/SearchGraphBar';
 import ConceptsBar from '../components/ConceptsBar';
+import GraphMenu from '../components/GraphMenu';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   height: '47px',
@@ -53,11 +54,28 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
 }));
 
+const StyledBar = styled('div')(() => ({
+  display: 'flex',
+  alignItems:'center',
+  justifyContent:'center',
+}));
+
+const StyledMetaMaskButton = styled('div')(() => ({
+  height:'55px',
+  display: 'flex',
+  justifyContent:'center',
+  alignItems:'center',
+  gap: '2px',
+  padding: '4px',
+  background: 'white',
+  borderRadius: '4px'
+}));
+
 function UtensilNavbar(props: any) {
 
   const [navbarMode, setNavbarMode] = useState<string | null>(null);
   const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
-  
+
   const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
     setNavbarMode(nextMode);
   };
@@ -74,37 +92,33 @@ function UtensilNavbar(props: any) {
   },[props.trees])
 
   return (
-    <div>
-      {/* <NewGraphMenu /> */}
-      <div
-        style={{
-          minWidth:'295px',
-          display: 'flex',
-          justifyContent:'space-between',
-          gap:'8px'
-        }}
-      >
+    <>
+      <StyledBar>
+        <div style={{marginLeft:'auto'}}>
+          <GraphMenu 
+            graphName={props.graphName}
+          />
+        </div>       
+
         <div
           style={{
-            height:'55px',
+            minWidth:'295px',
+            marginLeft:'auto',
             display: 'flex',
-            justifyContent:'center',
-            alignItems:'center',
-            gap: '2px',
-            padding: '4px',
-            background: 'white',
-            borderRadius: '4px'
+            justifyContent:'space-between',
+            gap:'8px'
           }}
         >
-          <MetaMaskButton getMetaMaskAccount={props.getMetaMaskAccount} />
-        </div>  
+          <StyledMetaMaskButton>
+            <MetaMaskButton getMetaMaskAccount={props.getMetaMaskAccount} />
+          </StyledMetaMaskButton>  
 
-        <StyledToggleButtonGroup
-          orientation="horizontal"
-          value={navbarMode} 
-          exclusive
-          onChange={handleChange}
-        >
+          <StyledToggleButtonGroup
+            orientation="horizontal"
+            value={navbarMode} 
+            exclusive
+            onChange={handleChange}
+          >
           <StyledToggleButton aria-label="search" value='search'>
             <SearchIcon />
           </StyledToggleButton>
@@ -113,7 +127,10 @@ function UtensilNavbar(props: any) {
           </StyledToggleButton>
         </StyledToggleButtonGroup>
 
-        {navbarMode === 'search' &&
+        
+        </div>
+        </StyledBar>
+          {navbarMode === 'search' &&
           <SearchGraphBar 
             closeBar={closeBar} 
             metaMaskAccount={props.metaMaskAccount}
@@ -127,9 +144,8 @@ function UtensilNavbar(props: any) {
             selectedNodes={props.selectedNodes} 
             setHoveredChipToVis={props.setHoveredChipToVis}
           />
-        }       
-      </div>
-    </div>
+        }     
+    </>   
   )
 }
 
