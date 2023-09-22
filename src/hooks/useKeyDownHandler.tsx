@@ -24,6 +24,18 @@ export const useKeyDownHandler = (onButton: (nextMode: string) => void, onUndo: 
             onButton("select");
         }
 
+        if (e.key === 'o') {
+            onButton("node");
+        }
+
+        if (e.key === 'l') {
+            onButton("edge");
+        }
+
+        if ( e.shiftKey && e.key === 'L') {
+            onButton('directed-edge');
+        } 
+
         if (e.key === 't') {
             onButton("text");
         }

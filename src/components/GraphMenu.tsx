@@ -91,7 +91,10 @@ function GraphMenu(props: any) {
             }}
           >
             <StyledMenuItem onClick={handleClose}>
-              Rename
+              Edit graph info
+            </StyledMenuItem>
+            <StyledMenuItem onClick={handleClose}>
+              Share
             </StyledMenuItem>
             <StyledDivider />
             <StyledMenuItem onClick={handleClose}>
@@ -99,9 +102,6 @@ function GraphMenu(props: any) {
             </StyledMenuItem>
             <StyledMenuItem onClick={handleClose}>
               Save as a new graph
-            </StyledMenuItem>
-            <StyledMenuItem onClick={handleClose}>
-              Copy Link
             </StyledMenuItem>
             <StyledDivider />
             <StyledMenuItem onClick={handleClose}>
