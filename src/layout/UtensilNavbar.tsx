@@ -5,7 +5,7 @@ import { THEME_COLORS } from "constants/colors";
 import { styled } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import SearchGraphBar from '../components/SearchGraphBar';
+import SearchGraphBar from '../components/SearchGraphBar/SearchGraphBar';
 import ConceptsBar from '../components/ConceptsBar';
 import GraphMenu from '../components/GraphMenu';
 
@@ -134,6 +134,9 @@ function UtensilNavbar(props: any) {
           <SearchGraphBar 
             closeBar={closeBar} 
             metaMaskAccount={props.metaMaskAccount}
+            onConfirmReplace={props.onConfirmReplace}
+            onConfirmImport={props.onConfirmImport}
+            onGraphSelected={props.onGraphSelected}
           />
         }
         {navbarMode === 'concepts' &&

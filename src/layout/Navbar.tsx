@@ -33,6 +33,9 @@ function Navbar(props: any) {
                 selectedNodes={props.selectedNodes} 
                 setHoveredChipToVis={props.setHoveredChipToVis}
                 graphName={props.graphName}
+                onConfirmReplace={props.onConfirmReplace}
+                onConfirmImport={props.onConfirmImport}
+                onGraphSelected={props.onGraphSelected}
               />
           }
       </div>

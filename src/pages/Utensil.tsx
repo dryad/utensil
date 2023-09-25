@@ -1035,6 +1035,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           selectedNodes={selectedNodesRef} 
           setHoveredChipToVis={setHoveredChipToVis}
           graphName={graphName}
+          onConfirmReplace={confirmReplaceGraph}
+          onConfirmImport={confirmImportGraph}
+          onGraphSelected={handleGraphSelected}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>
@@ -1082,8 +1085,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
               />
             </div>
           }
-          <ZoomActions />
-          
+          <ZoomActions />          
         </div>
       </main>
       {/* <div 
@@ -1152,8 +1154,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             handleGraphImport={handleGraphImport}
           />
         } */}
-        {/* <ZoomActions /> */}
-        {/* <VisNetwork
+      {/* <VisNetwork
             networkRef={networkRef}
             addNodeComplete={addNodeComplete}
             addEdgeComplete={addEdgeComplete}

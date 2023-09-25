@@ -394,10 +394,12 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           nodeRef.current = node;
           if (!node.level) {
             node.level = 0;
-            node.shape = 'image';
-            node.image = Circle;
+            node.color = NODE_COLORS[node.level];
+            // node.shape = 'image';
+            // node.image = Circle;
             node.font = { color: "#fff" };
-            node.opacity = 1;
+            // node.opacity = 1;
+            node.opacity = 0;
           }
           node.label = "";          
           networkRef.current?.triggerEvent("node-added", {
