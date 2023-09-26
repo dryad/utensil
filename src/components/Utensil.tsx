@@ -21,7 +21,7 @@ import ConfirmLoadDialog from "./ConfirmLoadDialog";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import ShowWarningDialog from "./ShowWarningDialog";
 import ShowGetAccountDialog from "./ShowGetAccountDialog";
-import SaveGraphDialog from "./SaveGraphDialog";
+import SaveGraphDialog from "./Dialog/SaveGraphDialog";
 import TreeList from "./Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "./MetaMaskButton";

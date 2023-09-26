@@ -14,8 +14,8 @@ export const useComputeFunctionalGraph = (networkRef: React.MutableRefObject<Vis
                 if (
                     node.hasOwnProperty('subGraphId') 
                 ) {
+                
                     const edgeToSelNode = edges.find((el: Edge) => el.to === node.id);
-        
                     const fromNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.from || el?.labelOfNode === edgeToSelNode.from);
                     const eventualNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);
                     const toNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.to || el?.labelOfNode === edgeToSelNode.to);

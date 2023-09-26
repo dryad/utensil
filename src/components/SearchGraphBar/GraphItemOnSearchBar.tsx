@@ -94,7 +94,7 @@ export default function GraphItemOnSearchBar({graph, onConfirmImport, onConfirmR
                     title={<>Replace current graph</> }
                 >
                     <div style={{display:'flex', alignItems:'center', justifyContent:'center', width:'23px', height:'23px', cursor:'pointer'}}
-                        onClick={() => {onGraphSelected(graph.id!); setIsReplaced(true); console.log('www')}}
+                        onClick={() => {onGraphSelected(graph.id!); setIsReplaced(true)}}
                     >
                         <ReplaceIcon />
                     </div>
@@ -103,7 +103,7 @@ export default function GraphItemOnSearchBar({graph, onConfirmImport, onConfirmR
                     title={<>Import</> }
                 >
                     <div style={{display:'flex', alignItems:'center', justifyContent:'center', width:'23px', height:'23px', cursor:'pointer'}}
-                        onClick={() => {onGraphSelected(graph.id!); setIsImported(true); console.log('www777')}}
+                        onClick={() => {onGraphSelected(graph.id!); setIsImported(true)}}
                     >
                         <ImportIcon />
                     </div>

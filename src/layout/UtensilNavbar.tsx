@@ -97,6 +97,9 @@ function UtensilNavbar(props: any) {
         <div style={{marginLeft:'auto'}}>
           <GraphMenu 
             graphName={props.graphName}
+            setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+            setIsPrivate={props.setIsPrivate}
+            saveGraphToDatabase={props.saveGraphToDatabase}
           />
         </div>       
 

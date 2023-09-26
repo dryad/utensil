@@ -26,6 +26,7 @@ const StyledMenuList = styled(MenuList)({
 
 const StyledMenuItem = styled(MenuItem)({
   fontSize:'0.75rem',
+  fontWeight: '500',
   lineHeight:'1rem',
   color: THEME_COLORS.get('gray700'),
   padding: '6px 5px 6px 6px'
@@ -36,7 +37,22 @@ const StyledDivider = styled(Divider)(() => ({
   marginLeft:'6px'
 }));
 
-function GraphMenu(props: any) {
+const arrowStyle = {
+  '&:before': {
+    content: '""',
+    display: 'block',
+    position: 'absolute',
+    top: '0',
+    right: '92px',
+    width: '11px',
+    height: '6px',
+    bgcolor: 'white',
+    transform: 'translateY(-50%) rotate(45deg)',
+    zIndex: 0,
+  }
+}
+
+export default function GraphMenu(props: any) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -71,24 +87,10 @@ function GraphMenu(props: any) {
       >
         <ClickAwayListener onClickAway={handleClose}>
           <StyledMenuList
-            autoFocusItem={open}
             id="composition-menu"
             aria-labelledby="composition-button"
+            sx={arrowStyle}
             onKeyDown={handleListKeyDown}
-            sx={{
-              '&:before': {
-                content: '""',
-                display: 'block',
-                position: 'absolute',
-                top: '0',
-                right: '92px',
-                width: '11px',
-                height: '6px',
-                bgcolor: 'white',
-                transform: 'translateY(-50%) rotate(45deg)',
-                zIndex: 0,
-              },
-            }}
           >
             <StyledMenuItem onClick={handleClose}>
               Edit graph info
@@ -97,10 +99,10 @@ function GraphMenu(props: any) {
               Share
             </StyledMenuItem>
             <StyledDivider />
-            <StyledMenuItem onClick={handleClose}>
+            <StyledMenuItem onClick={() => {handleClose(); props.saveGraphToDatabase();}}>
               Save
             </StyledMenuItem>
-            <StyledMenuItem onClick={handleClose}>
+            <StyledMenuItem onClick={() => {handleClose(); props.setIsPrivate(false); props.setOpenSaveGraphDialog(true);}}>
               Save as a new graph
             </StyledMenuItem>
             <StyledDivider />
@@ -113,5 +115,3 @@ function GraphMenu(props: any) {
     </>   
   )
 }
-
-export default GraphMenu

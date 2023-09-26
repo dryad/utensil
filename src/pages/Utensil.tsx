@@ -21,7 +21,7 @@ import ConfirmLoadDialog from "../components/ConfirmLoadDialog";
 import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog";
 import ShowWarningDialog from "../components/ShowWarningDialog";
 import ShowGetAccountDialog from "../components/ShowGetAccountDialog";
-import SaveGraphDialog from "../components/SaveGraphDialog";
+import SaveGraphDialog from "../components/Dialog/SaveGraphDialog";
 import TreeList from "../components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "../components/MetaMaskButton";
@@ -1038,6 +1038,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
+          setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+          setIsPrivate={setIsPrivate}
+          saveGraphToDatabase={saveGraphToDatabase}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>
@@ -1087,6 +1090,21 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           }
           <ZoomActions />          
         </div>
+
+        <SaveGraphDialog
+          openSaveGraphDialog={openSaveGraphDialog} 
+          setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+          graphName={graphName}
+          setGraphName={setGraphName}
+          graphNote={graphNote}
+          setGraphNote={setGraphNote}
+          prevGraphName={graphToLoad ? graphToLoad.name : ''}
+          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
+          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
+          setIsPrivate={setIsPrivate}
+          saveGraphToDatabase={saveGraphToDatabase}
+        />
+        {/* </SaveGraphDialog>   */}
       </main>
       {/* <div 
         style={{
@@ -1132,28 +1150,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             />
           </div>
         } */}
-        {/* {!isEmptyState && 
-          <VisNetwork
-            networkRef={networkRef}
-            addNodeComplete={addNodeComplete}
-            addEdgeComplete={addEdgeComplete}
-            historyListBack={historyListBack}
-            historyListForward={historyListForward}
-            historyListBackRef={historyListBackRef}
-            setIsUserDragging={setIsUserDraggingGlobal}
-            stringifyGraph={stringifyGraph}
-            deleteIfDeleteMode={deleteIfDeleteMode}
-            setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
-            addEdgeDirectedOrNot={addEdgeDirectedOrNot}
-            buttonModeRef={buttonModeRef}
-            hoveredNodes={hoveredNodesRef}
-            setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
-            selectedNodes={selectedNodesRef}
-            setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
-            graphs={publicPrivateGraphs}
-            handleGraphImport={handleGraphImport}
-          />
-        } */}
+        
       {/* <VisNetwork
             networkRef={networkRef}
             addNodeComplete={addNodeComplete}

@@ -36,6 +36,9 @@ function Navbar(props: any) {
                 onConfirmReplace={props.onConfirmReplace}
                 onConfirmImport={props.onConfirmImport}
                 onGraphSelected={props.onGraphSelected}
+                setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+                setIsPrivate={props.setIsPrivate}
+                saveGraphToDatabase={props.saveGraphToDatabase}
               />
           }
       </div>
