@@ -59,9 +59,10 @@ type Props = {
   saveGraphToDatabase: () => void;
   setIsChangesSavedMessageOpen: Dispatch<SetStateAction<boolean>>;
   closeBar: () => void;
+  canBeSavedGraph: boolean;
 }
 
-export default function GraphMenu({graphName, setOpenSaveGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar}: Props) {
+export default function GraphMenu({graphName, setOpenSaveGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -110,11 +111,14 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setIsPriva
             <StyledDivider />
             <StyledMenuItem 
               onClick={() => {
-                handleClose(); 
-                saveGraphToDatabase();
-                closeBar();
-                setIsChangesSavedMessageOpen(true);
+                if (canBeSavedGraph) {
+                  handleClose(); 
+                  saveGraphToDatabase();
+                  closeBar();
+                  setIsChangesSavedMessageOpen(true);
+                }                
               }}
+              sx={{color: canBeSavedGraph ? '' : THEME_COLORS.get('lightGray'), cursor: canBeSavedGraph ? '' : 'auto'}}
             >
               Save
             </StyledMenuItem>

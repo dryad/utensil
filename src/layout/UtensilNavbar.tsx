@@ -109,6 +109,7 @@ function UtensilNavbar(props: any) {
             saveGraphToDatabase={props.saveGraphToDatabase}
             setIsChangesSavedMessageOpen={setIsChangesSavedMessageOpen}
             closeBar={closeBar}
+            canBeSavedGraph={props.canBeSavedGraph}
           />
         </div>       
 

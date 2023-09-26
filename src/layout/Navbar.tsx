@@ -39,6 +39,7 @@ function Navbar(props: any) {
                 setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
                 setIsPrivate={props.setIsPrivate}
                 saveGraphToDatabase={props.saveGraphToDatabase}
+                canBeSavedGraph={props.canBeSavedGraph}
               />
           }
       </div>

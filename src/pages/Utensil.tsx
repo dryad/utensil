@@ -74,6 +74,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
+  const [canBeSavedGraph, setCanBeSavedGraph] = useState(false);
   
   useEffect(() => {
     if (selectedGraph) {
@@ -99,7 +100,11 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setGraphId(selectedGraph.id!);
       setIsPrivate(selectedGraph.private !== '');
     }
-  },[selectedGraph])
+  },[selectedGraph]);
+
+  useEffect(() => {
+    setCanBeSavedGraph(!(graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1));
+  },[graphId, publicPrivateGraphs]);
 
   useComputeFunctionalGraph(networkRef);
 
@@ -1042,6 +1047,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setOpenSaveGraphDialog={setOpenSaveGraphDialog}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
+          canBeSavedGraph={canBeSavedGraph}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>
