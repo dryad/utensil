@@ -34,6 +34,7 @@ import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
 import EmptyStatePopUp from '../components/EmptyStatePopUp';
 import ZoomActions from '../components/ZoomActions';
 import Navbar from "layout/Navbar";
+import functionalGraphData from "../functions/functionalGraphIds.json"; 
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -82,10 +83,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       const maxLevelOfNodes = Math.max(...nodesLevels);
 
       data.nodes.map((el: TreeNode) => {
-        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
           el.subGraphId = selectedGraph.id;
         }
-        if (el.opacity === 1) {
+        if (el.opacity === 1 && el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
           el.isUneditable = true;
         }
         
@@ -347,10 +348,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       const maxLevelOfNodes = Math.max(...nodesLevels);
 
       data.nodes.map((el: TreeNode) => {
-        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(graphToLoad.id!)) {
           el.subGraphId = graphToLoad.id;
         }
-        if (el.opacity === 1) {
+        if (el.opacity === 1 && el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(graphToLoad.id!)) {
           el.isUneditable = true;
         }
 
@@ -533,11 +534,11 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       const maxLevelOfNodes = Math.max(...nodesLevels);
 
       data.nodes.map((el: TreeNode) => {
-        if (el.level === maxLevelOfNodes && !el.isLabelNode) {
+        if (el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(graphToLoad.id!)) {
           el.subGraphId = graphToLoad.id;
         }
 
-        if (el.opacity === 1) {
+        if (el.opacity === 1 && el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(graphToLoad.id!)) {
           el.isUneditable = true;
         }
 
