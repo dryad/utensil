@@ -1,7 +1,7 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
 import { ChevronDownIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
-import React, {useState} from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import { THEME_COLORS } from "constants/colors";
 
 const StyledButton = styled('div')({
@@ -52,7 +52,16 @@ const arrowStyle = {
   }
 }
 
-export default function GraphMenu(props: any) {
+type Props = {
+  graphName: string; 
+  setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setIsPrivate: Dispatch<SetStateAction<boolean>>;
+  saveGraphToDatabase: () => void;
+  setIsChangesSavedMessageOpen: Dispatch<SetStateAction<boolean>>;
+  closeBar: () => void;
+}
+
+export default function GraphMenu({graphName, setOpenSaveGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -79,7 +88,7 @@ export default function GraphMenu(props: any) {
       <StyledButton
         aria-describedby={id} onClick={handleClick}
       >
-        {props.graphName}
+        {graphName === '' ? 'New graph' : graphName}
         <ChevronDownIcon />
       </StyledButton>
       <Popper
@@ -99,10 +108,17 @@ export default function GraphMenu(props: any) {
               Share
             </StyledMenuItem>
             <StyledDivider />
-            <StyledMenuItem onClick={() => {handleClose(); props.saveGraphToDatabase();}}>
+            <StyledMenuItem 
+              onClick={() => {
+                handleClose(); 
+                saveGraphToDatabase();
+                closeBar();
+                setIsChangesSavedMessageOpen(true);
+              }}
+            >
               Save
             </StyledMenuItem>
-            <StyledMenuItem onClick={() => {handleClose(); props.setIsPrivate(false); props.setOpenSaveGraphDialog(true);}}>
+            <StyledMenuItem onClick={() => {handleClose(); setIsPrivate(false); setOpenSaveGraphDialog(true);}}>
               Save as a new graph
             </StyledMenuItem>
             <StyledDivider />

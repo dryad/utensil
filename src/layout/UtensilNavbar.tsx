@@ -8,6 +8,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchGraphBar from '../components/SearchGraphBar/SearchGraphBar';
 import ConceptsBar from '../components/ConceptsBar';
 import GraphMenu from '../components/GraphMenu';
+import ChangesSavedMessage from 'components/ChangesSavedMessage';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   height: '47px',
@@ -75,13 +76,19 @@ function UtensilNavbar(props: any) {
 
   const [navbarMode, setNavbarMode] = useState<string | null>(null);
   const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
+  const [isChangesSavedMessageOpen, setIsChangesSavedMessageOpen] = useState(false);
 
   const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
+    setIsChangesSavedMessageOpen(false);
     setNavbarMode(nextMode);
   };
 
   const closeBar = () => {
     setNavbarMode(null);
+  }
+
+  const closeMessage = () => {
+    setIsChangesSavedMessageOpen(false);
   }
 
   useEffect(() => {
@@ -100,6 +107,8 @@ function UtensilNavbar(props: any) {
             setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
             setIsPrivate={props.setIsPrivate}
             saveGraphToDatabase={props.saveGraphToDatabase}
+            setIsChangesSavedMessageOpen={setIsChangesSavedMessageOpen}
+            closeBar={closeBar}
           />
         </div>       
 
@@ -122,35 +131,41 @@ function UtensilNavbar(props: any) {
             exclusive
             onChange={handleChange}
           >
-          <StyledToggleButton aria-label="search" value='search'>
-            <SearchIcon />
-          </StyledToggleButton>
-          <StyledToggleButton aria-label="concepts" value='concepts'>
-            <ConceptsIcon />
-          </StyledToggleButton>
-        </StyledToggleButtonGroup>
-
-        
+            <StyledToggleButton aria-label="search" value='search'>
+              <SearchIcon />
+            </StyledToggleButton>
+            <StyledToggleButton aria-label="concepts" value='concepts'>
+              <ConceptsIcon />
+            </StyledToggleButton>
+          </StyledToggleButtonGroup>        
         </div>
-        </StyledBar>
-          {navbarMode === 'search' &&
-          <SearchGraphBar 
-            closeBar={closeBar} 
-            metaMaskAccount={props.metaMaskAccount}
-            onConfirmReplace={props.onConfirmReplace}
-            onConfirmImport={props.onConfirmImport}
-            onGraphSelected={props.onGraphSelected}
-          />
-        }
-        {navbarMode === 'concepts' &&
-          <ConceptsBar 
-            closeBar={closeBar} 
-            trees={props.trees} 
-            hoveredNodes={props.hoveredNodes} 
-            selectedNodes={props.selectedNodes} 
-            setHoveredChipToVis={props.setHoveredChipToVis}
-          />
-        }     
+      </StyledBar>
+
+      {navbarMode === 'search' &&
+        <SearchGraphBar 
+          closeBar={closeBar} 
+          metaMaskAccount={props.metaMaskAccount}
+          onConfirmReplace={props.onConfirmReplace}
+          onConfirmImport={props.onConfirmImport}
+          onGraphSelected={props.onGraphSelected}
+        />
+      }
+      {navbarMode === 'concepts' &&
+        <ConceptsBar 
+          closeBar={closeBar} 
+          trees={props.trees} 
+          hoveredNodes={props.hoveredNodes} 
+          selectedNodes={props.selectedNodes} 
+          setHoveredChipToVis={props.setHoveredChipToVis}
+        />
+      }    
+
+      {isChangesSavedMessageOpen &&
+        <ChangesSavedMessage 
+          closeMessage={closeMessage}
+          startDate={new Date()}
+        />
+      } 
     </>   
   )
 }
