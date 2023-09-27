@@ -5,8 +5,9 @@ import { styled } from '@mui/styles';
 import { THEME_COLORS } from 'constants/colors';
 
 interface DialogProps {
-  openSaveGraphDialog: boolean;
-  setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
+  openEditGraphDialog: boolean;
+  setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setOpenCancelEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   graphName: string;
   setGraphName: Dispatch<SetStateAction<string>>;
   graphNote: string;
@@ -14,8 +15,9 @@ interface DialogProps {
   prevGraphName: string;
   prevGraphNote: string;
   prevGraphPrivate: boolean;
+  isPrivate: boolean;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
-  saveGraphToDatabase: (value: boolean) => void;
+  saveGraphToDatabase: () => void;
 }
 
 const StIcon = styled('span')(({ theme }) => ({
@@ -52,10 +54,9 @@ function StRadio(props: RadioProps) {
   );
 }
 
-const SaveGraphDialog = (props: DialogProps) => {
-  const { openSaveGraphDialog, setOpenSaveGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, setIsPrivate, saveGraphToDatabase } = props;
+const EditGraphDialog = (props: DialogProps) => {
+  const { openEditGraphDialog, setOpenEditGraphDialog, setOpenCancelEditGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, isPrivate, setIsPrivate, saveGraphToDatabase } = props;
   const [error, setError] = useState(false);
-  const [value, setValue] = useState('Public');
   
   useEffect(() => {
     if (graphName !== "")  {
@@ -63,30 +64,27 @@ const SaveGraphDialog = (props: DialogProps) => {
     } 
   }, [graphName]);
 
-  useEffect(() => {
-    openSaveGraphDialog && setIsPrivate(() => {return value === "Private"});
-  }, [value]);
-
-  useEffect(() => {
-    setValue('Public'); 
-  },[openSaveGraphDialog])
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value);
+    setIsPrivate((event.target as HTMLInputElement).value === 'Private');
   };
   
   return (
     <DialogWindow
-      open={openSaveGraphDialog}
-      onClose={() => setOpenSaveGraphDialog(false)}
-      aria-labelledby="save-graph-dialog"
+      open={openEditGraphDialog}
+      onClose={() => setOpenEditGraphDialog(false)}
+      aria-labelledby="edit-graph-dialog"
       width={'420px'}
     >
       <DialogTitle 
-        id="save-graph-dialog" 
-        onClose={() => setOpenSaveGraphDialog(false)}
+        id="edit-graph-dialog" 
+        onClose={() => {
+          setIsPrivate(() => prevGraphPrivate); 
+          setGraphName(prevGraphName);
+          setGraphNote(prevGraphNote);
+          setOpenEditGraphDialog(false);
+        }}
       >
-        Save graph as new 
+        Edit graph info 
       </DialogTitle>
     
       <div>
@@ -130,7 +128,7 @@ const SaveGraphDialog = (props: DialogProps) => {
             row
             aria-labelledby="radio-buttons-group"
             name="controlled-radio-buttons-group"
-            value={value}
+            value={isPrivate ? 'Private' : 'Public'}
             onChange={handleChange}
           >
             <FormControlLabel value="Public" control={<StRadio />} label="Public" sx={{height:'20px'}}/>
@@ -144,11 +142,15 @@ const SaveGraphDialog = (props: DialogProps) => {
           variant="outlined"
           sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
           onClick={() => {
-            setIsPrivate(() => prevGraphPrivate); 
-            setGraphName(prevGraphName);
-            setGraphNote(prevGraphNote);
+            if (
+              prevGraphName !== graphName || 
+              prevGraphNote !== graphNote || 
+              prevGraphPrivate !== isPrivate
+            ) {
+              setOpenCancelEditGraphDialog(true);
+            }
             setError(false);
-            setOpenSaveGraphDialog(false); 
+            setOpenEditGraphDialog(false); 
           }}
         >
           Cancel
@@ -160,16 +162,16 @@ const SaveGraphDialog = (props: DialogProps) => {
             if (graphName === "")  {
               setError(true);
             } else {
-              saveGraphToDatabase(true);
-              setOpenSaveGraphDialog(false);
+              saveGraphToDatabase();
+              setOpenEditGraphDialog(false);
             }
           }}
         >
-          Save Graph
+          Save
         </DialogButton>
       </DialogActions>
     </DialogWindow>
   );
 };
 
-export default SaveGraphDialog;
+export default EditGraphDialog;

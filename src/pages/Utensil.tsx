@@ -22,6 +22,8 @@ import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog";
 import ShowWarningDialog from "../components/ShowWarningDialog";
 import ShowGetAccountDialog from "../components/ShowGetAccountDialog";
 import SaveGraphDialog from "../components/Dialog/SaveGraphDialog";
+import EditGraphDialog from "../components/Dialog/EditGraphDialog";
+import CancelEditGraphDialog from "../components/Dialog/CancelEditGraphDialog";
 import TreeList from "../components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "../components/MetaMaskButton";
@@ -72,6 +74,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+  const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
+  const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [canBeSavedGraph, setCanBeSavedGraph] = useState(false);
@@ -1045,6 +1049,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
           setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+          setOpenEditGraphDialog={setOpenEditGraphDialog}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
           canBeSavedGraph={canBeSavedGraph}
@@ -1111,7 +1116,35 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
         />
-        {/* </SaveGraphDialog>   */}
+
+        <EditGraphDialog
+          openEditGraphDialog={openEditGraphDialog} 
+          setOpenEditGraphDialog={setOpenEditGraphDialog}
+          setOpenCancelEditGraphDialog={setOpenCancelEditGraphDialog}
+          graphName={graphName}
+          setGraphName={setGraphName}
+          graphNote={graphNote}
+          setGraphNote={setGraphNote}
+          prevGraphName={graphToLoad ? graphToLoad.name : ''}
+          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
+          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
+          isPrivate={isPrivate}
+          setIsPrivate={setIsPrivate}
+          saveGraphToDatabase={saveGraphToDatabase}
+        />
+
+        <CancelEditGraphDialog
+          openCancelEditGraphDialog={openCancelEditGraphDialog} 
+          setOpenCancelEditGraphDialog={setOpenCancelEditGraphDialog}
+          setGraphName={setGraphName}
+          setGraphNote={setGraphNote}
+          prevGraphName={graphToLoad ? graphToLoad.name : ''}
+          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
+          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
+          setIsPrivate={setIsPrivate}
+          saveGraphToDatabase={saveGraphToDatabase}
+        />
+        
       </main>
       {/* <div 
         style={{

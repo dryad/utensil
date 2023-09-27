@@ -37,6 +37,7 @@ function Navbar(props: any) {
                 onConfirmImport={props.onConfirmImport}
                 onGraphSelected={props.onGraphSelected}
                 setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+                setOpenEditGraphDialog={props.setOpenEditGraphDialog}
                 setIsPrivate={props.setIsPrivate}
                 saveGraphToDatabase={props.saveGraphToDatabase}
                 canBeSavedGraph={props.canBeSavedGraph}

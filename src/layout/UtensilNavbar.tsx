@@ -105,6 +105,7 @@ function UtensilNavbar(props: any) {
           <GraphMenu 
             graphName={props.graphName}
             setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+            setOpenEditGraphDialog={props.setOpenEditGraphDialog}
             setIsPrivate={props.setIsPrivate}
             saveGraphToDatabase={props.saveGraphToDatabase}
             setIsChangesSavedMessageOpen={setIsChangesSavedMessageOpen}

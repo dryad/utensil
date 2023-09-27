@@ -35,6 +35,20 @@ const StyledBox = styled('div')(({ theme }) => ({
 	}  
 }))
 
+const inputFieldStyles = {
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: '#e5e7eb',
+    },
+    '&:hover fieldset': {
+      borderColor: '#B2BAC2',
+    },
+    '&.Mui-focused fieldset': {
+      border: `1px solid ${THEME_COLORS.get('blue')}`,
+    },
+  },
+}
+
 function SearchGraphBar({closeBar, metaMaskAccount, onConfirmReplace, onConfirmImport, onGraphSelected}: Props) {
 
   const [graphs, setGraphs] = useState([]);
@@ -116,6 +130,7 @@ function SearchGraphBar({closeBar, metaMaskAccount, onConfirmReplace, onConfirmI
           ),
           endAdornment: searchQuery === '' ? null : (<div onClick={clearSearch} style={{cursor:'pointer', color: THEME_COLORS.get("gray")}} ><CloseIcon /></div>) 
         }}
+        sx={inputFieldStyles}
       />
       
       {searchQuery.trim() !== '' && graphs.length === 0 &&
