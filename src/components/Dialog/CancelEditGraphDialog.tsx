@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction} from 'react';
-import { DialogTitle, DialogActions, DialogWindow, DialogButton } from ".";
+import { DialogTitle, DialogActions, DialogWindow, DialogButton } from "./index";
 import { THEME_COLORS } from 'constants/colors';
 
 interface DialogProps {
-  openCancelEditGraphDialog: boolean;
-  setOpenCancelEditGraphDialog: Dispatch<SetStateAction<boolean>>;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   setGraphName: Dispatch<SetStateAction<string>>;
   setGraphNote: Dispatch<SetStateAction<string>>;
   prevGraphName: string;
@@ -15,12 +15,12 @@ interface DialogProps {
 }
 
 const CancelEditGraphDialog = (props: DialogProps) => {
-  const { openCancelEditGraphDialog, setOpenCancelEditGraphDialog, setGraphName, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, setIsPrivate, saveGraphToDatabase } = props;
+  const { open, setOpen, setGraphName, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, setIsPrivate, saveGraphToDatabase } = props;
     
   return (
     <DialogWindow
-      open={openCancelEditGraphDialog}
-      onClose={() => setOpenCancelEditGraphDialog(false)}
+      open={open}
+      onClose={() => setOpen(false)}
       aria-labelledby="cancel-edit-graph-dialog"
       width={'420px'}
     >
@@ -30,7 +30,7 @@ const CancelEditGraphDialog = (props: DialogProps) => {
           setIsPrivate(() => prevGraphPrivate); 
           setGraphName(prevGraphName);
           setGraphNote(prevGraphNote);
-          setOpenCancelEditGraphDialog(false);
+          setOpen(false);
         }}
       >
         Do you want to close without saving? 
@@ -46,7 +46,7 @@ const CancelEditGraphDialog = (props: DialogProps) => {
           sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
           onClick={() => {
             saveGraphToDatabase();
-            setOpenCancelEditGraphDialog(false);
+            setOpen(false);
           }}
         >
           Save and close
@@ -58,7 +58,7 @@ const CancelEditGraphDialog = (props: DialogProps) => {
             setIsPrivate(() => prevGraphPrivate); 
             setGraphName(prevGraphName);
             setGraphNote(prevGraphNote);
-            setOpenCancelEditGraphDialog(false); 
+            setOpen(false); 
           }}
         >
           Close without saving

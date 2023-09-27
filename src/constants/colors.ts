@@ -19,7 +19,8 @@ export const THEME_COLORS = new Map([
     ["white", '#fff'],
     ["gray", '#9ca3af'],
     ['bg', '#f5f5f5'],
-    ['gray700', '#374151']
+    ['gray700', '#374151'],
+    ['red', '#f44040']
   ]);
 
   

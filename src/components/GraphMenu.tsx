@@ -55,14 +55,16 @@ type Props = {
   graphName: string; 
   setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: () => void;
   setIsChangesSavedMessageOpen: Dispatch<SetStateAction<boolean>>;
   closeBar: () => void;
   canBeSavedGraph: boolean;
+  canBeDeletedGraph: boolean;
 }
 
-export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenEditGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph}: Props) {
+export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph, canBeDeletedGraph}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -150,7 +152,18 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenEdi
               Save as a new graph
             </StyledMenuItem>
             <StyledDivider />
-            <StyledMenuItem onClick={handleClose}>
+            <StyledMenuItem 
+              onClick={() => {
+                if (canBeDeletedGraph) {
+                  handleClose(); 
+                  setOpenDeleteGraphDialog(true);
+                }                
+              }}
+              sx={{
+                color: canBeDeletedGraph ? '' : THEME_COLORS.get('lightGray'), 
+                cursor: canBeDeletedGraph ? '' : 'auto'
+              }}
+            >
               Delete
             </StyledMenuItem>
           </StyledMenuList>

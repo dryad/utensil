@@ -5,8 +5,8 @@ import { styled } from '@mui/styles';
 import { THEME_COLORS } from 'constants/colors';
 
 interface DialogProps {
-  openEditGraphDialog: boolean;
-  setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
   setOpenCancelEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   graphName: string;
   setGraphName: Dispatch<SetStateAction<string>>;
@@ -55,7 +55,7 @@ function StRadio(props: RadioProps) {
 }
 
 const EditGraphDialog = (props: DialogProps) => {
-  const { openEditGraphDialog, setOpenEditGraphDialog, setOpenCancelEditGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, isPrivate, setIsPrivate, saveGraphToDatabase } = props;
+  const { open, setOpen, setOpenCancelEditGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, isPrivate, setIsPrivate, saveGraphToDatabase } = props;
   const [error, setError] = useState(false);
   
   useEffect(() => {
@@ -70,8 +70,8 @@ const EditGraphDialog = (props: DialogProps) => {
   
   return (
     <DialogWindow
-      open={openEditGraphDialog}
-      onClose={() => setOpenEditGraphDialog(false)}
+      open={open}
+      onClose={() => setOpen(false)}
       aria-labelledby="edit-graph-dialog"
       width={'420px'}
     >
@@ -81,7 +81,7 @@ const EditGraphDialog = (props: DialogProps) => {
           setIsPrivate(() => prevGraphPrivate); 
           setGraphName(prevGraphName);
           setGraphNote(prevGraphNote);
-          setOpenEditGraphDialog(false);
+          setOpen(false);
         }}
       >
         Edit graph info 
@@ -150,7 +150,7 @@ const EditGraphDialog = (props: DialogProps) => {
               setOpenCancelEditGraphDialog(true);
             }
             setError(false);
-            setOpenEditGraphDialog(false); 
+            setOpen(false); 
           }}
         >
           Cancel
@@ -163,7 +163,7 @@ const EditGraphDialog = (props: DialogProps) => {
               setError(true);
             } else {
               saveGraphToDatabase();
-              setOpenEditGraphDialog(false);
+              setOpen(false);
             }
           }}
         >

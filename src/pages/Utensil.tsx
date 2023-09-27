@@ -18,12 +18,12 @@ import GraphList from "../components/GraphList";
 import NetworkButtons from "../components/NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "../components/ConfirmLoadDialog";
-import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog";
 import ShowWarningDialog from "../components/ShowWarningDialog";
 import ShowGetAccountDialog from "../components/ShowGetAccountDialog";
 import SaveGraphDialog from "../components/Dialog/SaveGraphDialog";
 import EditGraphDialog from "../components/Dialog/EditGraphDialog";
 import CancelEditGraphDialog from "../components/Dialog/CancelEditGraphDialog";
+import DeleteGraphDialog from "../components/Dialog/DeleteGraphDialog";
 import TreeList from "../components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "../components/MetaMaskButton";
@@ -76,9 +76,12 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
+  const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [canBeSavedGraph, setCanBeSavedGraph] = useState(false);
+  const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
+  const [toCloseBar, setToCloseBar] = useState(false);
   
   useEffect(() => {
     if (selectedGraph) {
@@ -107,7 +110,18 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   },[selectedGraph]);
 
   useEffect(() => {
-    setCanBeSavedGraph(!(graphId == null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1));
+    setCanBeSavedGraph(!(graphId === null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1));
+  },[graphId, publicPrivateGraphs]);
+
+  useEffect(() => {
+    const currentGraph = publicPrivateGraphs.find(el => el.id === graphId);
+    
+    if (currentGraph) {
+      setCanBeDeletedGraph(currentGraph.private !== '');
+      if (currentGraph.private !== '') {
+        setGraphToDelete(currentGraph);
+      } 
+    }        
   },[graphId, publicPrivateGraphs]);
 
   useComputeFunctionalGraph(networkRef);
@@ -393,6 +407,20 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
       await axios.delete(`/api/graphs/${graphToDelete.id}/`);
       await refreshList();
+      initializeUndoTimer();
+      setGraphName('');
+      setGraphNote('');
+      setGraphId(null);
+      
+      const existingGraph = JSON.parse(stringifyGraph());
+      existingGraph.nodes = [];
+      existingGraph.edges = [];
+      setGraph(existingGraph);
+      networkRef.current?.setData(existingGraph);
+
+      setCanBeDeletedGraph(false);
+      setGraphToDelete(null);
+      setToCloseBar(true);
     }
   }
 
@@ -580,7 +608,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     if (graph) {
       setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
       setGraphIdToLoad(id);
-      setConfirmGraphLoadOpen(true);
+      // setConfirmGraphLoadOpen(true);
     }
   };
 
@@ -690,14 +718,14 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     }
   }
 
-  const handleGraphDelete = (id: any) => {
-    //set the graph to be potentially deleted
-    const graph = graphs?.find((g: any) => g.id === id);
-    if (graph) {
-      setGraphToDelete(graph); // after confirming 'yes', the confirmDeleteGraph function will be called, and will delete this graph from the database.
-      setConfirmGraphDeleteOpen(true);
-    } 
-  };
+  // const handleGraphDelete = (id: any) => {
+  //   //set the graph to be potentially deleted
+  //   const graph = graphs?.find((g: any) => g.id === id);
+  //   if (graph) {
+  //     setGraphToDelete(graph); // after confirming 'yes', the confirmDeleteGraph function will be called, and will delete this graph from the database.
+  //     setConfirmGraphDeleteOpen(true);
+  //   } 
+  // };
 
   const onUndo = () => {
     
@@ -1050,9 +1078,12 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onGraphSelected={handleGraphSelected}
           setOpenSaveGraphDialog={setOpenSaveGraphDialog}
           setOpenEditGraphDialog={setOpenEditGraphDialog}
+          setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
           canBeSavedGraph={canBeSavedGraph}
+          canBeDeletedGraph={canBeDeletedGraph}
+          toCloseBar={toCloseBar}
         />
       </nav>
       <main style={{ width: '100%', flex: '1 1 auto' }}>
@@ -1104,8 +1135,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         </div>
 
         <SaveGraphDialog
-          openSaveGraphDialog={openSaveGraphDialog} 
-          setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+          open={openSaveGraphDialog} 
+          setOpen={setOpenSaveGraphDialog}
           graphName={graphName}
           setGraphName={setGraphName}
           graphNote={graphNote}
@@ -1118,8 +1149,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         />
 
         <EditGraphDialog
-          openEditGraphDialog={openEditGraphDialog} 
-          setOpenEditGraphDialog={setOpenEditGraphDialog}
+          open={openEditGraphDialog} 
+          setOpen={setOpenEditGraphDialog}
           setOpenCancelEditGraphDialog={setOpenCancelEditGraphDialog}
           graphName={graphName}
           setGraphName={setGraphName}
@@ -1134,8 +1165,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         />
 
         <CancelEditGraphDialog
-          openCancelEditGraphDialog={openCancelEditGraphDialog} 
-          setOpenCancelEditGraphDialog={setOpenCancelEditGraphDialog}
+          open={openCancelEditGraphDialog} 
+          setOpen={setOpenCancelEditGraphDialog}
           setGraphName={setGraphName}
           setGraphNote={setGraphNote}
           prevGraphName={graphToLoad ? graphToLoad.name : ''}
@@ -1143,6 +1174,12 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
+        />
+
+        <DeleteGraphDialog
+          open={openDeleteGraphDialog} 
+          setOpen={setOpenDeleteGraphDialog}
+          onDelete={confirmDeleteGraph}
         />
         
       </main>

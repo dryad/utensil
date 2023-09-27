@@ -38,9 +38,12 @@ function Navbar(props: any) {
                 onGraphSelected={props.onGraphSelected}
                 setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
                 setOpenEditGraphDialog={props.setOpenEditGraphDialog}
+                setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
                 setIsPrivate={props.setIsPrivate}
                 saveGraphToDatabase={props.saveGraphToDatabase}
                 canBeSavedGraph={props.canBeSavedGraph}
+                canBeDeletedGraph={props.canBeDeletedGraph}
+                toCloseBar={props.toCloseBar}
               />
           }
       </div>

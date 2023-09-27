@@ -98,6 +98,12 @@ function UtensilNavbar(props: any) {
     }
   },[props.trees])
 
+  useEffect(() => {
+    if (props.toCloseBar) {
+      closeBar();
+    }
+  },[props.toCloseBar])
+
   return (
     <>
       <StyledBar>
@@ -106,11 +112,13 @@ function UtensilNavbar(props: any) {
             graphName={props.graphName}
             setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
             setOpenEditGraphDialog={props.setOpenEditGraphDialog}
+            setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
             setIsPrivate={props.setIsPrivate}
             saveGraphToDatabase={props.saveGraphToDatabase}
             setIsChangesSavedMessageOpen={setIsChangesSavedMessageOpen}
             closeBar={closeBar}
             canBeSavedGraph={props.canBeSavedGraph}
+            canBeDeletedGraph={props.canBeDeletedGraph}
           />
         </div>       
 
