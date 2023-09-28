@@ -90,7 +90,8 @@ const InputField = styled(TextField)({
     padding: '8px 12px 8px 8px',
   },
   '& .MuiFormHelperText-root': {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
+    color: THEME_COLORS.get('red')
   }, 
   '& .MuiOutlinedInput-root': {
     '& fieldset': {

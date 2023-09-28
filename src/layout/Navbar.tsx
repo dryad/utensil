@@ -37,11 +37,13 @@ function Navbar(props: any) {
                 onConfirmImport={props.onConfirmImport}
                 onGraphSelected={props.onGraphSelected}
                 setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+                setOpenShareGraphDialog={props.setOpenShareGraphDialog}
                 setOpenEditGraphDialog={props.setOpenEditGraphDialog}
                 setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
                 setIsPrivate={props.setIsPrivate}
                 saveGraphToDatabase={props.saveGraphToDatabase}
                 canBeSavedGraph={props.canBeSavedGraph}
+                canBeSharedGraph={props.canBeSharedGraph}
                 canBeDeletedGraph={props.canBeDeletedGraph}
                 toCloseBar={props.toCloseBar}
               />

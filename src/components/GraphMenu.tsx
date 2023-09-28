@@ -54,6 +54,7 @@ const arrowStyle = {
 type Props = {
   graphName: string; 
   setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setOpenShareGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
@@ -61,10 +62,11 @@ type Props = {
   setIsChangesSavedMessageOpen: Dispatch<SetStateAction<boolean>>;
   closeBar: () => void;
   canBeSavedGraph: boolean;
+  canBeSharedGraph: boolean;
   canBeDeletedGraph: boolean;
 }
 
-export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph, canBeDeletedGraph}: Props) {
+export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph, canBeSharedGraph, canBeDeletedGraph}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -122,7 +124,18 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenEdi
             >
               Edit graph info
             </StyledMenuItem>
-            <StyledMenuItem onClick={handleClose}>
+            <StyledMenuItem 
+              onClick={() => {
+                if (canBeSharedGraph) {
+                  handleClose(); 
+                  setOpenShareGraphDialog(true);
+                }                
+              }}
+              sx={{
+                color: canBeSharedGraph ? '' : THEME_COLORS.get('lightGray'), 
+                cursor: canBeSharedGraph ? '' : 'auto'
+              }}            
+            >
               Share
             </StyledMenuItem>
             <StyledDivider />

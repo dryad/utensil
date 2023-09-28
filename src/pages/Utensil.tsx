@@ -21,6 +21,7 @@ import ConfirmLoadDialog from "../components/ConfirmLoadDialog";
 import ShowWarningDialog from "../components/ShowWarningDialog";
 import ShowGetAccountDialog from "../components/ShowGetAccountDialog";
 import SaveGraphDialog from "../components/Dialog/SaveGraphDialog";
+import ShareGraphDialog from "../components/Dialog/ShareGraphDialog";
 import EditGraphDialog from "../components/Dialog/EditGraphDialog";
 import CancelEditGraphDialog from "../components/Dialog/CancelEditGraphDialog";
 import DeleteGraphDialog from "../components/Dialog/DeleteGraphDialog";
@@ -74,12 +75,14 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+  const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [canBeSavedGraph, setCanBeSavedGraph] = useState(false);
+  const [canBeSharedGraph, setCanBeSharedGraph] = useState(false);
   const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   
@@ -110,10 +113,27 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   },[selectedGraph]);
 
   useEffect(() => {
-    setCanBeSavedGraph(!(graphId === null || publicPrivateGraphs.findIndex(el => el.id === graphId) === -1));
+    // determine if current graph can be saved or edited
+
+    setCanBeSavedGraph(!(
+      graphId === null || 
+      publicPrivateGraphs.findIndex(el => el.id === graphId) === -1 ||
+      functionalGraphData.hasOwnProperty(graphId)  
+    ));
   },[graphId, publicPrivateGraphs]);
 
   useEffect(() => {
+    // determine if current graph can be shared
+
+    setCanBeSharedGraph(!(
+      graphId === null || 
+      publicPrivateGraphs.findIndex(el => el.id === graphId) === -1  
+    ));
+  },[graphId, publicPrivateGraphs]);
+
+  useEffect(() => {
+    // determine if current graph can be deleted
+    
     const currentGraph = publicPrivateGraphs.find(el => el.id === graphId);
     
     if (currentGraph) {
@@ -1077,11 +1097,13 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
           setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+          setOpenShareGraphDialog={setOpenShareGraphDialog}
           setOpenEditGraphDialog={setOpenEditGraphDialog}
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
           canBeSavedGraph={canBeSavedGraph}
+          canBeSharedGraph={canBeSharedGraph}
           canBeDeletedGraph={canBeDeletedGraph}
           toCloseBar={toCloseBar}
         />
@@ -1146,6 +1168,13 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
+        />
+
+        <ShareGraphDialog
+          open={openShareGraphDialog} 
+          setOpen={setOpenShareGraphDialog}
+          graphName={graphName}
+          graphId={graphId}
         />
 
         <EditGraphDialog

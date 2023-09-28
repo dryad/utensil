@@ -34,7 +34,12 @@ const DeleteGraphDialog = (props: DialogProps) => {
       <DialogActions>
         <DialogButton
           variant="outlined"
-          sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
+          sx={{
+            color: THEME_COLORS.get('gray700'), 
+            background: THEME_COLORS.get('white'), 
+            border: '1px solid #e5e7eb',
+            ':hover': {border: `1px solid ${THEME_COLORS.get('red')}`, background:'white'}
+          }}
           onClick={() => {
             setOpen(false);
           }}
@@ -43,7 +48,7 @@ const DeleteGraphDialog = (props: DialogProps) => {
         </DialogButton>
         <DialogButton
           variant="contained"
-          sx={{background: THEME_COLORS.get('red')}}
+          sx={{background: THEME_COLORS.get('red'), ':hover': {background: THEME_COLORS.get('red')}}}
           onClick={() => {
             setOpen(false); 
             onDelete();
