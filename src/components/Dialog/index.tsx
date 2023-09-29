@@ -54,7 +54,7 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 const DialogWindow = withStyles(styles)((props: any) => {
-  const { children, classes, onClose, width, ...other } = props;
+  const { children, classes, onClose, position, positionTop, width, gap = '20px', ...other } = props;
   return (
     <Dialog 
       slotProps={{ backdrop: { style: { backgroundColor: 'rgba(75, 85, 99, 0.2)' } } }}
@@ -63,7 +63,9 @@ const DialogWindow = withStyles(styles)((props: any) => {
           borderRadius: '8px',
           padding: '20px',
           display: 'flex',
-          gap: '20px',
+          position: position,
+          top: positionTop,
+          gap: gap,
           width: width,
           boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         },

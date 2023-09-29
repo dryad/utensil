@@ -210,7 +210,6 @@ export default function NetworkButtons(props: Props) {
                     value={props.buttonMode} // The value of the selected button comes from Utensil.tsx as a React prop
                     exclusive
                     onChange={handleChange}
-                    onMouseOver={(e) => {}}
                 >
                     <Wire value="pan" >
                         {(props:any) => (

@@ -3,9 +3,11 @@ import SmallVisCustomNetwork from "libs/small-vis-custom-network";
 
 type INetworkProps = {
   networkRef: any;
+  width?: string;
+  height?: string;
 };
 
-const SmallNetwork = ({ networkRef }: INetworkProps) => {
+const SmallNetwork = ({ networkRef, width='100px', height='80px' }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -15,7 +17,7 @@ const SmallNetwork = ({ networkRef }: INetworkProps) => {
     }, [networkRef]);
     
     return (
-      <div ref={domRef} style={{ height: `100px`, width: `100px`, background: '#fff' }} />
+      <div ref={domRef} style={{ height: height, width: width, background: '#fff' }} />
     );
   }
 

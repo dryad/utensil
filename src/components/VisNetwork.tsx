@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, memo, forwardRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Node, Edge } from "models";
 import { NODE_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
-import NodeDialog from "./NodeDialog";
+import EditNodeDialog from 'components/Dialog/EditNodeDialog';
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
@@ -485,7 +485,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     return (
       <>
         <div ref={domRef} style={{ height: canvasHeight, width: `100%` }} className="canvasWindow"/>
-        <NodeDialog
+        <EditNodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}
           nodeLabel={nodeDialogLabel}
