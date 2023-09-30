@@ -1088,6 +1088,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         <Navbar 
           getMetaMaskAccount={getMetaMaskAccount}
           metaMaskAccount={metaMaskAccount}
+          graphs={publicPrivateGraphs}
           trees={trees} 
           hoveredNodes={hoveredNodesRef} 
           selectedNodes={selectedNodesRef} 

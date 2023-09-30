@@ -1,24 +1,23 @@
-import { InputAdornment, TextField } from '@mui/material';
+import { Box, InputAdornment, TextField } from '@mui/material';
 import { CloseIcon, SearchIcon } from 'assets/icons/svg';
 import { useEffect, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
-import {useDebounce} from 'hooks/useDebounce';
-import axios from "libs/axios";
 import GraphItemOnSearchBar from './GraphItemOnSearchBar';
 import {Graph} from 'models';
 import { styled } from '@mui/material/styles';
 
 type Props = {
   closeBar: () => void;
+  graphs: Graph[];
   metaMaskAccount: string;
   onConfirmReplace: () => void;
   onConfirmImport: () => void;
   onGraphSelected: (id: number) => void;
 }
 
-const StyledBox = styled('div')(({ theme }) => ({
-  overflowY:'auto', 
-  height: '60%',
+const StyledBox = styled(Box)(() => ({
+  overflowY:'auto',
+  height: '80%',
   paddingTop: "1rem",
   display:'flex', 
   flexDirection:'column', 
@@ -49,35 +48,30 @@ const inputFieldStyles = {
   },
 }
 
-function SearchGraphBar({closeBar, metaMaskAccount, onConfirmReplace, onConfirmImport, onGraphSelected}: Props) {
+function SearchGraphBar({closeBar, graphs, onConfirmReplace, onConfirmImport, onGraphSelected}: Props) {
 
-  const [graphs, setGraphs] = useState([]);
+  const [filteredGraphs, setFilteredGraphs] = useState([...graphs]);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchQuery.trim(), 700);
-
-  console.log('graphs search: ', graphs);
-
-  useEffect(() => {
-		if (debouncedSearchTerm) {
-			setSearchTerm(debouncedSearchTerm);
-		} else {
-			setSearchTerm(debouncedSearchTerm);
-		}
-	}, [debouncedSearchTerm]);
+  
+  console.log('graphs search: ', filteredGraphs);
 
   const clearSearch = () => {
     setSearchQuery('');
   }
 
-  const refreshList = async () => {
-    const { data } = await axios.get(`/api/graphs/?q=${searchTerm}${metaMaskAccount ? `&private=${metaMaskAccount}` : ''}`);
-    setGraphs(data);  
-  };
-
   useEffect(() => {
-    searchQuery && refreshList(); 
-  }, [searchTerm, metaMaskAccount]);
+    
+    if (searchQuery && searchQuery?.trim().length > 0) {
+      const tempGraphs = graphs.filter((el: Graph) => {
+        if (el.name.toLowerCase().trim().includes(searchQuery.toLowerCase())) {
+          return el
+        }
+      })
+      setFilteredGraphs(tempGraphs);
+    } else {
+      setFilteredGraphs([...graphs]);
+    }
+  }, [searchQuery]);
 
   return (
     <div 
@@ -85,10 +79,9 @@ function SearchGraphBar({closeBar, metaMaskAccount, onConfirmReplace, onConfirmI
         position:'absolute', 
         top:'71px', 
         right:'16px', 
+        bottom: '79px', 
         zIndex:'10',
         width: '295px',
-        height:'300px',
-        minHeight: '300px',
         background:'white',
         padding: '20px'
       }}
@@ -133,19 +126,19 @@ function SearchGraphBar({closeBar, metaMaskAccount, onConfirmReplace, onConfirmI
         sx={inputFieldStyles}
       />
       
-      {searchQuery.trim() !== '' && graphs.length === 0 &&
+      {searchQuery.trim() !== '' && filteredGraphs.length === 0 &&
         <div style={{fontWeight:'500', fontSize:'0.75rem', paddingTop:'12px'}}>
           No results yet
         </div>
       }
 
-      {searchQuery.trim() !== '' && graphs.length > 0 &&
+      {filteredGraphs.length > 0 &&
         <>
           <div style={{fontWeight:'500', fontSize:'0.75rem', paddingTop:'12px'}}>
-            {graphs.length} result(s)
+            {filteredGraphs.length} result(s)
           </div>
           <StyledBox>
-            {graphs.map((graph: Graph) => 
+            {filteredGraphs.map((graph: Graph) => 
               <GraphItemOnSearchBar 
                 graph={graph}
                 key={graph.id}

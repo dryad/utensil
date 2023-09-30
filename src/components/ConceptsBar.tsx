@@ -12,7 +12,7 @@ type Props = {
   setHoveredChipToVis: any;
 }
 
-const StyledBox = styled(Box)(({ theme }) => ({
+const StyledBox = styled(Box)(() => ({
   overflowY:'auto', 
   height: '100%',
   paddingTop: "1rem",

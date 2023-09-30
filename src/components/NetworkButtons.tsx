@@ -7,6 +7,7 @@ import { THEME_COLORS } from "constants/colors";
 import { HandIcon, CursorIcon, CircleIcon, ArrowTopRightIcon, TextIcon, ContractionIcon, ExpansionIcon, UndoIcon, RedoIcon, LineIcon } from '../assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 type Props = {
     networkRef: React.MutableRefObject<VisCustomNetwork | null>;
@@ -216,24 +217,6 @@ export default function NetworkButtons(props: Props) {
                             <StyledTooltip placement="right" arrow 
                                 title={
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
-                                        <span>Hand tool</span>
-                                        <div style={tooltipStyles}>
-                                            H
-                                        </div>
-                                    </div>
-                                }
-                            >
-                                <StyledToggleButton aria-label="pan" {...props}>
-                                    <HandIcon />
-                                </StyledToggleButton>
-                            </StyledTooltip>
-                        )}
-                    </Wire>
-                    <Wire value="select" >
-                        {(props:any) => (
-                            <StyledTooltip placement="right" arrow 
-                                title={
-                                    <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
                                         <span>Select</span>
                                         <div style={tooltipStyles}>
                                             S
@@ -338,20 +321,20 @@ export default function NetworkButtons(props: Props) {
                     </Wire>
                      {/* ------ secondary tool bar ---- */}
 
-                    <Wire value="text" >
+                    <Wire value="delete" >
                         {(props:any) => (
                             <StyledTooltip placement="right" arrow 
                                 title={
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
-                                        <span>Text</span>
+                                        <span>Delete</span>
                                         <div style={tooltipStyles}>
-                                            T
+                                            D
                                         </div>
                                     </div>
                                 }
                             >
                                 <StyledToggleButton aria-label="text" {...props}>
-                                    <TextIcon />
+                                    <HighlightOffIcon />
                                 </StyledToggleButton>
                             </StyledTooltip>
                         )}

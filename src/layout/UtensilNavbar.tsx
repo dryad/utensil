@@ -156,6 +156,7 @@ function UtensilNavbar(props: any) {
       {navbarMode === 'search' &&
         <SearchGraphBar 
           closeBar={closeBar} 
+          graphs={props.graphs}
           metaMaskAccount={props.metaMaskAccount}
           onConfirmReplace={props.onConfirmReplace}
           onConfirmImport={props.onConfirmImport}

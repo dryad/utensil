@@ -16,12 +16,8 @@ export const useKeyDownHandler = (onButton: (nextMode: string) => void, onUndo: 
             onButton("pan");
         }
 
-        if(e.key === 'h') { 
-            onButton("pan");
-        }
-
         if (e.key === 's') {
-            onButton("select");
+            onButton("pan");
         }
 
         if (e.key === 'o') {
@@ -36,8 +32,8 @@ export const useKeyDownHandler = (onButton: (nextMode: string) => void, onUndo: 
             onButton('directed-edge');
         } 
 
-        if (e.key === 't') {
-            onButton("text");
+        if (e.key === 'd') {
+            onButton("delete");
         }
 
         if (e.key === 'g' && e.ctrlKey) {
