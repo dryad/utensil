@@ -11,7 +11,6 @@ import {
   CardContent,
   ButtonGroup,
 } from "@mui/material";
-import axios from "libs/axios";
 import VisCustomNetwork from "libs/vis-custom-network";
 import VisNetwork from "../components/VisNetwork";
 import GraphList from "../components/GraphList";
@@ -38,6 +37,7 @@ import EmptyStatePopUp from '../components/EmptyStatePopUp';
 import ZoomActions from '../components/ZoomActions';
 import Navbar from "layout/Navbar";
 import functionalGraphData from "../functions/functionalGraphIds.json"; 
+import { saveGraph, getAllGraphs, deleteGraph } from 'services/axiosRequests';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -85,6 +85,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [canBeSharedGraph, setCanBeSharedGraph] = useState(false);
   const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
+  const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
   
   useEffect(() => {
     if (selectedGraph) {
@@ -214,13 +215,19 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     window.isUserDragging = isUserDragging; // update the global variable, used to disable highlighting subordinate nodes when dragging, for performance.
     // console.log('set window.isUserDragging to: ', window.isUserDragging);
   }
-  const refreshList = async () => {
-    const { data } = await axios.get(`/api/graphs/?q=${searchQuery}${metaMaskAccount ? `&private=${metaMaskAccount}` : ''}`);
-    setGraphs(data);
 
-    const { data: allGraphs } = await axios.get(`/api/graphs/${metaMaskAccount ? `?private=${metaMaskAccount}` : ''}`);
-    setPublicPrivateGraphs(allGraphs);
-  };
+  const refreshList = async () => {
+    getAllGraphs(metaMaskAccount)
+    .then(res => {
+      if (Array.isArray(res.data)) {
+        setPublicPrivateGraphs(res.data)
+      } 
+      else {
+        setPublicPrivateGraphs([])
+      }
+    })  
+    .catch(err => {if (err) {setPublicPrivateGraphs([])}});
+  } 
 
   const testButton = () => {
     console.log('nodes', JSON.parse(stringifyGraph()).nodes);
@@ -425,22 +432,28 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     if (graphToDelete) {
       // this is run when the user confirms they want to delete a graph.
       console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
-      await axios.delete(`/api/graphs/${graphToDelete.id}/`);
-      await refreshList();
-      initializeUndoTimer();
-      setGraphName('');
-      setGraphNote('');
-      setGraphId(null);
-      
-      const existingGraph = JSON.parse(stringifyGraph());
-      existingGraph.nodes = [];
-      existingGraph.edges = [];
-      setGraph(existingGraph);
-      networkRef.current?.setData(existingGraph);
-
-      setCanBeDeletedGraph(false);
-      setGraphToDelete(null);
-      setToCloseBar(true);
+      deleteGraph(graphToDelete.id!)
+        .then(res => {
+          console.log(res.status, res);
+          if (res.status === 204) {
+            refreshList();
+            initializeUndoTimer();
+            setGraphName('');
+            setGraphNote('');
+            setGraphId(null);
+  
+            const existingGraph = JSON.parse(stringifyGraph());
+            existingGraph.nodes = [];
+            existingGraph.edges = [];
+            setGraph(existingGraph);
+            networkRef.current?.setData(existingGraph);
+  
+            setCanBeDeletedGraph(false);
+            setGraphToDelete(null);
+            setToCloseBar(true);
+          }          
+        })  
+        .catch(err => {if (err) {console.log(err)}});
     }
   }
 
@@ -624,7 +637,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   };
 
   const handleGraphSelected = (id: number) => {
-    const graph = graphs.find((g: Graph) => g.id === id);
+    const graph = publicPrivateGraphs.find((g: Graph) => g.id === id);
     if (graph) {
       setGraphToLoad(graph); // after confirming 'yes', the confirmLoadGraph function will be called, and will load this graph.
       setGraphIdToLoad(id);
@@ -998,45 +1011,36 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   
   async function saveGraphToDatabase(isNew: boolean = false) {
          
-    if (isPrivate && !metaMaskAccount) {
-      
+    if (isPrivate && !metaMaskAccount) {      
       if (metaMaskAccount === "")
         setShowGetAccountMessage(true);
         return;
     }
     
-    const data = stringifyGraph();
-    if (isNew) {
-      await axios.post("/api/graphs/", {
-        name: graphName, //graph is saved without an id, which will force the backend to save it as a new graph.
-        note: graphNote,
-        data: data,
-        creator: metaMaskAccount,
-        private: isPrivate ? metaMaskAccount : "",
-      }).then(response => {
-          //The new id of the graph is returned by the backend. We save it to the state in the graph object. This will activate the "save" button and let us update the graph on the server.
-          if (response.data.id) {
-            console.log('Saved graph to the database with this id: ', response.data.id);
-            setGraphId(parseInt(response.data.id));
-          }
-        });
-    } else {
-      await axios.post("/api/graphs/", {
-        id: graphId, //id is sent along with the graph, so we can update the graph in the database, rather than create new.
-        name: graphName,
-        note: graphNote,
-        data: data,
-        creator: metaMaskAccount,
-        private: isPrivate ? metaMaskAccount : "",
-      });         
-    }  
-    
+    const dataToSave = {
+      ...(!isNew && {id: graphId}),
+      name: graphName,
+      note: graphNote,
+      data: stringifyGraph(),
+      creator: metaMaskAccount,
+      private: isPrivate ? metaMaskAccount : "",
+    }
+
+    saveGraph(dataToSave)
+      .then((res) => {
+        if (res.data.id) {
+          console.log('Saved graph to the database with this id: ', res.data.id);
+          setGraphId(parseInt(res.data.id));
+          setIsSaveGraphResponseStatusOk(true);
+        }
+      })
+      .catch(err => {if (err) {setIsSaveGraphResponseStatusOk(false)}})
+   
     if (startNewConcept) {
       setStartNewConcept?.(false);
     } else {
       await refreshList();
-    }
-       
+    }       
   };
   
   async function getMetaMaskAccount() {
@@ -1103,6 +1107,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           saveGraphToDatabase={saveGraphToDatabase}
+          setIsSaveGraphResponseStatusOk={setIsSaveGraphResponseStatusOk}
+          isSaveGraphResponseStatusOk={isSaveGraphResponseStatusOk}
           canBeSavedGraph={canBeSavedGraph}
           canBeSharedGraph={canBeSharedGraph}
           canBeDeletedGraph={canBeDeletedGraph}

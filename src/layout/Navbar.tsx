@@ -43,6 +43,8 @@ function Navbar(props: any) {
                 setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
                 setIsPrivate={props.setIsPrivate}
                 saveGraphToDatabase={props.saveGraphToDatabase}
+                setIsSaveGraphResponseStatusOk={props.setIsSaveGraphResponseStatusOk}
+                isSaveGraphResponseStatusOk={props.isSaveGraphResponseStatusOk}
                 canBeSavedGraph={props.canBeSavedGraph}
                 canBeSharedGraph={props.canBeSharedGraph}
                 canBeDeletedGraph={props.canBeDeletedGraph}
