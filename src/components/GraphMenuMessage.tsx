@@ -1,28 +1,12 @@
-import { useEffect, useState } from 'react';
 import { CloseIcon } from "../assets/icons/svg";
 
 type Props = {
   closeMessage: () => void;
-  startDate: Date;
+  title: string;
+  message: string;
 }
 
-function ChangesSavedMessage({closeMessage, startDate}: Props) {
-
-  const [curDate, setCurDate] = useState(new Date());
-  const [minutesAgo, setMinutesAgo] = useState(1);
-  
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurDate(new Date());
-    }, 60000)
-
-    return () => clearInterval(intervalId);
-  }, [])
-
-  useEffect(() => {
-    let difference = curDate.getTime() - startDate.getTime();
-    setMinutesAgo(Math.round((difference/1000)/60));
-  },[curDate])
+function GraphMenuMessage({closeMessage, title, message}: Props) {
 
   return (
     <div 
@@ -43,10 +27,7 @@ function ChangesSavedMessage({closeMessage, startDate}: Props) {
     >
       <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
         <div style={{fontSize:'0.875rem', fontWeight:'600', color:'#111827'}}>
-          Changes saved
-        </div>
-        <div style={{marginLeft:'auto', marginRight: '16px', color:"#6b7280", fontSize:'0.875rem'}}>
-          {minutesAgo} min ago
+          {title}
         </div>
         <div
           style={{cursor:'pointer', display:'flex', alignItems:'center', color: "#6b7280", transform: 'scale(0.8)'}}
@@ -56,10 +37,10 @@ function ChangesSavedMessage({closeMessage, startDate}: Props) {
         </div>
       </div>
       <div style={{fontSize:'0.875rem', color: '#6b7280'}}>
-        All changes in your graph were saved.
+        {message}
       </div>
     </div>
   )
 }
 
-export default ChangesSavedMessage
+export default GraphMenuMessage

@@ -1,0 +1,58 @@
+import VisCustomNetwork from "libs/vis-custom-network";
+import { saveGraph } from 'services/axiosRequests';
+
+export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCustomNetwork | null>) => { 
+    
+    const edges = networkRef.current?.edges.get();
+    const nodes = networkRef.current?.nodes.get();
+    const positions = networkRef.current?.network.getPositions();
+
+    if (nodes) {
+      for (const node of nodes) {
+        node.x = positions[node.id].x;
+        node.y = positions[node.id].y;
+      }
+    }
+
+    //create viewPosition using the getViewPosition function of vis-network
+    const viewPosition = networkRef.current?.network.getViewPosition();
+    const scale = networkRef.current?.network.getScale();
+
+    return JSON.stringify({ edges, nodes, viewPosition, scale });  
+  };
+ 
+
+  export async function saveGraphToDB (
+    isNew: boolean = false, 
+    graphName: string,
+    graphNote: string,
+    metaMaskAccount: string,
+    isPrivate: boolean,
+    networkRef: React.MutableRefObject<VisCustomNetwork | null>,
+    refreshList: Function,
+    setIsSaveGraphResponseStatusOk: Function,
+    setGraphId: Function,
+    graphId?: number | null    
+    ){
+       
+    const dataToSave = {
+      ...(!isNew && {id: graphId}),
+      name: graphName,
+      note: graphNote,
+      data: stringifyCurrentGraph(networkRef),
+      creator: metaMaskAccount,
+      private: isPrivate ? metaMaskAccount : "",
+    }
+
+    saveGraph(dataToSave)
+      .then((res) => {
+        if (res.data.id) {
+          console.log('Saved graph to the database with this id: ', res.data.id);
+          setGraphId(parseInt(res.data.id))
+          refreshList();
+          setIsSaveGraphResponseStatusOk(true);
+        }
+      })
+      .catch(err => {if (err) {console.log(err); setIsSaveGraphResponseStatusOk(false)}})
+
+  };

@@ -8,7 +8,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchGraphBar from '../components/SearchGraphBar/SearchGraphBar';
 import ConceptsBar from '../components/ConceptsBar';
 import GraphMenu from '../components/GraphMenu';
-import ChangesSavedMessage from 'components/ChangesSavedMessage';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   height: '47px',
@@ -76,19 +75,15 @@ function UtensilNavbar(props: any) {
 
   const [navbarMode, setNavbarMode] = useState<string | null>(null);
   const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
-  const [isChangesSavedMessageOpen, setIsChangesSavedMessageOpen] = useState(false);
+  const [isMessageWindowOpen, setIsMessageWindowOpen] = useState(false);
 
   const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
-    setIsChangesSavedMessageOpen(false);
+    setIsMessageWindowOpen(false);
     setNavbarMode(nextMode);
   };
 
   const closeBar = () => {
     setNavbarMode(null);
-  }
-
-  const closeMessage = () => {
-    setIsChangesSavedMessageOpen(false);
   }
 
   useEffect(() => {
@@ -115,10 +110,13 @@ function UtensilNavbar(props: any) {
             setOpenEditGraphDialog={props.setOpenEditGraphDialog}
             setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
             setIsPrivate={props.setIsPrivate}
-            saveGraphToDatabase={props.saveGraphToDatabase}
-            setIsChangesSavedMessageOpen={setIsChangesSavedMessageOpen}
+            setGraphId={props.setGraphId}
+            networkRef={props.networkRef}
+            refreshList={props.refreshList}
+            graphDataToSave={props.graphDataToSave}
+            isMessageWindowOpen={isMessageWindowOpen}
+            setIsMessageWindowOpen={setIsMessageWindowOpen}
             closeBar={closeBar}
-            canBeSavedGraph={props.canBeSavedGraph}
             canBeSharedGraph={props.canBeSharedGraph}
             canBeDeletedGraph={props.canBeDeletedGraph}
           />
@@ -172,13 +170,6 @@ function UtensilNavbar(props: any) {
           setHoveredChipToVis={props.setHoveredChipToVis}
         />
       }    
-
-      {isChangesSavedMessageOpen &&
-        <ChangesSavedMessage 
-          closeMessage={closeMessage}
-          startDate={new Date()}
-        />
-      } 
     </>   
   )
 }

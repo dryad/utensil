@@ -34,6 +34,9 @@ function Navbar(props: any) {
                 selectedNodes={props.selectedNodes} 
                 setHoveredChipToVis={props.setHoveredChipToVis}
                 graphName={props.graphName}
+                networkRef={props.networkRef}
+                refreshList={props.refreshList}
+                graphDataToSave={props.graphDataToSave}
                 onConfirmReplace={props.onConfirmReplace}
                 onConfirmImport={props.onConfirmImport}
                 onGraphSelected={props.onGraphSelected}
@@ -42,10 +45,7 @@ function Navbar(props: any) {
                 setOpenEditGraphDialog={props.setOpenEditGraphDialog}
                 setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
                 setIsPrivate={props.setIsPrivate}
-                saveGraphToDatabase={props.saveGraphToDatabase}
-                setIsSaveGraphResponseStatusOk={props.setIsSaveGraphResponseStatusOk}
-                isSaveGraphResponseStatusOk={props.isSaveGraphResponseStatusOk}
-                canBeSavedGraph={props.canBeSavedGraph}
+                setGraphId={props.setGraphId}
                 canBeSharedGraph={props.canBeSharedGraph}
                 canBeDeletedGraph={props.canBeDeletedGraph}
                 toCloseBar={props.toCloseBar}

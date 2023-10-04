@@ -3,6 +3,10 @@ import { ChevronDownIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
 import { THEME_COLORS } from "constants/colors";
+import VisCustomNetwork from "libs/vis-custom-network";
+import { saveGraphToDB } from 'components/networkFunctions';
+import GraphMenuMessage from 'components/GraphMenuMessage';
+import functionalGraphData from "functions/functionalGraphIds.json"; 
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -58,20 +62,27 @@ type Props = {
   setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
-  saveGraphToDatabase: () => void;
-  setIsChangesSavedMessageOpen: Dispatch<SetStateAction<boolean>>;
+  isMessageWindowOpen: boolean;
+  setIsMessageWindowOpen: Function;
   closeBar: () => void;
-  canBeSavedGraph: boolean;
+  networkRef: React.MutableRefObject<VisCustomNetwork | null>;
+  refreshList: Function;
+  graphDataToSave: any; 
   canBeSharedGraph: boolean;
   canBeDeletedGraph: boolean;
+  setGraphId: Function;
 }
 
-export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, saveGraphToDatabase, setIsChangesSavedMessageOpen, closeBar, canBeSavedGraph, canBeSharedGraph, canBeDeletedGraph}: Props) {
+export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
+  const {graphId, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave);  
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
   const dropDownRef = useRef<HTMLDivElement>(null);
+
+  const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -88,7 +99,13 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
       setAnchorEl(null);
     }
   }  
+
+  const closeMessage = () => {
+    setIsMessageWindowOpen(false);
+  }  
   
+  const saveGraphToDatabase = async(isNew: boolean = false) => saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
+
   return (
     <>
       <StyledButton 
@@ -145,7 +162,7 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
                   handleClose(); 
                   saveGraphToDatabase();
                   closeBar();
-                  setIsChangesSavedMessageOpen(true);
+                  setIsMessageWindowOpen(true);
                 }                
               }}
               sx={{
@@ -182,6 +199,21 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
           </StyledMenuList>
         </ClickAwayListener>
       </Popper>
+
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Changes saved'}
+          message={'All changes in your graph were saved.'}
+        />
+      } 
+      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph not saved'}
+          message={'There was an error. Please try again.'}
+        />
+      } 
     </>   
   )
 }

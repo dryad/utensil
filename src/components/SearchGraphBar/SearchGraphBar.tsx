@@ -60,6 +60,10 @@ function SearchGraphBar({closeBar, graphs, onConfirmReplace, onConfirmImport, on
   }
 
   useEffect(() => {
+    setFilteredGraphs([...graphs]);
+  }, [graphs]);
+
+  useEffect(() => {
     
     if (searchQuery && searchQuery?.trim().length > 0) {
       const tempGraphs = graphs.filter((el: Graph) => {

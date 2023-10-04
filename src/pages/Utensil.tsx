@@ -12,32 +12,33 @@ import {
   ButtonGroup,
 } from "@mui/material";
 import VisCustomNetwork from "libs/vis-custom-network";
-import VisNetwork from "../components/VisNetwork";
-import GraphList from "../components/GraphList";
-import NetworkButtons from "../components/NetworkButtons";
+import VisNetwork from "components/VisNetwork";
+import GraphList from "components/GraphList";
+import NetworkButtons from "components/NetworkButtons";
 import useState from 'react-usestateref';
-import ConfirmLoadDialog from "../components/ConfirmLoadDialog";
-import ShowWarningDialog from "../components/ShowWarningDialog";
-import ShowGetAccountDialog from "../components/ShowGetAccountDialog";
-import SaveGraphDialog from "../components/Dialog/SaveGraphDialog";
-import ShareGraphDialog from "../components/Dialog/ShareGraphDialog";
-import EditGraphDialog from "../components/Dialog/EditGraphDialog";
-import CancelEditGraphDialog from "../components/Dialog/CancelEditGraphDialog";
-import DeleteGraphDialog from "../components/Dialog/DeleteGraphDialog";
-import TreeList from "../components/Tree/TreeList";
+import ConfirmLoadDialog from "components/ConfirmLoadDialog";
+import ShowWarningDialog from "components/ShowWarningDialog";
+import ShowGetAccountDialog from "components/ShowGetAccountDialog";
+import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
+import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
+import EditGraphDialog from "components/Dialog/EditGraphDialog";
+import CancelEditGraphDialog from "components/Dialog/CancelEditGraphDialog";
+import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
+import TreeList from "components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
-import MetaMaskButton from "../components/MetaMaskButton";
+import MetaMaskButton from "components/MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
-import WhitelistedAddresses from "../components/WhitelistedAddresses";
-import { contractAction } from "../components/ContractButtonFunctions";
+import WhitelistedAddresses from "components/WhitelistedAddresses";
+import { contractAction } from "components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
-import { useComputeFunctionalGraph } from '../hooks/useComputeFunctionalGraph';
-import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
-import EmptyStatePopUp from '../components/EmptyStatePopUp';
-import ZoomActions from '../components/ZoomActions';
+import { useComputeFunctionalGraph } from 'hooks/useComputeFunctionalGraph';
+import { useKeyDownHandler } from 'hooks/useKeyDownHandler';
+import EmptyStatePopUp from 'components/EmptyStatePopUp';
+import ZoomActions from 'components/ZoomActions';
 import Navbar from "layout/Navbar";
-import functionalGraphData from "../functions/functionalGraphIds.json"; 
+import functionalGraphData from "functions/functionalGraphIds.json"; 
 import { saveGraph, getAllGraphs, deleteGraph } from 'services/axiosRequests';
+import { stringifyCurrentGraph, saveGraphToDB } from 'components/networkFunctions';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -86,7 +87,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
-  
+  const stringifyGraph = () => stringifyCurrentGraph(networkRef);
+
   useEffect(() => {
     if (selectedGraph) {
       const data = JSON.parse(selectedGraph.data);
@@ -614,8 +616,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
 
         return el;
       })
-      
-      let existingGraph = JSON.parse(stringifyGraph());
+      const stringifyCurGraph = stringifyGraph();
+      let existingGraph = JSON.parse(stringifyCurGraph);
       console.log('existing graph', existingGraph);
       console.log('graph to load', JSON.parse(graphToLoad.data));
 
@@ -629,7 +631,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   
   const setGraphFromNodesAndEdges = (nodes: TreeNode[], edges: Edge[]) => { // receives new arrays of nodes and edges, used by merge node, and to update node opacity after a label edit
     // console.log('Setting snapped nodes and edges:', nodes, edges);
-    const existingGraph = JSON.parse(stringifyGraph());
+    const stringifyCurGraph = stringifyGraph();
+    const existingGraph = JSON.parse(stringifyCurGraph);
     existingGraph.nodes = nodes;
     existingGraph.edges = edges;
     setGraph(existingGraph);
@@ -991,57 +994,23 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
   }
 
-  const stringifyGraph = () => { //used in both handeSave and addHistoryBack
-    const edges = networkRef.current?.edges.get();
-    const nodes = networkRef.current?.nodes.get();
-    const positions = networkRef.current?.network.getPositions();
-
-    if (nodes) {
-      for (const node of nodes) {
-        node.x = positions[node.id].x;
-        node.y = positions[node.id].y;
-      }
-    }
-
-    //create viewPosition using the getViewPosition function of vis-network
-    const viewPosition = networkRef.current?.network.getViewPosition();
-    const scale = networkRef.current?.network.getScale();
-    return JSON.stringify({ edges, nodes, viewPosition, scale });  
-  };
-  
-  async function saveGraphToDatabase(isNew: boolean = false) {
-         
+  const saveGraphToDatabase = (isNew: boolean = false) => {
     if (isPrivate && !metaMaskAccount) {      
       if (metaMaskAccount === "")
         setShowGetAccountMessage(true);
         return;
     }
-    
-    const dataToSave = {
-      ...(!isNew && {id: graphId}),
-      name: graphName,
-      note: graphNote,
-      data: stringifyGraph(),
-      creator: metaMaskAccount,
-      private: isPrivate ? metaMaskAccount : "",
-    }
 
-    saveGraph(dataToSave)
-      .then((res) => {
-        if (res.data.id) {
-          console.log('Saved graph to the database with this id: ', res.data.id);
-          setGraphId(parseInt(res.data.id));
-          setIsSaveGraphResponseStatusOk(true);
-        }
-      })
-      .catch(err => {if (err) {setIsSaveGraphResponseStatusOk(false)}})
-   
-    if (startNewConcept) {
-      setStartNewConcept?.(false);
-    } else {
-      await refreshList();
-    }       
-  };
+    saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setGraphId, setIsSaveGraphResponseStatusOk, graphId); 
+  } 
+  
+  const graphDataToSave = JSON.stringify({
+    graphId: graphId,
+    graphName: graphName,
+    graphNote: graphNote,
+    metaMaskAccount: metaMaskAccount,
+    isPrivate: isPrivate
+  });
   
   async function getMetaMaskAccount() {
     if (typeof ethereum !== 'undefined') {
@@ -1080,10 +1049,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   }, []);
 
   useEffect(() => {
-      
-      if (isAddShapeButtonClicked && !isEmptyState) {
-          onButton('node');
-      }
+    if (isAddShapeButtonClicked && !isEmptyState) {
+      onButton('node');
+    }
   }, [isAddShapeButtonClicked, isEmptyState]);
 
   return (
@@ -1098,6 +1066,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           selectedNodes={selectedNodesRef} 
           setHoveredChipToVis={setHoveredChipToVis}
           graphName={graphName}
+          networkRef={networkRef}
+          refreshList={refreshList}
+          graphDataToSave={graphDataToSave}
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
@@ -1106,10 +1077,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setOpenEditGraphDialog={setOpenEditGraphDialog}
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
-          saveGraphToDatabase={saveGraphToDatabase}
-          setIsSaveGraphResponseStatusOk={setIsSaveGraphResponseStatusOk}
-          isSaveGraphResponseStatusOk={isSaveGraphResponseStatusOk}
-          canBeSavedGraph={canBeSavedGraph}
+          setGraphId={setGraphId}
           canBeSharedGraph={canBeSharedGraph}
           canBeDeletedGraph={canBeDeletedGraph}
           toCloseBar={toCloseBar}
@@ -1138,7 +1106,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             historyListForward={historyListForward}
             historyListBackRef={historyListBackRef}
             setIsUserDragging={setIsUserDraggingGlobal}
-            stringifyGraph={stringifyGraph}
             deleteIfDeleteMode={deleteIfDeleteMode}
             setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
             addEdgeDirectedOrNot={addEdgeDirectedOrNot}
@@ -1217,7 +1184,14 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setOpen={setOpenDeleteGraphDialog}
           onDelete={confirmDeleteGraph}
         />
-        
+
+        <ShowGetAccountDialog 
+          showGetAccountMessage={showGetAccountMessage} 
+          setShowGetAccountMessage={setShowGetAccountMessage} 
+          setIsPrivate={setIsPrivate}
+        >
+        </ShowGetAccountDialog>
+
       </main>
       {/* <div 
         style={{

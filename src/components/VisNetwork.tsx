@@ -7,6 +7,7 @@ import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
 import Circle from '../assets/icons/circle.svg';
+import { stringifyCurrentGraph } from 'components/networkFunctions';
 
 type INetworkProps = {
   networkRef: any;
@@ -18,7 +19,6 @@ type INetworkProps = {
   historyListBack: string[];
   historyListForward: string[];
   historyListBackRef: any;
-  stringifyGraph: Function;
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
   setGraphFromNodesAndEdges: Function;
@@ -32,7 +32,7 @@ type INetworkProps = {
   handleGraphImport: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs, handleGraphImport }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef,  setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs, handleGraphImport }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -79,7 +79,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       }
 
       //set graph from nodes and edges, this is needed to update the opacity of the nodes
-      const existingGraph = JSON.parse(stringifyGraph());
+      const existingGraph = JSON.parse(stringifyCurrentGraph(networkRef));
       existingGraph.nodes = [node, ...existingGraph.nodes.filter((el: any) => el.id !== node.id)];
       setGraphFromNodesAndEdges(existingGraph.nodes, existingGraph.edges);
       networkRef.current?.setData(existingGraph);
@@ -500,4 +500,3 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
   }
 
 export default memo(VisNetwork);
-// export default VisNetwork;
