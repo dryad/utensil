@@ -1,13 +1,14 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
 import { ChevronDownIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
-import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 import { THEME_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
 import { saveGraphToDB } from 'components/networkFunctions';
 import GraphMenuMessage from 'components/GraphMenuMessage';
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
+import EditGraphDialog from "components/Dialog/EditGraphDialog";
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -60,7 +61,6 @@ type Props = {
   setGraphName: Dispatch<SetStateAction<string>>;
   setGraphNote: Dispatch<SetStateAction<string>>;
   setOpenShareGraphDialog: Dispatch<SetStateAction<boolean>>;
-  setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   isMessageWindowOpen: boolean;
@@ -75,18 +75,37 @@ type Props = {
   setGraphId: Function;
 }
 
-export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
+type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'null';
+
+export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
+  const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
+  const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
-  const [isGraphSavedAsNew, setIsGraphSavedAsNew] = useState(false);
+  const [graphStatus, setGraphStatus] = useState<GraphStatus>('null');
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
-  const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
+  const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
+
+  useEffect(() => {
+    if (open) {
+      setGraphStatus('null');
+      setIsSaveGraphResponseStatusOk(null);
+    }    
+  },[open, anchorEl]);
+
+  useEffect(() => {
+    if (isSaveGraphResponseStatusOk === false) {
+      setIsPrivate(() => prevGraphPrivate); 
+      setGraphName(prevGraphName);
+      setGraphNote(prevGraphNote);
+    }
+  },[isSaveGraphResponseStatusOk])
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -106,6 +125,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
 
   const closeMessage = () => {
     setIsMessageWindowOpen(false);
+    setGraphStatus('null');
   }  
   
   const saveGraphToDatabase = async(isNew: boolean = false) => saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
@@ -136,6 +156,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
                 if (canBeSavedGraph) {
                   handleClose(); 
                   setOpenEditGraphDialog(true);
+                  setGraphStatus('edited')
                 }  
               }}
               sx={{
@@ -167,7 +188,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
                   saveGraphToDatabase();
                   closeBar();
                   setIsMessageWindowOpen(true);
-                  setIsGraphSavedAsNew(false);
+                  setGraphStatus('saved')
                 }                
               }}
               sx={{
@@ -182,7 +203,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
                 handleClose(); 
                 setIsPrivate(false); 
                 setOpenSaveGraphDialog(true);
-                setIsGraphSavedAsNew(true);
+                setGraphStatus('saved as new')
               }}
             >
               Save as a new graph
@@ -219,24 +240,51 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       />
 
-      {isSaveGraphResponseStatusOk && isMessageWindowOpen && !isGraphSavedAsNew &&
+      <EditGraphDialog
+        open={openEditGraphDialog} 
+        setOpen={setOpenEditGraphDialog}
+        graphDataToSave={graphDataToSave}
+        prevGraphDataToSave={prevGraphDataToSave}
+        setGraphName={setGraphName}
+        setGraphNote={setGraphNote}
+        setIsPrivate={setIsPrivate}
+        saveGraphToDatabase={saveGraphToDatabase}
+        closeBar={closeBar}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+      />
+
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Changes saved'}
           message={'All changes in your graph were saved.'}
         />
       } 
-      {isSaveGraphResponseStatusOk && isMessageWindowOpen && isGraphSavedAsNew &&
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved as new' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph saved'}
           message={'You have saved your graph.'}
         />
       } 
-      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen &&
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'edited' &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph info edited'}
+          message={'You have edited your graph info.'}
+        />
+      } 
+      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && ['saved', 'saved as new'].includes(graphStatus) &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph not saved'}
+          message={'There was an error. Please try again.'}
+        />
+      } 
+      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'edited' &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph not edited'}
           message={'There was an error. Please try again.'}
         />
       } 

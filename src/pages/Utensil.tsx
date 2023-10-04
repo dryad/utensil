@@ -78,8 +78,8 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
-  const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
-  const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
+  // const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
+  // const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
@@ -1082,7 +1082,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
           setOpenShareGraphDialog={setOpenShareGraphDialog}
-          setOpenEditGraphDialog={setOpenEditGraphDialog}
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           setGraphId={setGraphId}
@@ -1143,34 +1142,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           setOpen={setOpenShareGraphDialog}
           graphName={graphName}
           graphId={graphId}
-        />
-
-        <EditGraphDialog
-          open={openEditGraphDialog} 
-          setOpen={setOpenEditGraphDialog}
-          setOpenCancelEditGraphDialog={setOpenCancelEditGraphDialog}
-          graphName={graphName}
-          setGraphName={setGraphName}
-          graphNote={graphNote}
-          setGraphNote={setGraphNote}
-          prevGraphName={graphToLoad ? graphToLoad.name : ''}
-          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
-          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
-          isPrivate={isPrivate}
-          setIsPrivate={setIsPrivate}
-          saveGraphToDatabase={saveGraphToDatabase}
-        />
-
-        <CancelEditGraphDialog
-          open={openCancelEditGraphDialog} 
-          setOpen={setOpenCancelEditGraphDialog}
-          setGraphName={setGraphName}
-          setGraphNote={setGraphNote}
-          prevGraphName={graphToLoad ? graphToLoad.name : ''}
-          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
-          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
-          setIsPrivate={setIsPrivate}
-          saveGraphToDatabase={saveGraphToDatabase}
         />
 
         <DeleteGraphDialog

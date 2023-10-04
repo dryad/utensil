@@ -9,13 +9,8 @@ interface DialogProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
   graphDataToSave: string; 
   prevGraphDataToSave: string;
-  // graphName: string;
   setGraphName: Dispatch<SetStateAction<string>>;
-  // graphNote: string;
   setGraphNote: Dispatch<SetStateAction<string>>;
-  // prevGraphName: string;
-  // prevGraphNote: string;
-  // prevGraphPrivate: boolean;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: (value: boolean) => void;
   closeBar: Function;

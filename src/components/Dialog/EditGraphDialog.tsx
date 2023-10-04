@@ -7,20 +7,17 @@ import { THEME_COLORS } from 'constants/colors';
 interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setOpenCancelEditGraphDialog: Dispatch<SetStateAction<boolean>>;
-  graphName: string;
+  graphDataToSave: string; 
+  prevGraphDataToSave: string;
   setGraphName: Dispatch<SetStateAction<string>>;
-  graphNote: string;
   setGraphNote: Dispatch<SetStateAction<string>>;
-  prevGraphName: string;
-  prevGraphNote: string;
-  prevGraphPrivate: boolean;
-  isPrivate: boolean;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: () => void;
+  closeBar: Function;
+  setIsMessageWindowOpen: Function;
 }
 
-const StIcon = styled('span')(({ theme }) => ({
+const StIcon = styled('span')(() => ({
   borderRadius: '50%',
   width: 16,
   height: 16,
@@ -55,7 +52,9 @@ function StRadio(props: RadioProps) {
 }
 
 const EditGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, setOpenCancelEditGraphDialog, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, isPrivate, setIsPrivate, saveGraphToDatabase } = props;
+  const { open, setOpen, graphDataToSave, prevGraphDataToSave, setGraphName, setGraphNote, setIsPrivate, saveGraphToDatabase, closeBar, setIsMessageWindowOpen } = props;
+  const {graphName, graphNote, isPrivate} =  JSON.parse(graphDataToSave); 
+  const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
   const [error, setError] = useState(false);
   
   useEffect(() => {
@@ -142,13 +141,9 @@ const EditGraphDialog = (props: DialogProps) => {
           variant="outlined"
           sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
           onClick={() => {
-            if (
-              prevGraphName !== graphName || 
-              prevGraphNote !== graphNote || 
-              prevGraphPrivate !== isPrivate
-            ) {
-              setOpenCancelEditGraphDialog(true);
-            }
+            setIsPrivate(() => prevGraphPrivate); 
+            setGraphName(prevGraphName);
+            setGraphNote(prevGraphNote);
             setError(false);
             setOpen(false); 
           }}
@@ -164,6 +159,8 @@ const EditGraphDialog = (props: DialogProps) => {
             } else {
               saveGraphToDatabase();
               setOpen(false);
+              closeBar();
+              setIsMessageWindowOpen(true);
             }
           }}
         >

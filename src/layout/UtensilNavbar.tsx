@@ -107,7 +107,6 @@ function UtensilNavbar(props: any) {
             setGraphName={props.setGraphName}
             setGraphNote={props.setGraphNote}
             setOpenShareGraphDialog={props.setOpenShareGraphDialog}
-            setOpenEditGraphDialog={props.setOpenEditGraphDialog}
             setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
             setIsPrivate={props.setIsPrivate}
             setGraphId={props.setGraphId}
