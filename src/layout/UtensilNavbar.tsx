@@ -104,8 +104,8 @@ function UtensilNavbar(props: any) {
       <StyledBar>
         <div style={{marginLeft:'auto'}}>
           <GraphMenu 
-            graphName={props.graphName}
-            setOpenSaveGraphDialog={props.setOpenSaveGraphDialog}
+            setGraphName={props.setGraphName}
+            setGraphNote={props.setGraphNote}
             setOpenShareGraphDialog={props.setOpenShareGraphDialog}
             setOpenEditGraphDialog={props.setOpenEditGraphDialog}
             setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
@@ -114,6 +114,7 @@ function UtensilNavbar(props: any) {
             networkRef={props.networkRef}
             refreshList={props.refreshList}
             graphDataToSave={props.graphDataToSave}
+            prevGraphDataToSave={props.prevGraphDataToSave}
             isMessageWindowOpen={isMessageWindowOpen}
             setIsMessageWindowOpen={setIsMessageWindowOpen}
             closeBar={closeBar}

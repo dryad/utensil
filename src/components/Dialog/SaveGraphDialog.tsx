@@ -7,15 +7,19 @@ import { THEME_COLORS } from 'constants/colors';
 interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  graphName: string;
+  graphDataToSave: string; 
+  prevGraphDataToSave: string;
+  // graphName: string;
   setGraphName: Dispatch<SetStateAction<string>>;
-  graphNote: string;
+  // graphNote: string;
   setGraphNote: Dispatch<SetStateAction<string>>;
-  prevGraphName: string;
-  prevGraphNote: string;
-  prevGraphPrivate: boolean;
+  // prevGraphName: string;
+  // prevGraphNote: string;
+  // prevGraphPrivate: boolean;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: (value: boolean) => void;
+  closeBar: Function;
+  setIsMessageWindowOpen: Function;
 }
 
 const StIcon = styled('span')(({ theme }) => ({
@@ -53,10 +57,13 @@ function StRadio(props: RadioProps) {
 }
 
 const SaveGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, graphName, setGraphName, graphNote, setGraphNote, prevGraphName, prevGraphNote, prevGraphPrivate, setIsPrivate, saveGraphToDatabase } = props;
+  const { open, setOpen, graphDataToSave, prevGraphDataToSave, setGraphName, setGraphNote, setIsPrivate, saveGraphToDatabase, closeBar, setIsMessageWindowOpen } = props;
+  const {graphName, graphNote} =  JSON.parse(graphDataToSave); 
+  const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
+  
   const [error, setError] = useState(false);
   const [value, setValue] = useState('Public');
-  
+    
   useEffect(() => {
     if (graphName !== "")  {
       setError(false);
@@ -162,6 +169,8 @@ const SaveGraphDialog = (props: DialogProps) => {
             } else {
               saveGraphToDatabase(true);
               setOpen(false);
+              closeBar();
+              setIsMessageWindowOpen(true);
             }
           }}
         >

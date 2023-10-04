@@ -7,6 +7,7 @@ import VisCustomNetwork from "libs/vis-custom-network";
 import { saveGraphToDB } from 'components/networkFunctions';
 import GraphMenuMessage from 'components/GraphMenuMessage';
 import functionalGraphData from "functions/functionalGraphIds.json"; 
+import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -56,8 +57,8 @@ const arrowStyle = {
 }
 
 type Props = {
-  graphName: string; 
-  setOpenSaveGraphDialog: Dispatch<SetStateAction<boolean>>;
+  setGraphName: Dispatch<SetStateAction<string>>;
+  setGraphNote: Dispatch<SetStateAction<string>>;
   setOpenShareGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenEditGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
@@ -67,17 +68,20 @@ type Props = {
   closeBar: () => void;
   networkRef: React.MutableRefObject<VisCustomNetwork | null>;
   refreshList: Function;
-  graphDataToSave: any; 
+  graphDataToSave: string; 
+  prevGraphDataToSave: string;
   canBeSharedGraph: boolean;
   canBeDeletedGraph: boolean;
   setGraphId: Function;
 }
 
-export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
+export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraphDialog, setOpenEditGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
-  const {graphId, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave);  
+  const [isGraphSavedAsNew, setIsGraphSavedAsNew] = useState(false);
+  const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
+  const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -163,6 +167,7 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
                   saveGraphToDatabase();
                   closeBar();
                   setIsMessageWindowOpen(true);
+                  setIsGraphSavedAsNew(false);
                 }                
               }}
               sx={{
@@ -177,6 +182,7 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
                 handleClose(); 
                 setIsPrivate(false); 
                 setOpenSaveGraphDialog(true);
+                setIsGraphSavedAsNew(true);
               }}
             >
               Save as a new graph
@@ -200,11 +206,31 @@ export default function GraphMenu({graphName, setOpenSaveGraphDialog, setOpenSha
         </ClickAwayListener>
       </Popper>
 
-      {isSaveGraphResponseStatusOk && isMessageWindowOpen &&
+      <SaveGraphDialog
+        open={openSaveGraphDialog} 
+        setOpen={setOpenSaveGraphDialog}
+        graphDataToSave={graphDataToSave}
+        prevGraphDataToSave={prevGraphDataToSave}
+        setGraphName={setGraphName}
+        setGraphNote={setGraphNote}
+        setIsPrivate={setIsPrivate}
+        saveGraphToDatabase={saveGraphToDatabase}
+        closeBar={closeBar}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+      />
+
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && !isGraphSavedAsNew &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Changes saved'}
           message={'All changes in your graph were saved.'}
+        />
+      } 
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && isGraphSavedAsNew &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph saved'}
+          message={'You have saved your graph.'}
         />
       } 
       {isSaveGraphResponseStatusOk === false && isMessageWindowOpen &&

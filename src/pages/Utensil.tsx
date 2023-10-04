@@ -39,6 +39,7 @@ import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import { saveGraph, getAllGraphs, deleteGraph } from 'services/axiosRequests';
 import { stringifyCurrentGraph, saveGraphToDB } from 'components/networkFunctions';
+import GraphMenuMessage from 'components/GraphMenuMessage';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -1011,7 +1012,13 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     metaMaskAccount: metaMaskAccount,
     isPrivate: isPrivate
   });
-  
+
+  const prevGraphDataToSave = JSON.stringify({
+    prevGraphName: graphToLoad ? graphToLoad.name : '',
+    prevGraphNote: graphToLoad ? graphToLoad.note : '',
+    prevGraphPrivate: graphToLoad ? graphToLoad.private !== '' : false,
+  });
+
   async function getMetaMaskAccount() {
     if (typeof ethereum !== 'undefined') {
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -1065,14 +1072,15 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           hoveredNodes={hoveredNodesRef} 
           selectedNodes={selectedNodesRef} 
           setHoveredChipToVis={setHoveredChipToVis}
-          graphName={graphName}
+          setGraphName={setGraphName}
+          setGraphNote={setGraphNote}
           networkRef={networkRef}
           refreshList={refreshList}
           graphDataToSave={graphDataToSave}
+          prevGraphDataToSave={prevGraphDataToSave}
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
-          setOpenSaveGraphDialog={setOpenSaveGraphDialog}
           setOpenShareGraphDialog={setOpenShareGraphDialog}
           setOpenEditGraphDialog={setOpenEditGraphDialog}
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
@@ -1129,20 +1137,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           }
           <ZoomActions />          
         </div>
-
-        <SaveGraphDialog
-          open={openSaveGraphDialog} 
-          setOpen={setOpenSaveGraphDialog}
-          graphName={graphName}
-          setGraphName={setGraphName}
-          graphNote={graphNote}
-          setGraphNote={setGraphNote}
-          prevGraphName={graphToLoad ? graphToLoad.name : ''}
-          prevGraphNote={graphToLoad ? graphToLoad.note : ''}
-          prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
-          setIsPrivate={setIsPrivate}
-          saveGraphToDatabase={saveGraphToDatabase}
-        />
 
         <ShareGraphDialog
           open={openShareGraphDialog} 
