@@ -19,7 +19,6 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "components/ConfirmLoadDialog";
 import ShowWarningDialog from "components/ShowWarningDialog";
 import ShowGetAccountDialog from "components/ShowGetAccountDialog";
-import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import TreeList from "components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "components/MetaMaskButton";
@@ -32,7 +31,7 @@ import EmptyStatePopUp from 'components/EmptyStatePopUp';
 import ZoomActions from 'components/ZoomActions';
 import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
-import { getAllGraphs, deleteGraph } from 'services/axiosRequests';
+import { getAllGraphs } from 'services/axiosRequests';
 import { stringifyCurrentGraph } from 'components/networkFunctions';
 
 interface UtensilProps {
@@ -70,12 +69,13 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
-  const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
-  const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
+  const [isDeletedGraph, setIsDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
+
+  useComputeFunctionalGraph(networkRef);
 
   useEffect(() => {
     if (selectedGraph) {
@@ -101,22 +101,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setGraphId(selectedGraph.id!);
       setIsPrivate(selectedGraph.private !== '');
     }
-  },[selectedGraph]);
-
-  useEffect(() => {
-    // determine if current graph can be deleted
-    
-    const currentGraph = publicPrivateGraphs.find(el => el.id === graphId);
-    
-    if (currentGraph) {
-      setCanBeDeletedGraph(currentGraph.private !== '');
-      if (currentGraph.private !== '') {
-        setGraphToDelete(currentGraph);
-      } 
-    }        
-  },[graphId, publicPrivateGraphs]);
-
-  useComputeFunctionalGraph(networkRef);
+  },[selectedGraph]);  
 
   const clearSearch = () => {
     setSearchQuery('');
@@ -394,35 +379,24 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     }
   }
 
-  const confirmDeleteGraph = async () => {
-    if (graphToDelete) {
-      // this is run when the user confirms they want to delete a graph.
-      console.log('delete confirmed, graph id: ', graphToDelete.id, graphToDelete.name);
-      deleteGraph(graphToDelete.id!)
-        .then(res => {
-          console.log(res.status, res);
-          if (res.status === 204) {
-            refreshList();
-            initializeUndoTimer();
-            setGraphName('');
-            setGraphNote('');
-            setGraphId(null);
-  
-            const existingGraph = JSON.parse(stringifyGraph());
-            existingGraph.nodes = [];
-            existingGraph.edges = [];
-            setGraph(existingGraph);
-            networkRef.current?.setData(existingGraph);
-  
-            setCanBeDeletedGraph(false);
-            setGraphToDelete(null);
-            setToCloseBar(true);
-          }          
-        })  
-        .catch(err => {if (err) {console.log(err)}});
-    }
-  }
+  useEffect(() => {
+    if (isDeletedGraph) {
+      refreshList();
+      initializeUndoTimer();
+      setGraphName('');
+      setGraphNote('');
+      setGraphId(null);
 
+      const existingGraph = JSON.parse(stringifyCurrentGraph(networkRef));
+      existingGraph.nodes = [];
+      existingGraph.edges = [];
+      setGraph(existingGraph);
+      networkRef.current?.setData(existingGraph);
+      setToCloseBar(true);
+    }
+  },[setIsDeletedGraph, isDeletedGraph])
+
+  
   const canImportGraph = () =>{
     const existingGraph = JSON.parse(stringifyGraph());
     return existingGraph.nodes && existingGraph.nodes.length > 0 ? true : false;
@@ -641,11 +615,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     const maxLevelNode = nodes
       .filter((el: TreeNode) => {return !el.hasOwnProperty('isLabelNode')})
       .reduce((prev: TreeNode, current: TreeNode) => (prev.level > current.level) ? prev : current)
-    
-    console.log('node with max level ---', maxLevelNode);
-    
+        
     const {canBeContracted} = contractAction(maxLevelNode, nodes, edges);
-    
+    console.log('node with max level ---', maxLevelNode);
     console.log('canBeContracted --', canBeContracted);
     
     if (graphWithNewIds && canBeContracted && (replacedNode.level === 0 || replacedNode.shape === 'hexagon')) {
@@ -716,15 +688,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       changeNodesLevels(toNode, maxLevel + 1, nodes, edges);
     }
   }
-
-  // const handleGraphDelete = (id: any) => {
-  //   //set the graph to be potentially deleted
-  //   const graph = graphs?.find((g: any) => g.id === id);
-  //   if (graph) {
-  //     setGraphToDelete(graph); // after confirming 'yes', the confirmDeleteGraph function will be called, and will delete this graph from the database.
-  //     setConfirmGraphDeleteOpen(true);
-  //   } 
-  // };
 
   const onUndo = () => {
     
@@ -1029,10 +992,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
-          setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           setGraphId={setGraphId}
-          canBeDeletedGraph={canBeDeletedGraph}
+          setIsDeletedGraph={setIsDeletedGraph}
           toCloseBar={toCloseBar}
         />
       </nav>
@@ -1082,12 +1044,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           }
           <ZoomActions />          
         </div>
-
-        <DeleteGraphDialog
-          open={openDeleteGraphDialog} 
-          setOpen={setOpenDeleteGraphDialog}
-          onDelete={confirmDeleteGraph}
-        />
 
         <ShowGetAccountDialog 
           showGetAccountMessage={showGetAccountMessage} 

@@ -106,7 +106,6 @@ function UtensilNavbar(props: any) {
           <GraphMenu 
             setGraphName={props.setGraphName}
             setGraphNote={props.setGraphNote}
-            setOpenDeleteGraphDialog={props.setOpenDeleteGraphDialog}
             setIsPrivate={props.setIsPrivate}
             setGraphId={props.setGraphId}
             networkRef={props.networkRef}
@@ -115,8 +114,8 @@ function UtensilNavbar(props: any) {
             prevGraphDataToSave={props.prevGraphDataToSave}
             isMessageWindowOpen={isMessageWindowOpen}
             setIsMessageWindowOpen={setIsMessageWindowOpen}
+            setIsDeletedGraph={props.setIsDeletedGraph}
             closeBar={closeBar}
-            canBeDeletedGraph={props.canBeDeletedGraph}
           />
         </div>       
 

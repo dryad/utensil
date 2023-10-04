@@ -6,10 +6,12 @@ interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   onDelete: () => void;
+  closeBar: Function;
+  setIsMessageWindowOpen: Function;
 }
 
 const DeleteGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, onDelete } = props;
+  const { open, setOpen, onDelete, closeBar, setIsMessageWindowOpen } = props;
     
   return (
     <DialogWindow
@@ -52,6 +54,8 @@ const DeleteGraphDialog = (props: DialogProps) => {
           onClick={() => {
             setOpen(false); 
             onDelete();
+            closeBar();
+            setIsMessageWindowOpen(true);
           }}
         >
           Delete
