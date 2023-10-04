@@ -9,6 +9,7 @@ import GraphMenuMessage from 'components/GraphMenuMessage';
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
 import EditGraphDialog from "components/Dialog/EditGraphDialog";
+import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -60,7 +61,6 @@ const arrowStyle = {
 type Props = {
   setGraphName: Dispatch<SetStateAction<string>>;
   setGraphNote: Dispatch<SetStateAction<string>>;
-  setOpenShareGraphDialog: Dispatch<SetStateAction<boolean>>;
   setOpenDeleteGraphDialog: Dispatch<SetStateAction<boolean>>;
   setIsPrivate: Dispatch<SetStateAction<boolean>>;
   isMessageWindowOpen: boolean;
@@ -70,32 +70,35 @@ type Props = {
   refreshList: Function;
   graphDataToSave: string; 
   prevGraphDataToSave: string;
-  canBeSharedGraph: boolean;
   canBeDeletedGraph: boolean;
   setGraphId: Function;
 }
 
-type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'null';
+type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'null';
 
-export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraphDialog, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, canBeSharedGraph, canBeDeletedGraph, setGraphId}: Props) {
+export default function GraphMenu({setGraphName, setGraphNote, setOpenDeleteGraphDialog, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, canBeDeletedGraph, setGraphId}: Props) {
   const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
   const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
+  const [isShareGraphResponseStatusOk, setIsShareGraphResponseStatusOk] = useState<boolean | null>(null);
   const [graphStatus, setGraphStatus] = useState<GraphStatus>('null');
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
+  const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
+  const canBeSharedGraph = canBeSavedGraph;
 
   useEffect(() => {
     if (open) {
       setGraphStatus('null');
       setIsSaveGraphResponseStatusOk(null);
+      setIsShareGraphResponseStatusOk(null);
     }    
   },[open, anchorEl]);
 
@@ -170,7 +173,9 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
               onClick={() => {
                 if (canBeSharedGraph) {
                   handleClose(); 
+                  saveGraphToDatabase();
                   setOpenShareGraphDialog(true);
+                  setGraphStatus('shared')
                 }                
               }}
               sx={{
@@ -253,6 +258,16 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       />
 
+      <ShareGraphDialog
+        open={openShareGraphDialog} 
+        setOpen={setOpenShareGraphDialog}
+        graphName={graphName}
+        graphId={graphId}
+        setIsShareGraphResponseStatusOk={setIsShareGraphResponseStatusOk}
+        closeBar={closeBar}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+      />
+
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -274,6 +289,13 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
           message={'You have edited your graph info.'}
         />
       } 
+      {isShareGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'shared' &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph shared'}
+          message={'You have shared your graph.'}
+        />
+      } 
       {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && ['saved', 'saved as new'].includes(graphStatus) &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -288,6 +310,13 @@ export default function GraphMenu({setGraphName, setGraphNote, setOpenShareGraph
           message={'There was an error. Please try again.'}
         />
       } 
+      {isShareGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'shared' &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph not shared'}
+          message={'There was an error. Please try again.'}
+        />
+      }
     </>   
   )
 }

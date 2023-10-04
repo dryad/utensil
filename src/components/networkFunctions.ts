@@ -1,5 +1,5 @@
 import VisCustomNetwork from "libs/vis-custom-network";
-import { saveGraph } from 'services/axiosRequests';
+import { saveGraph, shareGraph } from 'services/axiosRequests';
 
 export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCustomNetwork | null>) => { 
     
@@ -54,5 +54,18 @@ export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCust
         }
       })
       .catch(err => {if (err) {console.log(err); setIsSaveGraphResponseStatusOk(false)}})
+  };
 
+  export async function shareGraphToDB (
+    addressToShare: string, 
+    graphId: number,
+    setIsShareGraphResponseStatusOk: Function,
+  ){
+    shareGraph(addressToShare, graphId)
+      .then((res) => {
+        if (res.status === 201) {
+          setIsShareGraphResponseStatusOk(true);
+        }
+      })
+      .catch(err => {if (err) {console.log(err); setIsShareGraphResponseStatusOk(false)}})
   };

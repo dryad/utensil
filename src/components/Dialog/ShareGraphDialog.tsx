@@ -1,16 +1,19 @@
 import {useState, useEffect, Dispatch, SetStateAction} from 'react';
 import { DialogTitle, DialogActions, DialogWindow, InputField, DialogButton } from ".";
 import { THEME_COLORS } from 'constants/colors';
-import axios from "libs/axios";
+import { shareGraphToDB } from 'components/networkFunctions';
 
 interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   graphName: string;
   graphId: number | null;
+  setIsShareGraphResponseStatusOk: Dispatch<SetStateAction<boolean | null>>;
+  closeBar: Function;
+  setIsMessageWindowOpen: Function;
 }
 
-const ShareGraphDialog = ({ open, setOpen, graphName, graphId }: DialogProps) => {
+const ShareGraphDialog = ({ open, setOpen, graphName, graphId, setIsShareGraphResponseStatusOk, closeBar, setIsMessageWindowOpen }: DialogProps) => {
     
   const [error, setError] = useState(false);
   const [notValidError, setNotValidError] = useState(false);
@@ -36,16 +39,8 @@ const ShareGraphDialog = ({ open, setOpen, graphName, graphId }: DialogProps) =>
   };
 
   const saveSharedGraphToDatabase = async(addressToShare: string) => {
-    await axios.post("api/graphs/shared/", {
-      address: addressToShare, 
-      graphId: graphId,
-    }).then(response => {
-        if (response.data.id) {
-          console.log('Saved info to the database with this id: ', response.data.id);
-        }
-      });    
+    shareGraphToDB(addressToShare, graphId!, setIsShareGraphResponseStatusOk);
   }
-
   
   return (
     <DialogWindow
@@ -109,6 +104,8 @@ const ShareGraphDialog = ({ open, setOpen, graphName, graphId }: DialogProps) =>
             else {
               saveSharedGraphToDatabase(walletAddress);
               setOpen(false);
+              closeBar();
+              setIsMessageWindowOpen(true);
             }
           }}
         >

@@ -17,16 +17,14 @@ export async function saveGraph (data: DataProps) {
         data: data.data,
         creator: data.creator,
         private: data.private,
-      }).then((res: any) => {
-            return res
-        });
+      }).then((res: any) => { return res });
     
     return response;    
 }
 
 export async function getAllGraphs (metaMaskAccount: string) {
     const data = await axios.get(`/api/graphs/${metaMaskAccount ? `?private=${metaMaskAccount}` : ''}`)
-        .then((res: any) => {
+        .then((res: any) => { 
             return res
         });
     return data;
@@ -34,10 +32,17 @@ export async function getAllGraphs (metaMaskAccount: string) {
 
 export async function deleteGraph(id: number) {
     const response = await axios.delete(`/api/graphs/${id}/`)
-        .then((res: any) => {
-            return res
-        });
+        .then((res: any) => { return res });
     return response;    
 }
+
+export async function shareGraph(addressToShare: string, id: number) {
+    const response = await axios.post("api/graphs/shared/", {
+        address: addressToShare, 
+        graphId: id,
+      }).then(res => { return res }); 
+    return response;    
+}
+
 
 

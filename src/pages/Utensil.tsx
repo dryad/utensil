@@ -19,10 +19,6 @@ import useState from 'react-usestateref';
 import ConfirmLoadDialog from "components/ConfirmLoadDialog";
 import ShowWarningDialog from "components/ShowWarningDialog";
 import ShowGetAccountDialog from "components/ShowGetAccountDialog";
-import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
-import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
-import EditGraphDialog from "components/Dialog/EditGraphDialog";
-import CancelEditGraphDialog from "components/Dialog/CancelEditGraphDialog";
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import TreeList from "components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
@@ -32,14 +28,12 @@ import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { contractAction } from "components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
 import { useComputeFunctionalGraph } from 'hooks/useComputeFunctionalGraph';
-import { useKeyDownHandler } from 'hooks/useKeyDownHandler';
 import EmptyStatePopUp from 'components/EmptyStatePopUp';
 import ZoomActions from 'components/ZoomActions';
 import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
-import { saveGraph, getAllGraphs, deleteGraph } from 'services/axiosRequests';
-import { stringifyCurrentGraph, saveGraphToDB } from 'components/networkFunctions';
-import GraphMenuMessage from 'components/GraphMenuMessage';
+import { getAllGraphs, deleteGraph } from 'services/axiosRequests';
+import { stringifyCurrentGraph } from 'components/networkFunctions';
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -76,18 +70,11 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
-  const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
-  const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
-  // const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
-  // const [openCancelEditGraphDialog, setOpenCancelEditGraphDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
-  const [canBeSavedGraph, setCanBeSavedGraph] = useState(false);
-  const [canBeSharedGraph, setCanBeSharedGraph] = useState(false);
   const [canBeDeletedGraph, setCanBeDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
-  const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
 
   useEffect(() => {
@@ -115,25 +102,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setIsPrivate(selectedGraph.private !== '');
     }
   },[selectedGraph]);
-
-  useEffect(() => {
-    // determine if current graph can be saved or edited
-
-    setCanBeSavedGraph(!(
-      graphId === null || 
-      publicPrivateGraphs.findIndex(el => el.id === graphId) === -1 ||
-      functionalGraphData.hasOwnProperty(graphId)  
-    ));
-  },[graphId, publicPrivateGraphs]);
-
-  useEffect(() => {
-    // determine if current graph can be shared
-
-    setCanBeSharedGraph(!(
-      graphId === null || 
-      publicPrivateGraphs.findIndex(el => el.id === graphId) === -1  
-    ));
-  },[graphId, publicPrivateGraphs]);
 
   useEffect(() => {
     // determine if current graph can be deleted
@@ -252,12 +220,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     let treeText = "";
     let nodes = networkRef.current?.nodes.get(); // get all nodes from the network.
     let edges = networkRef.current?.edges.get(); // get all edges from the network.
-    // if (!nodes) {
-    //   nodes = []
-    // };
-    // if (!edges) {
-    //   edges = []
-    // };
+    
     const positions = networkRef.current?.network.getPositions();
     console.log('all nodes: ', nodes)
     console.log('all edges: ', edges)
@@ -330,7 +293,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     };
 
     const toTraverseSet = new Set(to_traverse);
-    // if (false) {
+    
     var parseList = [];
     if (to_traverse.length > 0) {
       var traversedSet: Set<TreeNode> = new Set();
@@ -729,8 +692,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setImportGraphToggle(prev => !prev);
       
       return !(!canBeContracted || replacedNode.level !== 0)
-    }
-        
+    }        
   };
 
   const changeNodesLevels = (node: TreeNode, maxLevel: number, nodes: TreeNode[], edges: Edge[]) => {
@@ -994,16 +956,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const addEdgeComplete = () => {
     networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
   }
-
-  const saveGraphToDatabase = (isNew: boolean = false) => {
-    if (isPrivate && !metaMaskAccount) {      
-      if (metaMaskAccount === "")
-        setShowGetAccountMessage(true);
-        return;
-    }
-
-    saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setGraphId, setIsSaveGraphResponseStatusOk, graphId); 
-  } 
   
   const graphDataToSave = JSON.stringify({
     graphId: graphId,
@@ -1026,10 +978,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       console.log('set metaMaskAccount', account);
       setMetaMaskAccount(account);
     }
-  };
-
-  const handleSave = async () => {
-    saveGraphToDatabase();
   };
 
   const handleCloseButton = () => {
@@ -1081,11 +1029,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
-          setOpenShareGraphDialog={setOpenShareGraphDialog}
           setOpenDeleteGraphDialog={setOpenDeleteGraphDialog}
           setIsPrivate={setIsPrivate}
           setGraphId={setGraphId}
-          canBeSharedGraph={canBeSharedGraph}
           canBeDeletedGraph={canBeDeletedGraph}
           toCloseBar={toCloseBar}
         />
@@ -1136,13 +1082,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           }
           <ZoomActions />          
         </div>
-
-        <ShareGraphDialog
-          open={openShareGraphDialog} 
-          setOpen={setOpenShareGraphDialog}
-          graphName={graphName}
-          graphId={graphId}
-        />
 
         <DeleteGraphDialog
           open={openDeleteGraphDialog} 
