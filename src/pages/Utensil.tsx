@@ -18,7 +18,6 @@ import NetworkButtons from "components/NetworkButtons";
 import useState from 'react-usestateref';
 import ConfirmLoadDialog from "components/ConfirmLoadDialog";
 import ShowWarningDialog from "components/ShowWarningDialog";
-import ShowGetAccountDialog from "components/ShowGetAccountDialog";
 import TreeList from "components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import MetaMaskButton from "components/MetaMaskButton";
@@ -68,7 +67,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
-  const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [isDeletedGraph, setIsDeletedGraph] = useState(false);
@@ -1042,17 +1040,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
               />
             </div>
           }
-          <ZoomActions />          
+          {/* <ZoomActions />           */}
         </div>
-
-        <ShowGetAccountDialog 
-          showGetAccountMessage={showGetAccountMessage} 
-          setShowGetAccountMessage={setShowGetAccountMessage} 
-          setIsPrivate={setIsPrivate}
-        >
-        </ShowGetAccountDialog>
-
       </main>
+      
       {/* <div 
         style={{
           display:'flex',alignItems:'center', height: '100%'
@@ -1147,13 +1138,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
               canImportGraph={canImportGraph}
             >
             </ConfirmLoadDialog>
-            <ConfirmDeleteDialog
-              title={graphToDelete && graphToDelete.name}
-              open={confirmGraphDeleteOpen}
-              setOpen={setConfirmGraphDeleteOpen}
-              onConfirmDelete={confirmDeleteGraph}
-            >
-            </ConfirmDeleteDialog>
             <ShowWarningDialog 
               showWarning={showWarning} 
               setShowWarning={setShowWarning} 
@@ -1169,20 +1153,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
               setIsPrivate={setIsPrivate}
             >
             </ShowGetAccountDialog> 
-            <SaveGraphDialog
-              openSaveGraphDialog={openSaveGraphDialog} 
-              setOpenSaveGraphDialog={setOpenSaveGraphDialog}
-              graphName={graphName}
-              setGraphName={setGraphName}
-              graphNote={graphNote}
-              setGraphNote={setGraphNote}
-              prevGraphName={graphToLoad ? graphToLoad.name : ''}
-              prevGraphNote={graphToLoad ? graphToLoad.note : ''}
-              prevGraphPrivate={graphToLoad ? graphToLoad.private !== '' : false}
-              setIsPrivate={setIsPrivate}
-              saveGraphToDatabase={saveGraphToDatabase}
-            >
-            </SaveGraphDialog>  
             <VisNetwork
               networkRef={networkRef}
               addNodeComplete={addNodeComplete}

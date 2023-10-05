@@ -44,13 +44,13 @@ export const useKeyDownHandler = (onButton: (nextMode: string) => void, onUndo: 
             onButton('expansion');
         }   
         
-        if (e.key === 'z' && e.ctrlKey) {
-            onUndo();
-        }
+        // if (e.key === 'z' && e.ctrlKey) {
+        //     onUndo();
+        // }
 
-        if (e.key === 'y' && e.ctrlKey) {
-            onRedo();
-        }
+        // if (e.key === 'y' && e.ctrlKey) {
+        //     onRedo();
+        // }
         
        return false;
     };            

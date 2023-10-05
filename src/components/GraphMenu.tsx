@@ -11,6 +11,7 @@ import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
 import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
+import ShowGetAccountDialog from 'components/Dialog/ShowGetAccountDialog';
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -76,7 +77,7 @@ type Props = {
 
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
-export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, setIsDeletedGraph, setGraphId}: Props) {
+export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, setIsDeletedGraph, setGraphId }: Props) {
   const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
   const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
 
@@ -89,6 +90,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
+  const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
   const dropDownRef = useRef<HTMLDivElement>(null);
@@ -135,8 +137,16 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
     setGraphStatus('null');
   }  
   
-  const saveGraphToDatabase = async(isNew: boolean = false) => saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
-
+  const saveGraphToDatabase = async(isNew: boolean = false) => {
+    if (isPrivate && !metaMaskAccount) {
+      
+      if (metaMaskAccount === "")
+        setShowGetAccountMessage(true);
+        return;
+    }
+    saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
+  }    
+    
   const handleDeleteGraph = async() => {
     deleteGraphFromDB(graphId, setIsDeleteGraphResponseStatusOk);
   } 
@@ -291,6 +301,12 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       />
 
+      <ShowGetAccountDialog 
+        showGetAccountMessage={showGetAccountMessage} 
+        setShowGetAccountMessage={setShowGetAccountMessage} 
+        setIsPrivate={setIsPrivate}
+      />
+     
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}

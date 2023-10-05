@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Stack, Tooltip, TooltipProps, tooltipClasses } from "@mui/material";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import VisCustomNetwork from "libs/vis-custom-network";
 import { THEME_COLORS } from "constants/colors";
-import { HandIcon, CursorIcon, CircleIcon, ArrowTopRightIcon, TextIcon, ContractionIcon, ExpansionIcon, UndoIcon, RedoIcon, LineIcon } from '../assets/icons/svg';
+import { CursorIcon, CircleIcon, ArrowTopRightIcon, ContractionIcon, ExpansionIcon, UndoIcon, RedoIcon, LineIcon } from '../assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -19,7 +19,7 @@ type Props = {
     buttonMode: string;
 }
 
-const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
+const StyledToggleButton = styled(ToggleButton)(() => ({
     height: '47px',
     width: '47px',
     background: 'white', 
@@ -88,65 +88,6 @@ const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
     },       
 })
 
-const SecondaryStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))({
-    [`& .${tooltipClasses.tooltip}`]: {
-      backgroundColor: 'white',
-      height: '36px',
-      display: 'flex',
-      alignItems: 'center',
-      color: 'gray',
-      position: 'relative',
-      right: '4px'
-    },
-    [`& .${tooltipClasses.arrow}`]: {
-        color: 'white',            
-    },       
-})
-
-const SecondaryTooltip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))({
-    [`& .${tooltipClasses.tooltip}`]: {
-      background: 'transparent',  
-    },
-})
-
-const SecondaryButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-    position: 'relative',
-    top: '23px',
-    right: '15px', 
-}))
-
-const SecondaryButton = styled(ToggleButton)(({ theme }) => ({
-    height: '47px',
-    width: '47px',
-    background: 'white', 
-    color: THEME_COLORS.get("darkGray"),
-    border: 'none',
-    borderRadius: '4px',
-    padding: '5px',
-    ':hover': {
-        border: 'none',
-        borderRadius: '4px',
-        background: THEME_COLORS.get("white"),
-        color: THEME_COLORS.get("blue")
-    },
-    ':hover&.Mui-selected': {
-        border: 'none',
-        borderRadius: '4px',
-        backgroundColor: THEME_COLORS.get("white"),
-        color: THEME_COLORS.get("blue")
-    },
-    '&.Mui-selected': {
-        border: 'none',
-        borderRadius: '4px',
-        backgroundColor: THEME_COLORS.get("white"),
-        color: THEME_COLORS.get("blue"),
-    },  
-}))
-
 const tooltipStyles = {
     background: THEME_COLORS.get("darkGray"), 
     padding: '2px 4px',
@@ -162,30 +103,9 @@ const tooltipStyles = {
 
 export default function NetworkButtons(props: Props) {    
 
-    const [lineMode, setLineMode] = useState<string>("directed-edge");
-
-    useEffect(() => {
-        if (props.buttonMode === 'edge') {
-            setLineMode("edge");
-        }
-        if (props.buttonMode === 'directed-edge') {
-            setLineMode("directed-edge");
-        }
-    },[props.buttonMode]);
-
-    const [isLineArrowModeHovered, setIsLineArrowModeHovered] = useState(false);
-        
     const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
         if (nextMode !== null) { //disallow unselecting an item. 
             props.onButton(nextMode); // Tell Utensil.tsx to change the button mode
-        }
-    };
-
-    const handleLineModeChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
-        if (nextMode !== null) {  
-            setLineMode(nextMode); 
-            props.onButton(nextMode);
-            setIsLineArrowModeHovered(false);
         }
     };
 
@@ -193,16 +113,6 @@ export default function NetworkButtons(props: Props) {
 
     const Wire = ({ children, ...props }: any) => children(props);
     
-    const [open, setOpen] = React.useState(false);
-
-    const handleClose = () => {
-      setOpen(false);
-    };
-  
-    const handleOpen = () => {
-      setOpen(true);
-    };
-
     return(
         <div>
             <Stack direction="column" spacing={1}>
@@ -248,79 +158,45 @@ export default function NetworkButtons(props: Props) {
                             </StyledTooltip>
                         )}
                     </Wire>
-                                        
-                    {/* ------ secondary tool bar ---- */}
-                    <Wire value={lineMode} >
+
+                    <Wire value="directed-edge" >
                         {(props:any) => (
-                            <SecondaryTooltip placement="right"  
-                                open={open} onClose={handleClose} onOpen={handleOpen}
+                            <StyledTooltip placement="right" arrow 
                                 title={
-                                    <SecondaryButtonGroup
-                                        orientation="vertical"
-                                        value={lineMode} 
-                                        exclusive
-                                        onChange={handleLineModeChange}
-                                        onMouseEnter={(e) => { setIsLineArrowModeHovered(true)}}
-                                        onMouseLeave={(e) => { setIsLineArrowModeHovered(false); handleClose()}}
-                                    >
-                                        <Wire value="directed-edge" >
-                                            {(props:any) => (
-                                                <SecondaryStyledTooltip placement="right" arrow 
-                                                    title={
-                                                        <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
-                                                            <span>Arrow</span>
-                                                            <div style={tooltipStyles}>
-                                                                Shift+L
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <SecondaryButton aria-label="directed-edge" {...props}>
-                                                        <ArrowTopRightIcon />
-                                                    </SecondaryButton>
-                                                </SecondaryStyledTooltip>
-                                            )}
-                                        </Wire>
-                                                                    
-                                        <Wire value="edge" >
-                                            {(props:any) => (
-                                                <SecondaryStyledTooltip placement="right" arrow 
-                                                    title={
-                                                        <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
-                                                            <span>Line</span>
-                                                            <div style={tooltipStyles}>
-                                                                L
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                >
-                                                    <SecondaryButton aria-label="edge" {...props}>
-                                                        <LineIcon />
-                                                    </SecondaryButton>
-                                                </SecondaryStyledTooltip>
-                                            )}
-                                        </Wire>
-                                    </SecondaryButtonGroup>
+                                    <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
+                                        <span>Arrow</span>
+                                        <div style={tooltipStyles}>
+                                            Shift+L
+                                        </div>
+                                    </div>
                                 }
                             >
-                                <StyledToggleButton  aria-label="directed-edge"  {...props}  
-                                    style={{
-                                        background: isLineArrowModeHovered ? THEME_COLORS.get("blue") : '',
-                                        color: isLineArrowModeHovered ? 'white' : ''
-                                    }}                                                                  
-                                >
-                                    { lineMode === 'directed-edge' &&
-                                        <ArrowTopRightIcon />
-                                    }
-                                    { lineMode === 'edge' &&  
-                                        <LineIcon />
-                                    }                                    
+                                <StyledToggleButton aria-label="directed-edge" {...props}>
+                                    <ArrowTopRightIcon />
                                 </StyledToggleButton>
-                            </SecondaryTooltip>
+                            </StyledTooltip>
                         )}
                     </Wire>
-                     {/* ------ secondary tool bar ---- */}
 
+                    <Wire value="edge" >
+                        {(props:any) => (
+                            <StyledTooltip placement="right" arrow 
+                                title={
+                                    <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
+                                        <span>Line</span>
+                                        <div style={tooltipStyles}>
+                                            L
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <StyledToggleButton aria-label="edge" {...props}>
+                                    <LineIcon />
+                                </StyledToggleButton>
+                            </StyledTooltip>
+                        )}
+                    </Wire>
+                                        
                     <Wire value="delete" >
                         {(props:any) => (
                             <StyledTooltip placement="right" arrow 
@@ -378,7 +254,7 @@ export default function NetworkButtons(props: Props) {
                 </StyledToggleButtonGroup>
                 <StyledActionToggleButtonGroup
                     orientation="vertical"
-                    exclusive
+                    exclusive                    
                 >
                     <Wire value="undo" disabled={props.undoDisabled} onClick={() => props.onUndo()}>
                         {(props:any) => (
@@ -386,9 +262,9 @@ export default function NetworkButtons(props: Props) {
                                 title={
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
                                         <span>Undo</span>
-                                        <div style={tooltipStyles}>
+                                        {/* <div style={tooltipStyles}>
                                             Ctrl+Z
-                                        </div>
+                                        </div> */}
                                     </div>
                                 }
                             >
@@ -409,9 +285,9 @@ export default function NetworkButtons(props: Props) {
                                 title={
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
                                         <span>Redo</span>
-                                        <div style={tooltipStyles}>
+                                        {/* <div style={tooltipStyles}>
                                             Ctrl+Y
-                                        </div>
+                                        </div> */}
                                     </div>
                                 }
                             >
