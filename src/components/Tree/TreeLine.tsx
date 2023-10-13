@@ -36,11 +36,30 @@ const TreeLine: React.FC<IGraphListProps> = (props) => {
             sx={{ 
               fontSize: '0.75rem',
               lineHeight: '1rem',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 2px',
               color: props.selectedNodes.current?.includes(node.id) 
                 ? THEME_COLORS.get("blue") 
                 : props.hoveredNodes.current?.includes(node.id) 
                   ? THEME_COLORS.get("blue") 
-                  : THEME_COLORS.get("black") 
+                  : THEME_COLORS.get("black"),
+              background: props.selectedNodes.current?.includes(node.id) 
+                ? 'rgba(245, 245, 245, 1)' 
+                : props.hoveredNodes.current?.includes(node.id) 
+                  ? 'rgba(245, 245, 245, 1)' 
+                  : '',
+              border: props.selectedNodes.current?.includes(node.id) 
+              ? '1px solid rgba(141, 121, 255, 1)' 
+              : props.hoveredNodes.current?.includes(node.id) 
+                ? '1px solid rgba(141, 121, 255, 1)'  
+                : 'none',
+              borderRadius: props.selectedNodes.current?.includes(node.id) 
+              ? '4px' 
+              : props.hoveredNodes.current?.includes(node.id) 
+                ? '4px'  
+                : '',  
             }}
             key={nodeIndex}
             onClick={() => {

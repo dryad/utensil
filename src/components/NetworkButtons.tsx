@@ -4,10 +4,9 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import VisCustomNetwork from "libs/vis-custom-network";
 import { THEME_COLORS } from "constants/colors";
-import { CursorIcon, CircleIcon, ArrowTopRightIcon, ContractionIcon, ExpansionIcon, UndoIcon, RedoIcon, LineIcon } from '../assets/icons/svg';
+import { CursorIcon, CircleIcon, ArrowTopRightIcon, ContractionIcon, ExpansionIcon, DeleteIcon, UndoIcon, RedoIcon, LineIcon } from '../assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import { useKeyDownHandler } from '../hooks/useKeyDownHandler';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 type Props = {
     networkRef: React.MutableRefObject<VisCustomNetwork | null>;
@@ -197,24 +196,6 @@ export default function NetworkButtons(props: Props) {
                         )}
                     </Wire>
                                         
-                    <Wire value="delete" >
-                        {(props:any) => (
-                            <StyledTooltip placement="right" arrow 
-                                title={
-                                    <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
-                                        <span>Delete</span>
-                                        <div style={tooltipStyles}>
-                                            D
-                                        </div>
-                                    </div>
-                                }
-                            >
-                                <StyledToggleButton aria-label="text" {...props}>
-                                    <HighlightOffIcon />
-                                </StyledToggleButton>
-                            </StyledTooltip>
-                        )}
-                    </Wire>
                     <Wire value="contraction" >
                         {(props:any) => (
                             <StyledTooltip placement="right" arrow 
@@ -247,6 +228,25 @@ export default function NetworkButtons(props: Props) {
                             >
                                 <StyledToggleButton aria-label="expansion" {...props}>
                                     <ExpansionIcon />
+                                </StyledToggleButton>
+                            </StyledTooltip>
+                        )}
+                    </Wire>
+
+                    <Wire value="delete" >
+                        {(props:any) => (
+                            <StyledTooltip placement="right" arrow 
+                                title={
+                                    <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
+                                        <span>Delete</span>
+                                        <div style={tooltipStyles}>
+                                            D
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <StyledToggleButton aria-label="text" {...props}>
+                                    <DeleteIcon />
                                 </StyledToggleButton>
                             </StyledTooltip>
                         )}

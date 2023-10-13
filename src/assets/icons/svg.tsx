@@ -451,3 +451,20 @@ export const ClockIcon: FC = () => (
         />
     </svg>
 );
+
+export const DeleteIcon: FC = () => (
+    <svg 
+        width="15" 
+        height="16" 
+        viewBox="0 0 15 16" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path 
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M5.5 1.5C5.22386 1.5 5 1.72386 5 2C5 2.27614 5.22386 2.5 5.5 2.5H9.5C9.77614 2.5 10 2.27614 10 2C10 1.72386 9.77614 1.5 9.5 1.5H5.5ZM3 4C3 3.72386 3.22386 3.5 3.5 3.5H5H10H11.5C11.7761 3.5 12 3.72386 12 4C12 4.27614 11.7761 4.5 11.5 4.5H11V12.5C11 13.0523 10.5523 13.5 10 13.5H5C4.44772 13.5 4 13.0523 4 12.5V4.5L3.5 4.5C3.22386 4.5 3 4.27614 3 4ZM5 4.5H10V12.5H5V4.5Z" 
+            fill="currentColor"
+        />
+    </svg>
+);
