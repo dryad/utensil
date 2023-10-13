@@ -203,7 +203,7 @@ export default function NetworkButtons(props: Props) {
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
                                         <span>Contract nodes</span>
                                         <div style={tooltipStyles}>
-                                            Ctrl+G
+                                            C
                                         </div>
                                     </div>
                                 }
@@ -221,7 +221,7 @@ export default function NetworkButtons(props: Props) {
                                     <div style={{display:'flex', alignItems:"center", gap:'4px'}}>
                                         <span>Expand nodes</span>
                                         <div style={tooltipStyles}>
-                                            Ctrl+Shift+G
+                                            E
                                         </div>
                                     </div>
                                 }

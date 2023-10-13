@@ -36,11 +36,11 @@ export const useKeyDownHandler = (onButton: (nextMode: string) => void, onUndo: 
             onButton("delete");
         }
 
-        if (e.key === 'g' && e.ctrlKey) {
+        if (e.key === 'c') {
             onButton('contraction');
         }
 
-        if ( e.shiftKey && e.ctrlKey && e.key === 'G') {
+        if ( e.key === 'e') {
             onButton('expansion');
         }   
         
