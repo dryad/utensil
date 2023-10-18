@@ -1,15 +1,22 @@
 import { Dispatch, SetStateAction } from 'react';
 import { DialogTitle, DialogActions, DialogWindow, DialogButton } from ".";
 import { THEME_COLORS } from 'constants/colors';
+import { useShallow } from 'zustand/react/shallow'
+import { useGraphStore } from 'store/useGraphStore';
 
 interface DialogProps {
   showGetAccountMessage: boolean;
   setShowGetAccountMessage: Dispatch<SetStateAction<boolean>>;
-  setIsPrivate: Dispatch<SetStateAction<boolean>>;
 }
 
 const ShowGetAccountDialog = (props: DialogProps) => {
-  const { showGetAccountMessage, setShowGetAccountMessage, setIsPrivate } = props;
+  const { showGetAccountMessage, setShowGetAccountMessage } = props;
+
+  const [setIsPrivate] = useGraphStore(
+    useShallow((state) => [
+      state.setIsPrivate,      
+    ])
+  );
     
   return (
     <DialogWindow

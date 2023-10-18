@@ -33,18 +33,11 @@ function Navbar(props: any) {
                 hoveredNodes={props.hoveredNodes} 
                 selectedNodes={props.selectedNodes} 
                 setHoveredChipToVis={props.setHoveredChipToVis}
-                setGraphName={props.setGraphName}
-                setGraphNote={props.setGraphNote}
                 networkRef={props.networkRef}
                 refreshList={props.refreshList}
-                graphDataToSave={props.graphDataToSave}
-                prevGraphDataToSave={props.prevGraphDataToSave}
                 onConfirmReplace={props.onConfirmReplace}
                 onConfirmImport={props.onConfirmImport}
                 onGraphSelected={props.onGraphSelected}
-                setIsPrivate={props.setIsPrivate}
-                setGraphId={props.setGraphId}
-                setIsDeletedGraph={props.setIsDeletedGraph}
                 toCloseBar={props.toCloseBar}
               />
           }

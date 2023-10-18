@@ -2,19 +2,26 @@ import {useState, useEffect, Dispatch, SetStateAction} from 'react';
 import { DialogTitle, DialogActions, DialogWindow, InputField, DialogButton } from ".";
 import { THEME_COLORS } from 'constants/colors';
 import { shareGraphToDB } from 'components/networkFunctions';
+import { useShallow } from 'zustand/react/shallow'
+import { useGraphStore } from 'store/useGraphStore';
 
 interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  graphName: string;
-  graphId: number | null;
   setIsShareGraphResponseStatusOk: Dispatch<SetStateAction<boolean | null>>;
   closeBar: Function;
   setIsMessageWindowOpen: Function;
 }
 
-const ShareGraphDialog = ({ open, setOpen, graphName, graphId, setIsShareGraphResponseStatusOk, closeBar, setIsMessageWindowOpen }: DialogProps) => {
+const ShareGraphDialog = ({ open, setOpen, setIsShareGraphResponseStatusOk, closeBar, setIsMessageWindowOpen }: DialogProps) => {
     
+  const [graphName, graphId] = useGraphStore(
+    useShallow((state) => [
+      state.graphName, 
+      state.graphId,      
+    ])
+  );
+   
   const [error, setError] = useState(false);
   const [notValidError, setNotValidError] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');

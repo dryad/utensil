@@ -104,17 +104,11 @@ function UtensilNavbar(props: any) {
       <StyledBar>
         <div style={{marginLeft:'auto'}}>
           <GraphMenu 
-            setGraphName={props.setGraphName}
-            setGraphNote={props.setGraphNote}
-            setIsPrivate={props.setIsPrivate}
-            setGraphId={props.setGraphId}
             networkRef={props.networkRef}
             refreshList={props.refreshList}
-            graphDataToSave={props.graphDataToSave}
-            prevGraphDataToSave={props.prevGraphDataToSave}
+            metaMaskAccount={props.metaMaskAccount}
             isMessageWindowOpen={isMessageWindowOpen}
             setIsMessageWindowOpen={setIsMessageWindowOpen}
-            setIsDeletedGraph={props.setIsDeletedGraph}
             closeBar={closeBar}
           />
         </div>       

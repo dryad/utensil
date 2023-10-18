@@ -32,6 +32,8 @@ import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import { getAllGraphs } from 'services/axiosRequests';
 import { stringifyCurrentGraph } from 'components/networkFunctions';
+import { useGraphStore } from 'store/useGraphStore';
+import { useShallow } from 'zustand/react/shallow'
 
 interface UtensilProps {
   startNewConcept?: boolean;
@@ -46,13 +48,9 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
   const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
   const [graph, setGraph] = useState<GraphData | null>(null); // The currently loaded graph object.
-  const [graphId, setGraphId] = useState<number | null>(null); // The currently loaded graph id. We save it separately from the graph, so it does not interfere with the undo stack
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
   const [graphToLoad, setGraphToLoad] = useState<Graph | null | undefined>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
   const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
-  const [graphName, setGraphName] = useState(""); // The name of the graph, used by the text box for Graph Name
-  const [graphNote, setGraphNote] = useState(""); // The note of the graph, used by the text box for Graph Note
-  const [isPrivate, setIsPrivate] = useState(graphToLoad ? graphToLoad.private !== '' : false);
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]); // The list of redo steps, for Redo.
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false); // Whether the user is currently dragging a node or the network. This temporarily disables the undo timer from saving steps.
@@ -69,9 +67,31 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [showWarning, setShowWarning] = useState(false);
   const [isEmptyState, setIsEmptyState] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
-  const [isDeletedGraph, setIsDeletedGraph] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
+
+  const [graphName, graphNote, isDeletedGraph, setGraphName, setGraphNote, setIsPrivate, setGraphId, setIsDeletedGraph, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
+    useShallow((state) => [
+      state.graphName, 
+      state.graphNote,
+      state.isDeletedGraph,
+      state.setGraphName,
+      state.setGraphNote,
+      state.setIsPrivate,
+      state.setGraphId, 
+      state.setIsDeletedGraph, 
+      state.setPrevGraphName,
+      state.setPrevGraphNote,
+      state.setPrevGraphPrivate,  
+    ])
+  );
+
+  useEffect(() => {
+    // setIsPrivate(graphToLoad ? graphToLoad.private !== '' : false);
+    setPrevGraphName(graphToLoad ? graphToLoad.name : '');
+    setPrevGraphNote(graphToLoad ? graphToLoad.note : '');
+    setPrevGraphPrivate(graphToLoad ? graphToLoad.private !== '' : false);
+  },[graphToLoad]);
 
   useComputeFunctionalGraph(networkRef);
 
@@ -918,20 +938,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
   }
   
-  const graphDataToSave = JSON.stringify({
-    graphId: graphId,
-    graphName: graphName,
-    graphNote: graphNote,
-    metaMaskAccount: metaMaskAccount,
-    isPrivate: isPrivate
-  });
-
-  const prevGraphDataToSave = JSON.stringify({
-    prevGraphName: graphToLoad ? graphToLoad.name : '',
-    prevGraphNote: graphToLoad ? graphToLoad.note : '',
-    prevGraphPrivate: graphToLoad ? graphToLoad.private !== '' : false,
-  });
-
   async function getMetaMaskAccount() {
     if (typeof ethereum !== 'undefined') {
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
@@ -981,18 +987,11 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           hoveredNodes={hoveredNodesRef} 
           selectedNodes={selectedNodesRef} 
           setHoveredChipToVis={setHoveredChipToVis}
-          setGraphName={setGraphName}
-          setGraphNote={setGraphNote}
           networkRef={networkRef}
           refreshList={refreshList}
-          graphDataToSave={graphDataToSave}
-          prevGraphDataToSave={prevGraphDataToSave}
           onConfirmReplace={confirmReplaceGraph}
           onConfirmImport={confirmImportGraph}
           onGraphSelected={handleGraphSelected}
-          setIsPrivate={setIsPrivate}
-          setGraphId={setGraphId}
-          setIsDeletedGraph={setIsDeletedGraph}
           toCloseBar={toCloseBar}
         />
       </nav>

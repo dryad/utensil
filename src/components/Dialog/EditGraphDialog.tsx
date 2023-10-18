@@ -3,15 +3,12 @@ import { Radio, RadioGroup, FormControl, FormControlLabel, RadioProps } from "@m
 import { DialogTitle, DialogActions, DialogWindow, InputField, DialogButton } from ".";
 import { styled } from '@mui/styles';
 import { THEME_COLORS } from 'constants/colors';
+import { useShallow } from 'zustand/react/shallow'
+import { useGraphStore } from 'store/useGraphStore';
 
 interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  graphDataToSave: string; 
-  prevGraphDataToSave: string;
-  setGraphName: Dispatch<SetStateAction<string>>;
-  setGraphNote: Dispatch<SetStateAction<string>>;
-  setIsPrivate: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: () => void;
   closeBar: Function;
   setIsMessageWindowOpen: Function;
@@ -52,9 +49,21 @@ function StRadio(props: RadioProps) {
 }
 
 const EditGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, graphDataToSave, prevGraphDataToSave, setGraphName, setGraphNote, setIsPrivate, saveGraphToDatabase, closeBar, setIsMessageWindowOpen } = props;
-  const {graphName, graphNote, isPrivate} =  JSON.parse(graphDataToSave); 
-  const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
+  const { open, setOpen, saveGraphToDatabase, closeBar, setIsMessageWindowOpen } = props;
+  const [graphName, graphNote, isPrivate, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate] = useGraphStore(
+    useShallow((state) => [
+      state.graphName, 
+      state.graphNote,
+      state.isPrivate,
+      state.setGraphName,
+      state.setGraphNote,
+      state.setIsPrivate,
+      state.prevGraphName,
+      state.prevGraphNote,
+      state.prevGraphPrivate,      
+    ])
+  );
+
   const [error, setError] = useState(false);
   
   useEffect(() => {
@@ -77,7 +86,7 @@ const EditGraphDialog = (props: DialogProps) => {
       <DialogTitle 
         id="edit-graph-dialog" 
         onClose={() => {
-          setIsPrivate(() => prevGraphPrivate); 
+          setIsPrivate(prevGraphPrivate); 
           setGraphName(prevGraphName);
           setGraphNote(prevGraphNote);
           setOpen(false);
@@ -141,7 +150,7 @@ const EditGraphDialog = (props: DialogProps) => {
           variant="outlined"
           sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
           onClick={() => {
-            setIsPrivate(() => prevGraphPrivate); 
+            setIsPrivate(prevGraphPrivate); 
             setGraphName(prevGraphName);
             setGraphNote(prevGraphNote);
             setError(false);

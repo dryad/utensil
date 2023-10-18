@@ -1,7 +1,7 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
 import { ChevronDownIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
-import React, {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
 import { saveGraphToDB, deleteGraphFromDB } from 'components/networkFunctions';
@@ -12,6 +12,8 @@ import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import ShowGetAccountDialog from 'components/Dialog/ShowGetAccountDialog';
+import { useGraphStore } from 'store/useGraphStore';
+import { useShallow } from 'zustand/react/shallow'
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -61,25 +63,33 @@ const arrowStyle = {
 }
 
 type Props = {
-  setGraphName: Dispatch<SetStateAction<string>>;
-  setGraphNote: Dispatch<SetStateAction<string>>;
-  setIsPrivate: Dispatch<SetStateAction<boolean>>;
   isMessageWindowOpen: boolean;
   setIsMessageWindowOpen: Function;
+  metaMaskAccount: string;
   closeBar: () => void;
   networkRef: React.MutableRefObject<VisCustomNetwork | null>;
-  refreshList: Function;
-  graphDataToSave: string; 
-  prevGraphDataToSave: string;
-  setIsDeletedGraph: Dispatch<SetStateAction<boolean>>;
-  setGraphId: Function;
+  refreshList: Function; 
 }
 
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
-export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList, graphDataToSave, prevGraphDataToSave, setIsDeletedGraph, setGraphId }: Props) {
-  const {graphId, graphName, graphNote, metaMaskAccount, isPrivate} =  JSON.parse(graphDataToSave); 
-  const {prevGraphName, prevGraphNote, prevGraphPrivate} =  JSON.parse(prevGraphDataToSave); 
+export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen, metaMaskAccount, closeBar, networkRef, refreshList }: Props) {
+  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph] = useGraphStore(
+    useShallow((state) => [
+      state.graphName, 
+      state.graphNote,
+      state.isPrivate,
+      state.graphId,
+      state.setGraphName,
+      state.setGraphNote,
+      state.setIsPrivate,
+      state.prevGraphName,
+      state.prevGraphNote,
+      state.prevGraphPrivate,  
+      state.setGraphId, 
+      state.setIsDeletedGraph,   
+    ])
+  );
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
@@ -99,6 +109,8 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
   const canBeSharedGraph = canBeSavedGraph;
   const canBeDeletedGraph = graphId !== null && isPrivate;
 
+  console.log(graphId, isPrivate, canBeDeletedGraph, '---112')
+
   useEffect(() => {
     if (open) {
       setGraphStatus('null');
@@ -110,7 +122,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
 
   useEffect(() => {
     if (isSaveGraphResponseStatusOk === false) {
-      setIsPrivate(() => prevGraphPrivate); 
+      setIsPrivate(prevGraphPrivate); 
       setGraphName(prevGraphName);
       setGraphNote(prevGraphNote);
     }
@@ -148,7 +160,7 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
   }    
     
   const handleDeleteGraph = async() => {
-    deleteGraphFromDB(graphId, setIsDeleteGraphResponseStatusOk);
+    deleteGraphFromDB(graphId!, setIsDeleteGraphResponseStatusOk);
   } 
 
   useEffect(() => {
@@ -260,11 +272,6 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
       <SaveGraphDialog
         open={openSaveGraphDialog} 
         setOpen={setOpenSaveGraphDialog}
-        graphDataToSave={graphDataToSave}
-        prevGraphDataToSave={prevGraphDataToSave}
-        setGraphName={setGraphName}
-        setGraphNote={setGraphNote}
-        setIsPrivate={setIsPrivate}
         saveGraphToDatabase={saveGraphToDatabase}
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
@@ -273,11 +280,6 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
       <EditGraphDialog
         open={openEditGraphDialog} 
         setOpen={setOpenEditGraphDialog}
-        graphDataToSave={graphDataToSave}
-        prevGraphDataToSave={prevGraphDataToSave}
-        setGraphName={setGraphName}
-        setGraphNote={setGraphNote}
-        setIsPrivate={setIsPrivate}
         saveGraphToDatabase={saveGraphToDatabase}
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
@@ -286,8 +288,6 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
       <ShareGraphDialog
         open={openShareGraphDialog} 
         setOpen={setOpenShareGraphDialog}
-        graphName={graphName}
-        graphId={graphId}
         setIsShareGraphResponseStatusOk={setIsShareGraphResponseStatusOk}
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
@@ -304,7 +304,6 @@ export default function GraphMenu({setGraphName, setGraphNote, setIsPrivate, isM
       <ShowGetAccountDialog 
         showGetAccountMessage={showGetAccountMessage} 
         setShowGetAccountMessage={setShowGetAccountMessage} 
-        setIsPrivate={setIsPrivate}
       />
      
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&
