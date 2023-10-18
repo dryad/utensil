@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { DialogTitle, DialogActions, DialogWindow, DialogButton } from ".";
 import { THEME_COLORS } from 'constants/colors';
 import { useShallow } from 'zustand/react/shallow'
-import { useGraphStore } from 'store/useGraphStore';
+import { useGraphStore } from 'store/GraphStore';
 
 interface DialogProps {
   showGetAccountMessage: boolean;

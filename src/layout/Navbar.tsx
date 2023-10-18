@@ -26,8 +26,6 @@ function Navbar(props: any) {
           {path === 'profile' 
             ? <ProfileNavbar /> 
             : <UtensilNavbar 
-                getMetaMaskAccount={props.getMetaMaskAccount} 
-                metaMaskAccount={props.metaMaskAccount}
                 graphs={props.graphs}
                 trees={props.trees} 
                 hoveredNodes={props.hoveredNodes} 

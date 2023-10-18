@@ -3,8 +3,22 @@ import Utensil from "pages/Utensil";
 import Profile from "pages/Profile";
 import EditProfile from "components/EditProfile";
 import Layout from "layout/Layout";
+import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
+import { useShallow } from "zustand/react/shallow";
+import { useEffect } from "react";
 
 function App() {
+  
+  const [getMetaMaskAccount] = useMetaMaskAccountStore(
+    useShallow((state) => [
+      state.getMetaMaskAccount,
+    ])
+  );
+
+  useEffect(() => {
+    getMetaMaskAccount();
+  },[getMetaMaskAccount])
+
   return (
     <Routes>
       <Route path='/' element={<Layout />}>

@@ -9,7 +9,6 @@ import { styled } from '@mui/material/styles';
 type Props = {
   closeBar: () => void;
   graphs: Graph[];
-  metaMaskAccount: string;
   onConfirmReplace: () => void;
   onConfirmImport: () => void;
   onGraphSelected: (id: number) => void;

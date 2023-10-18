@@ -12,8 +12,9 @@ import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import ShowGetAccountDialog from 'components/Dialog/ShowGetAccountDialog';
-import { useGraphStore } from 'store/useGraphStore';
+import { useGraphStore } from 'store/GraphStore';
 import { useShallow } from 'zustand/react/shallow'
+import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -65,7 +66,6 @@ const arrowStyle = {
 type Props = {
   isMessageWindowOpen: boolean;
   setIsMessageWindowOpen: Function;
-  metaMaskAccount: string;
   closeBar: () => void;
   networkRef: React.MutableRefObject<VisCustomNetwork | null>;
   refreshList: Function; 
@@ -73,7 +73,7 @@ type Props = {
 
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
-export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen, metaMaskAccount, closeBar, networkRef, refreshList }: Props) {
+export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList }: Props) {
   const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
@@ -88,6 +88,12 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
       state.prevGraphPrivate,  
       state.setGraphId, 
       state.setIsDeletedGraph,   
+    ])
+  );
+
+  const [metaMaskAccount] = useMetaMaskAccountStore(
+    useShallow((state) => [
+      state.metaMaskAccount,
     ])
   );
 
@@ -108,8 +114,6 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
   const canBeDeletedGraph = graphId !== null && isPrivate;
-
-  console.log(graphId, isPrivate, canBeDeletedGraph, '---112')
 
   useEffect(() => {
     if (open) {

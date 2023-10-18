@@ -106,7 +106,6 @@ function UtensilNavbar(props: any) {
           <GraphMenu 
             networkRef={props.networkRef}
             refreshList={props.refreshList}
-            metaMaskAccount={props.metaMaskAccount}
             isMessageWindowOpen={isMessageWindowOpen}
             setIsMessageWindowOpen={setIsMessageWindowOpen}
             closeBar={closeBar}
@@ -123,7 +122,7 @@ function UtensilNavbar(props: any) {
           }}
         >
           <StyledMetaMaskButton>
-            <MetaMaskButton getMetaMaskAccount={props.getMetaMaskAccount} />
+            <MetaMaskButton />
           </StyledMetaMaskButton>  
 
           <StyledToggleButtonGroup
@@ -146,7 +145,6 @@ function UtensilNavbar(props: any) {
         <SearchGraphBar 
           closeBar={closeBar} 
           graphs={props.graphs}
-          metaMaskAccount={props.metaMaskAccount}
           onConfirmReplace={props.onConfirmReplace}
           onConfirmImport={props.onConfirmImport}
           onGraphSelected={props.onGraphSelected}

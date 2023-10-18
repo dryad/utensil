@@ -32,7 +32,8 @@ import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import { getAllGraphs } from 'services/axiosRequests';
 import { stringifyCurrentGraph } from 'components/networkFunctions';
-import { useGraphStore } from 'store/useGraphStore';
+import { useGraphStore } from 'store/GraphStore';
+import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from 'zustand/react/shallow'
 
 interface UtensilProps {
@@ -61,7 +62,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [trees, setTrees] = useState<Tree[]>([]); // The list of trees shown on the bottom of the app.
   const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
   const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
-  const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
+  // const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
@@ -83,6 +84,14 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       state.setPrevGraphName,
       state.setPrevGraphNote,
       state.setPrevGraphPrivate,  
+    ])
+  );
+
+  // The metamask account that is currently selected.
+  const [metaMaskAccount, getMetaMaskAccount] = useMetaMaskAccountStore(
+    useShallow((state) => [
+      state.metaMaskAccount,
+      state.getMetaMaskAccount,
     ])
   );
 
@@ -938,15 +947,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     networkRef.current?.network.addEdgeMode(); // Makes adding edges continual
   }
   
-  async function getMetaMaskAccount() {
-    if (typeof ethereum !== 'undefined') {
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const account = accounts[0];
-      console.log('set metaMaskAccount', account);
-      setMetaMaskAccount(account);
-    }
-  };
-
   const handleCloseButton = () => {
     const currentGraph = stringifyGraph();
     
@@ -965,7 +965,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   }
 
   useEffect(() => {
-    getMetaMaskAccount();
+    // getMetaMaskAccount();
     refreshList();
     initializeUndoTimer();    
   }, []);
@@ -980,8 +980,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     <>
       <nav>
         <Navbar 
-          getMetaMaskAccount={getMetaMaskAccount}
-          metaMaskAccount={metaMaskAccount}
           graphs={publicPrivateGraphs}
           trees={trees} 
           hoveredNodes={hoveredNodesRef} 

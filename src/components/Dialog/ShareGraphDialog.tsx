@@ -3,7 +3,7 @@ import { DialogTitle, DialogActions, DialogWindow, InputField, DialogButton } fr
 import { THEME_COLORS } from 'constants/colors';
 import { shareGraphToDB } from 'components/networkFunctions';
 import { useShallow } from 'zustand/react/shallow'
-import { useGraphStore } from 'store/useGraphStore';
+import { useGraphStore } from 'store/GraphStore';
 
 interface DialogProps {
   open: boolean;
