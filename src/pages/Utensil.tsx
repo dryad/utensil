@@ -26,7 +26,7 @@ import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { contractAction } from "components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
 import { useComputeFunctionalGraph } from 'hooks/useComputeFunctionalGraph';
-import EmptyStatePopUp from 'components/EmptyStatePopUp';
+import EmptyUtensilPopUp from 'components/EmptyUtensilPopUp';
 import ZoomActions from 'components/ZoomActions';
 import Navbar from "layout/Navbar";
 import functionalGraphData from "functions/functionalGraphIds.json"; 
@@ -66,7 +66,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
   const [showWarning, setShowWarning] = useState(false);
-  const [isEmptyState, setIsEmptyState] = useState(true);
+  const [isEmptyUtensil, setIsEmptyUtensil] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
@@ -971,10 +971,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   }, []);
 
   useEffect(() => {
-    if (isAddShapeButtonClicked && !isEmptyState) {
+    if (isAddShapeButtonClicked && !isEmptyUtensil) {
       onButton('node');
     }
-  }, [isAddShapeButtonClicked, isEmptyState]);
+  }, [isAddShapeButtonClicked, isEmptyUtensil]);
 
   return (
     <>
@@ -1027,12 +1027,12 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
             graphs={publicPrivateGraphs}
             handleGraphImport={handleGraphImport}
           />
-          {isEmptyState &&
+          {isEmptyUtensil &&
             <div 
               style={{position:'absolute', left:'50%', top:'50%', transform: 'translate(-50%, -50%)'}}
             >
-              <EmptyStatePopUp 
-                setIsEmptyState={setIsEmptyState}
+              <EmptyUtensilPopUp 
+                setIsEmptyUtensil={setIsEmptyUtensil}
                 setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
               />
             </div>
@@ -1041,51 +1041,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
         </div>
       </main>
       
-      {/* <div 
-        style={{
-          display:'flex',alignItems:'center', height: '100%'
-        }}
-      >
-        <NetworkButtons
-          networkRef={networkRef}
-          onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
-          undoDisabled={historyListBack.length <= 1}
-          redoDisabled={historyListForward.length === 0}
-          onUndo={onUndo}
-          onRedo={onRedo}
-          buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
-        />
-        <VisNetwork
-          networkRef={networkRef}
-          addNodeComplete={addNodeComplete}
-          addEdgeComplete={addEdgeComplete}
-          historyListBack={historyListBack}
-          historyListForward={historyListForward}
-          historyListBackRef={historyListBackRef}
-          setIsUserDragging={setIsUserDraggingGlobal}
-          stringifyGraph={stringifyGraph}
-          deleteIfDeleteMode={deleteIfDeleteMode}
-          setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
-          addEdgeDirectedOrNot={addEdgeDirectedOrNot}
-          buttonModeRef={buttonModeRef}
-          hoveredNodes={hoveredNodesRef}
-          setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
-          selectedNodes={selectedNodesRef}
-          setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
-          graphs={publicPrivateGraphs}
-          handleGraphImport={handleGraphImport}
-        />
-        {isEmptyState &&
-          <div 
-            style={{position:'absolute', left:'50%', top:'50%', transform: 'translate(-50%, -50%)'}}
-          >
-            <EmptyStatePopUp 
-              setIsEmptyState={setIsEmptyState}
-              setIsAddShapeButtonClicked={setIsAddShapeButtonClicked}
-            />
-          </div>
-        } */}
-        
       {/* <VisNetwork
             networkRef={networkRef}
             addNodeComplete={addNodeComplete}

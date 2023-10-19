@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction } from 'react'
-import { CloseIcon, ImgForEmptyState } from '../assets/icons/svg';
+import { CloseIcon, ImgForEmptyUtensil } from '../assets/icons/svg';
 import Button from '@mui/material/Button';
 import { THEME_COLORS } from "constants/colors";
 
 type Props = {
-    setIsEmptyState: Dispatch<SetStateAction<boolean>>;
+    setIsEmptyUtensil: Dispatch<SetStateAction<boolean>>;
     setIsAddShapeButtonClicked: Dispatch<SetStateAction<boolean>>;
 }
 
-function EmptyStatePopUp({setIsEmptyState, setIsAddShapeButtonClicked}: Props) {
+function EmptyUtensilPopUp({setIsEmptyUtensil, setIsAddShapeButtonClicked}: Props) {
 
   return (
     <div
@@ -28,12 +28,12 @@ function EmptyStatePopUp({setIsEmptyState, setIsAddShapeButtonClicked}: Props) {
     >
         <div
             style={{cursor: 'pointer', position:'absolute', top: '1rem', right:'1rem'}}
-            onClick={() => {setIsEmptyState(false)}} 
+            onClick={() => {setIsEmptyUtensil(false)}} 
         > 
             <CloseIcon />
         </div>
 
-        <ImgForEmptyState />
+        <ImgForEmptyUtensil />
         
         <div 
             style={{
@@ -61,7 +61,7 @@ function EmptyStatePopUp({setIsEmptyState, setIsAddShapeButtonClicked}: Props) {
                 margin:'0'
             }}
             onClick={() => { 
-                setIsEmptyState(false);
+                setIsEmptyUtensil(false);
                 setIsAddShapeButtonClicked(true);
             }}
         >
@@ -71,4 +71,4 @@ function EmptyStatePopUp({setIsEmptyState, setIsAddShapeButtonClicked}: Props) {
   )
 }
 
-export default EmptyStatePopUp
+export default EmptyUtensilPopUp

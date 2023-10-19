@@ -2,12 +2,21 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { HomeIcon, FileIcon } from '../assets/icons/svg';
 import { THEME_COLORS } from "constants/colors";
+import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
+import { useShallow } from 'zustand/react/shallow';
 
 function PageSwitcher() {
     let navigate = useNavigate();
     const location = useLocation();
 	const path = location.pathname.split('/')[1];
     const [page, setPage] = useState('/' + path);
+
+    const [metaMaskAccount, getMetaMaskAccount] = useMetaMaskAccountStore(
+        useShallow((state) => [
+          state.metaMaskAccount,
+          state.getMetaMaskAccount,
+        ])
+      );
     
     useEffect(() => {
         setPage('/' + path);
@@ -45,7 +54,7 @@ function PageSwitcher() {
                     background: page === '/profile' ? THEME_COLORS.get("darkGray") : THEME_COLORS.get("white"),
                     color: page === '/profile' ? THEME_COLORS.get("white") : THEME_COLORS.get("black")
                 }}
-                onClick={(e) => togglePage(e, '/profile')}
+                onClick={(e) => togglePage(e, `/profile/${metaMaskAccount}`)}
             >
                 <HomeIcon />
             </div>

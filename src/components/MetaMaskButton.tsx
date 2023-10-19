@@ -1,36 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button, Avatar } from "@mui/material";
-import axios from "libs/axios";
 import { THEME_COLORS } from "constants/colors";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useShallow } from "zustand/react/shallow";
 
-interface AddressType {
-  id: number;
-  name: string | null;
-  address: string | null | undefined;
-  about: string;
-  avatar_url: string;
-}
-
 export default function MetaMaskButton() {
 
-  const [getMetaMaskAccount] = useMetaMaskAccountStore(
+  const [address, getMetaMaskAccount, getAddress] = useMetaMaskAccountStore(
     useShallow((state) => [
+      state.address,
       state.getMetaMaskAccount,
+      state.getAddress
     ])
   );
-    
-  const [address, setAddress] = useState<AddressType | null>(null); // The address object to display
-      
-  const getAddress = async () => {
-    if (typeof window.ethereum !== 'undefined') {
-      const { data }: { data: AddressType } = await axios.get(`/api/address/${window.ethereum.selectedAddress}/`);
-      setAddress(data);
-      console.log('metamaskbutton set address', data.avatar_url);
-    }
-  };
-  
+   
   const shortenAddress = (address: string) => {
     // display the first 6 characters of the address, then "..." then the last 4 characters
     const first = address.slice(0, 6).toLowerCase();
@@ -39,7 +22,9 @@ export default function MetaMaskButton() {
   };
 
   useEffect(() => {
-      getAddress();
+    if (typeof window.ethereum !== 'undefined') {
+      getAddress(window.ethereum.selectedAddress);
+    }      
   }, []);
 
   return (
