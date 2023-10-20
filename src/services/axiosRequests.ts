@@ -31,6 +31,30 @@ export async function getAllGraphs (metaMaskAccount: string) {
     return data;
   };
 
+export async function getPublicGraphs () {
+    const { data: publicData } = await axios.get(`/api/graphs/public/`)
+        .then((res: any) => { 
+            return res
+        });
+    return publicData;
+}  
+
+export async function getPrivateGraphs (wallet: string) {
+    const { data: privateData } = await axios.get(`/api/graphs/private/?private=${wallet}`)
+        .then((res: any) => { 
+            return res
+        });
+    return privateData;
+} 
+
+export async function getSharedGraphs (wallet: string) {
+    const { data: sharedData } = await axios.get(`/api/graphs/shared/?address=${wallet}`)
+        .then((res: any) => { 
+            return res
+        });
+    return sharedData;
+} 
+
 export async function deleteGraph(id: number) {
     const response = await axios.delete(`/api/graphs/${id}/`)
         .then((res: any) => { return res });

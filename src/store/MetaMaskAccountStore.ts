@@ -38,8 +38,10 @@ export const useMetaMaskAccountStore = create<MetaMaskState>((set, get) => ({
   },
 
   getAddress: async(value: string) => {
-    const { data: address }: { data: Address } = await axios.get(`/api/address/${value}/`);
-    set({ address });
+    if (value) {
+      const { data: address }: { data: Address } = await axios.get(`/api/address/${value}/`);
+      set({ address });
+    }    
   }
 
 }));
