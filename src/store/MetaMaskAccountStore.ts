@@ -7,6 +7,7 @@ interface Address {
   address: string | null | undefined;
   about: string;
   avatar_url: string;
+  avatar?: string;
 }
 
 interface MetaMaskState {
@@ -42,16 +43,3 @@ export const useMetaMaskAccountStore = create<MetaMaskState>((set, get) => ({
   }
 
 }));
-
-// const getAddress = async () => {
-//   if (typeof window.ethereum !== 'undefined') {
-//     const { data }: { data: Address } = await axios.get(`/api/address/${window.ethereum.selectedAddress}/`);
-//     setAddress(data);
-//     console.log('metamaskbutton set address', data.avatar_url);
-//   }
-// };
-
-// const getAddress = async () => {
-//   const { data } = await axios.get(`/api/address/${addressId}/`);
-//   setAddress(data);
-// };

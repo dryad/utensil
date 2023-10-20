@@ -34,6 +34,8 @@ def address(request, addressId=None):
                 ext = format.split('/')[-1] 
                 data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext) # You can save this as file instance.
                 address.avatar.save(address.address + '.png', data, save=True)
+            else:
+                address.avatar = ''
                 # address.avatar = address.address + '.png'
             # address.avatar.save(avatar.name, avatar)
 

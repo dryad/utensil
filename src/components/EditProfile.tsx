@@ -146,7 +146,6 @@ function EditProfile() {
                                     onChange={(e) => {
                                         setAddress({ ...address, about: e.target.value });
                                     }}
-
                                 />
                             </Grid>
                             <Grid item xs={12}>

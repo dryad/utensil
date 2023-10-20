@@ -1,4 +1,5 @@
 import axios from "libs/axios";
+import { Address } from 'models';
 
 type DataProps = {
     id?: number | null;
@@ -44,5 +45,10 @@ export async function shareGraph(addressToShare: string, id: number) {
     return response;    
 }
 
-
+export async function editProfile (account: string, editAddress: Address) {
+    const response = await axios.post(`/api/address/${account}/`, {editAddress})
+        .then((res: any) => { return res });
+    
+    return response;    
+}
 

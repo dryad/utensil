@@ -1,34 +1,34 @@
 import { useEffect } from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import EmptyProfilePopUp from 'components/EmptyProfilePopUp';
+import ProfileInfo from 'components/ProfileInfo';
 import Navbar from "layout/Navbar";
 import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useShallow } from "zustand/react/shallow";
+import { Button } from "@mui/material";
 
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
-    const [metaMaskAccount] = useMetaMaskAccountStore(
+    const [metaMaskAccount, getAddress] = useMetaMaskAccountStore(
         useShallow((state) => [
-          state.metaMaskAccount
+          state.metaMaskAccount,
+          state.getAddress
         ])
       );
-   
-console.log(addressId === undefined, addressId, typeof addressId)
+
+    useEffect(() => {
+        if (addressId) {
+            getAddress(addressId);
+        }
+    },[addressId]);  
         
     useEffect(() => {
         if (metaMaskAccount) {
             navigate(`/profile/${metaMaskAccount}`);
         }
     },[metaMaskAccount])    
-
-    const shortenAddress = (address: string) => {
-        // display the first 6 characters of the address, then "..." then the last 4 characters
-        const first = address.slice(0, 6);
-        const last = address.slice(-4);
-        return `${first}...${last}`;
-    }
 
     const address_is_whitelisted = () => {
         return WhitelistedAddresses.includes(metaMaskAccount);
@@ -48,9 +48,36 @@ console.log(addressId === undefined, addressId, typeof addressId)
                     </div>
                 }
                 {addressId !== undefined &&
-                    <div>
-                        Profile page
-                    </div>
+                    <div
+                        style={{
+                            display: 'flex',
+                            height: '100%',
+                            paddingTop:'8px'
+                        }}
+                    >
+                        <div 
+                            style={{
+                                display:'flex',
+                                flexDirection:'column',
+                                justifyContent:'space-between',
+                                width: '300px'
+                            }}
+                        >
+                            <ProfileInfo />
+                            <Button>
+                                + Create new graph
+                            </Button>
+                        </div>
+                        <div>
+                            <div>
+                                Graphs
+                            </div>
+                            {/* <ProfileMenuBar /> */}
+                            <div>
+                                graphs array
+                            </div>
+                        </div>
+                    </div>                    
                 }
             </main>
         </>

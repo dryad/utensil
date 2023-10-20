@@ -56,3 +56,12 @@ export type GraphData = {
 export type Tree = {
   nodes: TreeNode[];
 }
+
+export interface Address {
+  id: number;
+  name: string | null;
+  address: string | null | undefined;
+  about: string;
+  avatar_url: string;
+  avatar?: string;
+}

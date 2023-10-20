@@ -1,5 +1,6 @@
 import VisCustomNetwork from "libs/vis-custom-network";
-import { saveGraph, shareGraph, deleteGraph } from 'services/axiosRequests';
+import { saveGraph, shareGraph, deleteGraph, editProfile } from 'services/axiosRequests';
+import { Address } from 'models';
 
 export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCustomNetwork | null>) => { 
     
@@ -79,4 +80,18 @@ export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCust
         }
       })
       .catch(err => {if (err) {console.log(err); setIsDeleteGraphResponseStatusOk(false)}})
+  };
+
+  export async function saveProfileToDB (
+    account: string,
+    editAddress: Address,
+    setIsSaveProfileResponseStatusOk: Function   
+    ){   
+      editProfile(account, editAddress)
+        .then((res) => {
+          if (res.status === 200) {
+            setIsSaveProfileResponseStatusOk(true);
+          }
+        })
+        .catch(err => {if (err) {console.log(err); setIsSaveProfileResponseStatusOk(false)}})
   };

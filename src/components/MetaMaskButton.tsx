@@ -47,9 +47,17 @@ export default function MetaMaskButton() {
             )}
             {window.ethereum.isMetaMask && window.ethereum.selectedAddress && (
               <>
-                <Avatar sx={{width: '36px', height: '36px', bgcolor: THEME_COLORS.get('blue')}} src={address?.avatar_url} />
+                {address?.avatar_url &&
+                  <Avatar sx={{width: '36px', height: '36px'}} src={address?.avatar_url} />
+                }
+                {!address?.avatar_url &&
+                  <Avatar sx={{width: '36px', height: '36px', bgcolor: THEME_COLORS.get('blue'), fontSize:'1rem', fontWeight:'500' }} >
+                    { address?.name == undefined ? null : address.name[0]}
+                  </Avatar> 
+                }                
                 {shortenAddress(window.ethereum.selectedAddress)}
-              </>                
+              </>   
+                          
             )}
           </div>
         }
