@@ -46,14 +46,12 @@ const StyledBox = styled('div')(() => ({
 
 function ProfileGraphsContainer({ currentTab }: Props) {
 
-  const [publicGraphs, privateGraphs, sharedGraphs, getPublicGraphs, getPrivateGraphs, getSharedGraphs] = useAllGraphsStore(
+  const [publicGraphs, privateGraphs, sharedGraphs, searchString] = useAllGraphsStore(
     useShallow((state) => [
         state.publicGraphs,
         state.privateGraphs,
         state.sharedGraphs,
-        state.getPublicGraphs,
-        state.getPrivateGraphs,
-        state.getSharedGraphs
+        state.searchString
     ])
 );  
 
@@ -74,6 +72,13 @@ const [can_edit_profile] = useMetaMaskAccountStore(
           <TabPanel value={currentTab} index={0}>
             <StyledBox>
               {publicGraphs.map((graph) => {
+                if (
+                  searchString &&
+                  !graph.name
+                      .toLowerCase()
+                      .includes(searchString.toLowerCase())
+                )
+                  return null;
                 return (
                   <div key={graph.id}>
                     <ProfileGraphItem graph={graph} />
@@ -94,6 +99,13 @@ const [can_edit_profile] = useMetaMaskAccountStore(
           <TabPanel value={currentTab} index={1}>
               <StyledBox>
                 {privateGraphs.map((graph) => {
+                  if (
+                    searchString &&
+                    !graph.name
+                        .toLowerCase()
+                        .includes(searchString.toLowerCase())
+                  )
+                    return null;
                   return (
                     <div key={graph.id}>
                       <ProfileGraphItem graph={graph} />
@@ -106,7 +118,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
       { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
           <TabPanel value={currentTab} index={1}>
               <div style={{ width: '100%' }}>
-                no graphs... or no access
+                No graphs... 
               </div>
           </TabPanel>
       )}
@@ -114,6 +126,13 @@ const [can_edit_profile] = useMetaMaskAccountStore(
         <TabPanel value={currentTab} index={2}>
           <StyledBox>
             {sharedGraphs.map((graph) => {
+              if (
+                searchString &&
+                !graph.name
+                    .toLowerCase()
+                    .includes(searchString.toLowerCase())
+              )
+                return null;
               return (
                 <div key={graph.id}>
                   <ProfileGraphItem graph={graph} />
@@ -126,7 +145,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
       { (!can_edit_profile() || (can_edit_profile() && sharedGraphs.length === 0)) && (
           <TabPanel value={currentTab} index={2}>
               <div style={{ width: '100%' }}>
-                no graphs... or no access
+                No graphs...
               </div>
           </TabPanel>
       )}

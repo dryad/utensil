@@ -7,10 +7,12 @@ interface AllGraphsState {
   publicGraphs: Graph[];
   privateGraphs: Graph[];
   sharedGraphs: Graph[];  
+  searchString: string;
   getAllGraphs: () => void;
   getPublicGraphs: () => void;
   getPrivateGraphs: (wallet: string) => void;
   getSharedGraphs: (wallet: string) => void;
+  setSearchString: (searchString: string) => void;
 }
 
 export const useAllGraphsStore = create<AllGraphsState>((set, get) => ({
@@ -18,6 +20,7 @@ export const useAllGraphsStore = create<AllGraphsState>((set, get) => ({
   publicGraphs: <Graph[]>[],
   privateGraphs: <Graph[]>[],
   sharedGraphs: <Graph[]>[],
+  searchString: "",
 
   getAllGraphs: async() => {    
 
@@ -60,6 +63,7 @@ export const useAllGraphsStore = create<AllGraphsState>((set, get) => ({
       }
     })  
     .catch((err: any) => {if (err) {set({ sharedGraphs: [] })}});
-  } 
+  },
+  setSearchString: (searchString) => set({searchString}), 
 
 }));

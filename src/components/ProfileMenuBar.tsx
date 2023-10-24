@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react'
+import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react';
 import {
   Container,
   Box,
@@ -13,6 +13,7 @@ import {
   Tooltip,
   styled
 } from "@mui/material";
+import ProfileSearchGraphs from './ProfileSearchGraphs';
 import { THEME_COLORS } from 'constants/colors';
 
 function a11yProps(index: number) {
@@ -77,7 +78,8 @@ function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
     <div 
       style={{
         display:'flex',
-        justifyContent:'space-between'
+        justifyContent:'space-between',
+        alignItems:'flex-start'
       }}
     >
       <StyledTabs value={currentTab} onChange={handleChange} >
@@ -88,7 +90,7 @@ function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
         <Tab label="Shared" {...a11yProps(2)} disableRipple />
       </StyledTabs>
       
-      {/* <ProfileSearchGraphs /> */}
+      <ProfileSearchGraphs />
     </div>
   )
 }
