@@ -12,6 +12,7 @@ import { THEME_COLORS } from "constants/colors";
 import styled from "@emotion/styled";
 import ProfileMenuBar from 'components/ProfileMenuBar';
 import ProfileGraphsContainer from 'components/ProfileGraphsContainer';
+import { useAllUsersStore } from 'store/AllUsersStore';
 
 const StyledButton = styled(Button)(() => ({
     backgroundColor: THEME_COLORS.get('blue'), 
@@ -23,10 +24,6 @@ const StyledButton = styled(Button)(() => ({
   }));
 
   const ScrollBox = styled('div')(() => ({
-    // display:'flex', 
-    // justifyContent:'space-between', 
-    // flexWrap:'wrap', 
-    // gap: '28px',
     flex: '1',
     overflowY:'auto', 
     '&::-webkit-scrollbar':{
@@ -64,6 +61,16 @@ function Profile() {
             state.getSharedGraphs
         ])
     );
+
+    const [getAllUsers] = useAllUsersStore(
+        useShallow((state) => [
+            state.getAllUsers
+        ])
+    );
+
+    useEffect(() => {
+        getAllUsers()
+    },[])
 
     const can_edit_profile = () => {
         return metaMaskAccount === address?.address;

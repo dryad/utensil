@@ -23,3 +23,8 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ('id', 'name', 'about', 'address', 'avatar_url')
+
+class AddressesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('name', 'address', 'avatar_url')

@@ -76,3 +76,10 @@ export async function editProfile (account: string, editAddress: Address) {
     return response;    
 }
 
+export async function getUsers () {
+    const data = await axios.get(`/api/addresses/`)
+        .then((res: any) => { 
+            return res
+        });
+    return data;
+};

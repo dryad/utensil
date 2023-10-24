@@ -1,7 +1,13 @@
-import { Button, Avatar } from "@mui/material";
+import { Avatar } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
 
-export default function ProfileCreatorButton({creator}: {creator: string}) {
+type User = {
+  name: string;
+  address: string;
+  avatar_url: string;
+}
+
+export default function ProfileCreatorButton({creator}: {creator: User}) {
    
   const shortenAddress = (address: string) => {
     // display the first 9 characters of the address, then "..." then the last 3 characters
@@ -25,16 +31,16 @@ export default function ProfileCreatorButton({creator}: {creator: string}) {
             borderRadius:'4px'
           }}
         > 
-          {/* {address?.avatar_url &&
-            <Avatar sx={{width: '36px', height: '36px'}} src={address?.avatar_url} />
+          {creator?.avatar_url &&
+            <Avatar sx={{width: '24px', height: '24px'}} src={creator?.avatar_url} />
           }
-          {!address?.avatar_url &&
-            <Avatar sx={{width: '36px', height: '36px', bgcolor: THEME_COLORS.get('blue'), fontSize:'1rem', fontWeight:'500' }} >
-              { address?.name == undefined ? null : address.name[0]}
+          {!creator?.avatar_url &&
+            <Avatar sx={{width: '22px', height: '22px', bgcolor: THEME_COLORS.get('blue'), fontSize:'1rem', fontWeight:'500' }} >
+              { creator?.name == undefined ? null : creator.name[0]}
             </Avatar> 
-          }                 */}
+          }                
           <div style={{fontSize:'0.75rem', color: 'black', fontWeight:'500'}}>
-            {shortenAddress(creator)}
+            {shortenAddress(creator.address)}
           </div>        
         </div>      
       }    

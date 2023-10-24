@@ -5,6 +5,8 @@ import ProfileCreatorButton from './ProfileCreatorButton';
 import { Graph } from "models";
 import { THEME_COLORS } from "constants/colors";
 import ProfileGraphMenu from 'components/ProfileGraphMenu';
+import { useAllUsersStore } from "store/AllUsersStore";
+import { useShallow } from "zustand/react/shallow";
 
 type GraphItemProps = {
   graph: Graph;
@@ -15,6 +17,13 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({
 }) => {
   const networkRef = useRef<VisCustomNetwork | null>(null);
   
+  const [allUsers] = useAllUsersStore(
+    useShallow((state) => [
+        state.allUsers,
+    ])
+  );
+  const user = allUsers.find(el => el.address === graph.creator);
+
   useEffect(() => {
     const data = JSON.parse(graph.data);
     networkRef.current?.setData(data);
@@ -57,7 +66,7 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({
           </div>
         </div>
         <div style={{height:'1.75rem', display:'flex', justifyContent:'start', gap:'4px'}}>
-          <ProfileCreatorButton creator={graph.creator} />
+          <ProfileCreatorButton creator={user!} />
           <ProfileGraphMenu graph={graph} />
         </div>
       </div>

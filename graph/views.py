@@ -1,4 +1,4 @@
-from .serializers import GraphSerializer, AddressSerializer, SharedGraphsSerializer
+from .serializers import GraphSerializer, AddressSerializer, SharedGraphsSerializer, AddressesSerializer
 from .models import Graph, Address, SharedGraphs
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.core import serializers
@@ -156,3 +156,10 @@ def sharedGraphs(request):
         return HttpResponse(status=202)
     else:
         return HttpResponse(status=405)
+
+@csrf_exempt
+def addresses(request):
+    if request.method == 'GET':
+        addresses = Address.objects.all()
+        serializer = AddressesSerializer(addresses, many=True)
+        return JsonResponse(serializer.data, safe=False)
