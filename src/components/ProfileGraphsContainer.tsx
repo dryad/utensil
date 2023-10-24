@@ -4,7 +4,6 @@ import { useAllGraphsStore } from 'store/AllGraphsStore';
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from "zustand/react/shallow";
 import ProfileGraphItem from './ProfileGraphItem';
-import { THEME_COLORS } from 'constants/colors';
 
 type Props = {
   currentTab: number;

@@ -158,6 +158,8 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
       
       if (metaMaskAccount === "")
         setShowGetAccountMessage(true);
+        setGraphName('');
+        setGraphNote('');
         return;
     }
     saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 

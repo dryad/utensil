@@ -2,7 +2,7 @@ import { IconButton, Theme, Dialog, styled, TextField, Button } from "@mui/mater
 import MuiDialogTitle from "@mui/material/DialogTitle";
 import MuiDialogContent from "@mui/material/DialogContent";
 import MuiDialogActions from "@mui/material/DialogActions";
-import { CloseIcon } from "assets/icons/svg";
+import { CloseIcon, InfoLabelIcon } from "assets/icons/svg";
 import withStyles from '@mui/styles/withStyles';
 import createStyles from '@mui/styles/createStyles';
 import { THEME_COLORS } from "constants/colors";
@@ -36,6 +36,25 @@ const DialogTitle = withStyles(styles)((props: any) => {
           <CloseIcon />
         </IconButton>
       ) : null}
+    </MuiDialogTitle>
+  );
+});
+
+const InfoDialogTitle = withStyles(styles)((props: any) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle className={classes.root} {...other}
+      sx={{
+        display:'flex',
+        flexDirection:'column',
+        justifyContent: 'center',
+        alignItems:'center',
+        gap:'20px',
+        marginBottom:'-8px'
+      }}
+    >
+      <InfoLabelIcon />
+      {children}
     </MuiDialogTitle>
   );
 });
@@ -116,4 +135,17 @@ const DialogButton = styled(Button)({
   height: '36px'
 });
 
-export { DialogTitle, DialogContent, DialogActions, DialogWindow, InputField, DialogButton };
+const StyledOKButton = styled('div')(() => ({
+  height:'2.25rem',
+  width: '8.75rem',
+  display: 'flex',
+  justifyContent:'center',
+  alignItems:'center',
+  padding: '8px 12px',
+  background: THEME_COLORS.get("blue"),
+  borderRadius: '4px',
+  color: 'white',
+  cursor: 'pointer'
+}));
+
+export { DialogTitle, InfoDialogTitle, DialogContent, DialogActions, DialogWindow, InputField, DialogButton, StyledOKButton };

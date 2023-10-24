@@ -1,20 +1,14 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent } from 'react';
+import React, { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
 import {
-  Container,
-  Box,
-  Button,
-  Grid,
-  Typography,
-  Avatar,
-  Stack,
   Tabs,
   Tab,
-  Drawer,
-  Tooltip,
   styled
 } from "@mui/material";
 import ProfileSearchGraphs from './ProfileSearchGraphs';
 import { THEME_COLORS } from 'constants/colors';
+import ShowPromptDialog from './ShowPromptDialog';
+import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
+import { useShallow } from 'zustand/react/shallow';
 
 function a11yProps(index: number) {
   return {
@@ -62,36 +56,48 @@ const StyledTabs = styled((props: StyledTabsProps) => (
 
 type Props = {
   currentTab: number;
-  setCurrentTab: Dispatch<SetStateAction<number>>;
-  
+  setCurrentTab: Dispatch<SetStateAction<number>>;  
 }
 
 function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
+  const [can_edit_profile] = useMetaMaskAccountStore(
+    useShallow((state) => [
+      state.can_edit_profile,
+    ])
+  );
 
-  
-  
+  const [showPrompt, setShowPrompt] = useState(false);
   const handleChange = (event: SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
+    can_edit_profile() && setCurrentTab(newValue);
   };
 
   return (
-    <div 
-      style={{
-        display:'flex',
-        justifyContent:'space-between',
-        alignItems:'flex-start'
-      }}
-    >
-      <StyledTabs value={currentTab} onChange={handleChange} >
-        <Tab label="Public" {...a11yProps(0)} disableRipple />
-        <Tab label="Private" {...a11yProps(1)}  disableRipple
-          // onClick={() => !can_edit_profile() && setShowPrompt(true)}
-        />
-        <Tab label="Shared" {...a11yProps(2)} disableRipple />
-      </StyledTabs>
-      
-      <ProfileSearchGraphs />
-    </div>
+    <>
+      <div 
+        style={{
+          display:'flex',
+          justifyContent:'space-between',
+          alignItems:'flex-start'
+        }}
+      >
+        <StyledTabs value={currentTab} onChange={handleChange} >
+          <Tab label="Public" {...a11yProps(0)} disableRipple />
+          <Tab label="Private" {...a11yProps(1)}  disableRipple
+            onClick={() => !can_edit_profile() && setShowPrompt(true)}
+          />
+          <Tab label="Shared" {...a11yProps(2)} disableRipple 
+            onClick={() => !can_edit_profile() && setShowPrompt(true)}
+          />
+        </StyledTabs>
+        
+        <ProfileSearchGraphs />
+      </div>
+      <ShowPromptDialog 
+        showPrompt={showPrompt} 
+        setShowPrompt={setShowPrompt} 
+      >fdggdd
+      </ShowPromptDialog>
+    </>
   )
 }
 

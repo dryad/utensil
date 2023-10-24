@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { InputAdornment, TextField } from '@mui/material';
 import { CloseIcon, SearchIcon } from 'assets/icons/svg';
 import { THEME_COLORS } from 'constants/colors';

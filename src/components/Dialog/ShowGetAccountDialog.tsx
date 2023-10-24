@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { DialogTitle, DialogActions, DialogWindow, DialogButton } from ".";
+import { DialogActions, DialogWindow, StyledOKButton, InfoDialogTitle } from ".";
 import { THEME_COLORS } from 'constants/colors';
 import { useShallow } from 'zustand/react/shallow'
 import { useGraphStore } from 'store/GraphStore';
@@ -22,35 +22,28 @@ const ShowGetAccountDialog = (props: DialogProps) => {
     <DialogWindow
       open={showGetAccountMessage}
       onClose={() => {setShowGetAccountMessage(false); setIsPrivate(false)}}
-      aria-labelledby="show-warning-dialog"
+      aria-labelledby="show-info-dialog"
       width={'420px'}
     >
-      <DialogTitle 
-        id="show-warning-dialog" 
-        onClose={() => {setShowGetAccountMessage(false); setIsPrivate(false)}}
+      <InfoDialogTitle 
+        id="show-info-dialog" 
       >
-        Warning
-      </DialogTitle>
-    
-      <div>
-        <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
-          <div style={{fontSize:"0.9375rem", fontWeight:'500', color: "#191919"}}>
-            Get your MetaMask account first before saving private concept!
-          </div>
-        </div>       
+        Connect your wallet first
+      </InfoDialogTitle>
+
+      <div style={{fontSize:"0.875rem", fontWeight:'400', color: THEME_COLORS.get('gray500')}}>
+        You need to connect your wallet to save private graphs
       </div>
       
-      <DialogActions>
-        <DialogButton
-          variant="contained"
-          sx={{background: THEME_COLORS.get('blue')}}
+      <DialogActions sx={{display:'flex', justifyContent:'center'}}>
+        <StyledOKButton
           onClick={() => {
             setShowGetAccountMessage(false);
             setIsPrivate(false);           
           }}
         >
           OK
-        </DialogButton>
+        </StyledOKButton>
       </DialogActions>
     </DialogWindow>
   );
