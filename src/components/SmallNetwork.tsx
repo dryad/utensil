@@ -17,7 +17,7 @@ const SmallNetwork = ({ networkRef, width='100px', height='80px' }: INetworkProp
     }, [networkRef]);
     
     return (
-      <div ref={domRef} style={{ height: height, width: width, background: '#fff' }} />
+      <div ref={domRef} style={{ height: height, width: width, background: '#fff', borderRadius:'4px' }} />
     );
   }
 

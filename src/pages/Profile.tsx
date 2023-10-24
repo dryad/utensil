@@ -21,17 +21,36 @@ const StyledButton = styled(Button)(() => ({
     fontSize: '1rem',
     fontWeight: '500'
   }));
+
+  const ScrollBox = styled('div')(() => ({
+    // display:'flex', 
+    // justifyContent:'space-between', 
+    // flexWrap:'wrap', 
+    // gap: '28px',
+    flex: '1',
+    overflowY:'auto', 
+    '&::-webkit-scrollbar':{
+      width: '7px',
+      },
+    '&::-webkit-scrollbar-thumb': {
+          background: THEME_COLORS.get('lightGray'),    
+          borderRadius: '20px',
+          '&:hover': {
+              background: THEME_COLORS.get('gray')     
+          }
+      }  
+  }))
   
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
     const [currentTab, setCurrentTab] = useState(0);
 
-    const [metaMaskAccount, getAddress, can_edit_profile] = useMetaMaskAccountStore(
+    const [metaMaskAccount, address, getAddress] = useMetaMaskAccountStore(
         useShallow((state) => [
           state.metaMaskAccount,
-          state.getAddress,
-          state.can_edit_profile
+          state.address,
+          state.getAddress
         ])
       );
 
@@ -46,6 +65,10 @@ function Profile() {
         ])
     );
 
+    const can_edit_profile = () => {
+        return metaMaskAccount === address?.address;
+    }
+
     useEffect(() => {
         getPublicGraphs();
     },[getPublicGraphs]);
@@ -54,13 +77,13 @@ function Profile() {
         if (can_edit_profile()) {
             getPrivateGraphs(addressId!);
         } 
-    },[metaMaskAccount, addressId]);
+    },[metaMaskAccount, addressId, address]);
 
     useEffect(() => {
         if (can_edit_profile()) {
             getSharedGraphs(addressId!);
         } 
-    },[metaMaskAccount, addressId]);
+    },[metaMaskAccount, addressId, address]);
 
     console.log(publicGraphs, '====public');
     console.log(privateGraphs, '===private');
@@ -75,7 +98,7 @@ function Profile() {
                 navigate(`/profile/${metaMaskAccount}`);
             }
         }
-    },[addressId]);  
+    },[addressId, metaMaskAccount]);  
         
     const address_is_whitelisted = () => {
         return WhitelistedAddresses.includes(metaMaskAccount);
@@ -108,25 +131,31 @@ function Profile() {
                                 display:'flex',
                                 flexDirection:'column',
                                 justifyContent:'space-between',
-                                width: '300px'
+                                minWidth: '300px'
                             }}
                         >
                             <ProfileInfo />
-                            <StyledButton variant="contained">
-                                + Create new graph
-                            </StyledButton>
+                            {can_edit_profile() && 
+                                <StyledButton variant="contained">
+                                    + Create new graph
+                                </StyledButton>
+                            }                            
                         </div>
-                        <div style={{display:'flex', flexDirection:'column', gap:'20px'}}>
-                            <div style={{fontSize:"1.75rem", fontWeight:'500', color: THEME_COLORS.get('black')}}>
+                        <div style={{width:'100%', display:'flex', flexDirection:'column', gap:'20px'}}>
+                            <div style={{height: '39px', fontSize:"1.75rem", fontWeight:'500', color: THEME_COLORS.get('black')}}>
                                 Graphs
                             </div>
-                            <ProfileMenuBar 
-                                currentTab={currentTab}
-                                setCurrentTab={setCurrentTab}
-                            />
-                            <ProfileGraphsContainer 
-                                currentTab={currentTab}
-                            />
+                            <div style={{height:"36px"}}>
+                                <ProfileMenuBar 
+                                    currentTab={currentTab}
+                                    setCurrentTab={setCurrentTab}
+                                />
+                            </div>
+                            <ScrollBox>
+                                <ProfileGraphsContainer 
+                                        currentTab={currentTab}
+                                    />
+                            </ScrollBox>                           
                         </div>
                     </div>                    
                 }

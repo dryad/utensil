@@ -1,8 +1,10 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { ReactNode } from 'react';
 import { useAllGraphsStore } from 'store/AllGraphsStore';
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from "zustand/react/shallow";
+import ProfileGraphItem from './ProfileGraphItem';
+import { THEME_COLORS } from 'constants/colors';
 
 type Props = {
   currentTab: number;
@@ -35,6 +37,13 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+const StyledBox = styled('div')(() => ({
+  display:'flex', 
+  justifyContent:'space-between', 
+  flexWrap:'wrap', 
+  gap: '28px' 
+}))
+
 function ProfileGraphsContainer({ currentTab }: Props) {
 
   const [publicGraphs, privateGraphs, sharedGraphs, getPublicGraphs, getPrivateGraphs, getSharedGraphs] = useAllGraphsStore(
@@ -57,44 +66,41 @@ const [can_edit_profile] = useMetaMaskAccountStore(
   return (
     <div 
       style={{
-        display:'flex',
-        justifyContent:'space-between'
+        width: '100%',
+        height: '0'
       }}
     >
-     
-     {publicGraphs.length > 0 && (
+      {publicGraphs.length > 0 && (
           <TabPanel value={currentTab} index={0}>
-              <div style={{ width: '100%' }}>
-                  {publicGraphs.map((graph) => {
-                    return (
-                      <div key={graph.id}>
-                        {graph.name}
-                      </div>
-                    )
-                  }) 
-                  }
-              </div>
+            <StyledBox>
+              {publicGraphs.map((graph) => {
+                return (
+                  <div key={graph.id}>
+                    <ProfileGraphItem graph={graph} />
+                  </div>
+                )
+              })}
+            </StyledBox>
           </TabPanel>
       )}
       {publicGraphs.length === 0 && (
           <TabPanel value={currentTab} index={0}>
               <div style={{ width: '100%' }}>
-                no graphs... or no access
+                No graphs... 
               </div>
           </TabPanel>
       )}
       { can_edit_profile() && privateGraphs.length > 0 && (
           <TabPanel value={currentTab} index={1}>
-              <div style={{ width: '100%' }}>
+              <StyledBox>
                 {privateGraphs.map((graph) => {
                   return (
                     <div key={graph.id}>
-                      {graph.name}
+                      <ProfileGraphItem graph={graph} />
                     </div>
                   )
-                }) 
-                }
-              </div>
+                })}
+              </StyledBox>
           </TabPanel>
       )}
       { (!can_edit_profile() || (can_edit_profile() && privateGraphs.length === 0)) && (
@@ -105,18 +111,17 @@ const [can_edit_profile] = useMetaMaskAccountStore(
           </TabPanel>
       )}
       { can_edit_profile() && sharedGraphs.length > 0 && (
-          <TabPanel value={currentTab} index={2}>
-              <div style={{ width: '100%' }}>
-                {sharedGraphs.map((graph) => {
-                  return (
-                    <div key={graph.id}>
-                      {graph.name}
-                    </div>
-                  )
-                }) 
-                }
-              </div>
-          </TabPanel>
+        <TabPanel value={currentTab} index={2}>
+          <StyledBox>
+            {sharedGraphs.map((graph) => {
+              return (
+                <div key={graph.id}>
+                  <ProfileGraphItem graph={graph} />
+                </div>
+              )
+            })}
+          </StyledBox>
+        </TabPanel>
       )}
       { (!can_edit_profile() || (can_edit_profile() && sharedGraphs.length === 0)) && (
           <TabPanel value={currentTab} index={2}>

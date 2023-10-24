@@ -1,23 +1,68 @@
 import React, { useEffect, useRef } from "react";
 import SmallNetwork from "./SmallNetwork";
 import VisCustomNetwork from "libs/vis-custom-network";
+import ProfileCreatorButton from './ProfileCreatorButton';
+import { Graph } from "models";
+import { THEME_COLORS } from "constants/colors";
+import ProfileGraphMenu from 'components/ProfileGraphMenu';
 
 type GraphItemProps = {
-  graphData: any;
+  graph: Graph;
 };
 
 const ProfileGraphItem: React.FC<GraphItemProps> = ({
-  graphData
+  graph
 }) => {
   const networkRef = useRef<VisCustomNetwork | null>(null);
   
   useEffect(() => {
-    const data = JSON.parse(graphData);
+    const data = JSON.parse(graph.data);
     networkRef.current?.setData(data);
-  },[graphData])
+  },[graph])
   
   return (
-      <SmallNetwork networkRef={networkRef} /> 
+    <div
+      style={{
+        minWidth: '438px',
+        display:'flex',
+        gap:'16px'
+      }}
+    >
+      <SmallNetwork networkRef={networkRef} width={'216px'} height={'160px'} /> 
+      <div
+        style={{width: '206px', padding:'16px 0', display:'flex', flexDirection:'column', justifyContent:'space-between'}}
+      >
+        <div 
+          style={{display:'flex',flexDirection:'column', gap:'12px'}}
+        >
+          <div
+            style={{fontWeight:'500',fontSize:'1rem', color:THEME_COLORS.get('black'), overflowWrap: 'break-word'}}
+          >
+            {graph.name}
+          </div>
+          <div
+            style={{
+              fontWeight:'400', 
+              fontSize:'0.875rem', 
+              color:THEME_COLORS.get('darkGray'),
+              display: '-webkit-box',
+              WebkitLineClamp: '2',
+              WebkitBoxOrient:'vertical',
+              overflow: 'hidden',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word', 
+            }}
+          >
+            {graph.note}
+          </div>
+        </div>
+        <div style={{height:'1.75rem', display:'flex', justifyContent:'start', gap:'4px'}}>
+          <ProfileCreatorButton creator={graph.creator} />
+          <ProfileGraphMenu graph={graph} />
+        </div>
+      </div>
+    </div>
+     
     );
 };
 

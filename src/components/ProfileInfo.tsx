@@ -20,9 +20,9 @@ function ProfileInfo() {
   const [isSaveProfileResponseStatusOk, setIsSaveProfileResponseStatusOk] = useState<boolean | null>(null);
   
   const shortenAddress = (address: string) => {
-    // display the first 6 characters of the address, then "..." then the last 4 characters
-    const first = address.slice(0, 6);
-    const last = address.slice(-4);
+    // display the first 9 characters of the address, then "..." then the last 3 characters
+    const first = address.slice(0, 9);
+    const last = address.slice(-3);
     return `${first}...${last}`;
   }
 
