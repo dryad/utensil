@@ -566,20 +566,20 @@ function Profile() {
                                     </div>
                                 </TabPanel>
                             )}
-                            <ShowPromptDialog 
+                            {/* <ShowPromptDialog 
                                 showPrompt={showPrompt} 
                                 setShowPrompt={setShowPrompt} 
                             >
-                            </ShowPromptDialog>
+                            </ShowPromptDialog> */}
                         </Grid>
                     </Grid>
-                    <ShareGraphDialog
+                    {/* <ShareGraphDialog
                         openShareGraphDialog={openShareGraphDialog} 
                         setOpenShareGraphDialog={setOpenShareGraphDialog}
                         graphName={graphName}
                         saveSharedGraphToDatabase={saveSharedGraphToDatabase}
                         >
-                    </ShareGraphDialog>                     
+                    </ShareGraphDialog>                      */}
                 </Container>
             </ThemeProvider>
         );

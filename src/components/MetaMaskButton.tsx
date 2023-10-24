@@ -3,6 +3,7 @@ import { Button, Avatar } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useShallow } from "zustand/react/shallow";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function MetaMaskButton() {
 
@@ -13,7 +14,11 @@ export default function MetaMaskButton() {
       state.getAddress
     ])
   );
-   
+
+  let navigate = useNavigate();
+  const location = useLocation();
+  const path = location.pathname.split('/')[1];
+
   const shortenAddress = (address: string) => {
     // display the first 9 characters of the address, then "..." then the last 3 characters
     const first = address.slice(0, 9).toLowerCase();
@@ -26,7 +31,7 @@ export default function MetaMaskButton() {
       getAddress(window.ethereum.selectedAddress);
     }      
   }, []);
-
+    
   return (
       <>
         {window.ethereum &&
@@ -54,8 +59,13 @@ export default function MetaMaskButton() {
                   <Avatar sx={{width: '36px', height: '36px', bgcolor: THEME_COLORS.get('blue'), fontSize:'1rem', fontWeight:'500' }} >
                     { address?.name == undefined ? null : address.name[0]}
                   </Avatar> 
-                }                
-                {shortenAddress(window.ethereum.selectedAddress)}
+                }     
+                <div 
+                  style={{cursor: path === 'profile' ? 'pointer' : ''}}
+                  onClick={() => {path === 'profile' && navigate(`/profile/${window.ethereum.selectedAddress}`)}}
+                >
+                  {shortenAddress(window.ethereum.selectedAddress)}
+                </div>                  
               </>   
                           
             )}

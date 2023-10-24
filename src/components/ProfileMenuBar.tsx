@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import ProfileSearchGraphs from './ProfileSearchGraphs';
 import { THEME_COLORS } from 'constants/colors';
-import ShowPromptDialog from './ShowPromptDialog';
+import ShowAccessPrivateGraphsDialog from 'components/Dialog/ShowAccessPrivateGraphsDialog';
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -66,7 +66,7 @@ function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
     ])
   );
 
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     can_edit_profile() && setCurrentTab(newValue);
   };
@@ -83,20 +83,20 @@ function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
         <StyledTabs value={currentTab} onChange={handleChange} >
           <Tab label="Public" {...a11yProps(0)} disableRipple />
           <Tab label="Private" {...a11yProps(1)}  disableRipple
-            onClick={() => !can_edit_profile() && setShowPrompt(true)}
+            onClick={() => !can_edit_profile() && setShowMessage(true)}
           />
           <Tab label="Shared" {...a11yProps(2)} disableRipple 
-            onClick={() => !can_edit_profile() && setShowPrompt(true)}
+            onClick={() => !can_edit_profile() && setShowMessage(true)}
           />
         </StyledTabs>
         
         <ProfileSearchGraphs />
       </div>
-      <ShowPromptDialog 
-        showPrompt={showPrompt} 
-        setShowPrompt={setShowPrompt} 
-      >fdggdd
-      </ShowPromptDialog>
+      
+      <ShowAccessPrivateGraphsDialog 
+        showMessage={showMessage} 
+        setShowMessage={setShowMessage} 
+      />
     </>
   )
 }
