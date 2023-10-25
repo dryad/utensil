@@ -60,7 +60,7 @@ type GraphProps = {
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
 export default function ProfileGraphMenu({ graph }: GraphProps) {
-  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
+  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
       state.graphNote,
@@ -73,7 +73,6 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
       state.prevGraphNote,
       state.prevGraphPrivate,  
       state.setGraphId, 
-      state.setIsDeletedGraph,
       state.setGraphName,
       state.setGraphNote,
       state.setIsPrivate   
@@ -113,8 +112,8 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
   const canBeEditedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
-  const canBeDeletedGraph = graphId !== null && isPrivate;
-  const canBeDeletedOrBePrivate = graph.creator === metaMaskAccount;
+  const canBeDeletedGraph = (metaMaskAccount && graph.creator === metaMaskAccount) || isPrivate;
+  const canBePrivateGraph = graph.creator === metaMaskAccount;
 
   useEffect(() => {
     if (openEditGraphDialog) {
@@ -179,7 +178,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
     } 
   }
   
-  const saveGraphToDatabase = async(isNew: boolean = false) => {
+  const saveGraphToDatabase = async() => {
     if (isPrivate && !metaMaskAccount) {
       
       if (metaMaskAccount === "")
@@ -203,7 +202,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
 
   useEffect(() => {
     if (isDeleteGraphResponseStatusOk) {
-      setIsDeletedGraph(true);
+      refreshList();
     } 
   },[isDeleteGraphResponseStatusOk])
 
@@ -323,7 +322,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         saveGraphToDatabase={saveGraphToDatabase}
         closeBar={null}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
-        canBeDeletedOrBePrivate={canBeDeletedOrBePrivate}
+        canBePrivateGraph={canBePrivateGraph}
       />
 
       {/* <SaveGraphDialog
@@ -344,13 +343,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       /> */}
 
-      {/* <DeleteGraphDialog
+      <DeleteGraphDialog
         open={openDeleteGraphDialog} 
         setOpen={setOpenDeleteGraphDialog}
         onDelete={handleDeleteGraph}
-        closeBar={closeBar}
+        closeBar={null}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
-      /> */}
+      />
 
       <ShowGetAccountDialog 
         showGetAccountMessage={showGetAccountMessage} 
@@ -385,13 +384,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           message={'You have shared your graph.'}
         />
       }  */}
-      {/* {isDeleteGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'deleted' &&
+      {isDeleteGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'deleted' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph deleted'}
           message={'You have deleted your graph.'}
         />
-      }  */}
+      } 
       {/* {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && ['saved', 'saved as new'].includes(graphStatus) &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -399,13 +398,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           message={'There was an error. Please try again.'}
         />
       }  */}
-      {/* {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'edited' &&
+      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'edited' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph not edited'}
           message={'There was an error. Please try again.'}
         />
-      }  */}
+      } 
       {/* {isShareGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'shared' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -413,13 +412,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           message={'There was an error. Please try again.'}
         />
       } */}
-      {/* {isDeleteGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'deleted' &&
+      {isDeleteGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'deleted' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph not deleted'}
           message={'There was an error. Please try again.'}
         />
-      } */}
+      }
     </>   
   )
 }

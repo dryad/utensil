@@ -971,6 +971,10 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     // getMetaMaskAccount();
     refreshList();
     initializeUndoTimer();    
+    setGraphName('');
+    setGraphNote('');
+    setGraphCreator('');
+    setGraphId(null);
   }, []);
 
   useEffect(() => {

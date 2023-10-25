@@ -114,8 +114,10 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
 
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
-  const canBeDeletedGraph = graphId !== null && isPrivate;
-  const canBeDeletedOrBePrivate = graphCreator === metaMaskAccount;
+  // const canBeDeletedGraph = graphId !== null && isPrivate;
+  const canBeDeletedGraph = (graphId !== null) && 
+    ((metaMaskAccount && graphCreator === metaMaskAccount) || isPrivate);
+  const canBePrivateGraph = graphCreator === metaMaskAccount;
 
   useEffect(() => {
     if (open) {
@@ -291,7 +293,7 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
         saveGraphToDatabase={saveGraphToDatabase}
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
-        canBeDeletedOrBePrivate={canBeDeletedOrBePrivate}
+        canBePrivateGraph={canBePrivateGraph}
       />
 
       <ShareGraphDialog

@@ -12,7 +12,7 @@ interface DialogProps {
   saveGraphToDatabase: () => void;
   closeBar: Function | null;
   setIsMessageWindowOpen: Function;
-  canBeDeletedOrBePrivate: boolean;
+  canBePrivateGraph: boolean;
 }
 
 const StIcon = styled('span')(() => ({
@@ -50,7 +50,7 @@ function StRadio(props: RadioProps) {
 }
 
 const EditGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, saveGraphToDatabase, closeBar, setIsMessageWindowOpen, canBeDeletedOrBePrivate } = props;
+  const { open, setOpen, saveGraphToDatabase, closeBar, setIsMessageWindowOpen, canBePrivateGraph } = props;
   const [graphName, graphNote, isPrivate, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
@@ -144,14 +144,14 @@ const EditGraphDialog = (props: DialogProps) => {
               value="Public" 
               control={<StRadio />} 
               label="Public" 
-              disabled={!canBeDeletedOrBePrivate}
+              disabled={!canBePrivateGraph}
               sx={{height:'20px'}}
             />
             <FormControlLabel 
               value="Private" 
               control={<StRadio />} 
               label="Private" 
-              disabled={!canBeDeletedOrBePrivate}
+              disabled={!canBePrivateGraph}
               sx={{height:'20px'}}
             />
           </RadioGroup>

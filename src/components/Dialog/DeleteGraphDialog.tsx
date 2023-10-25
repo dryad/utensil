@@ -6,7 +6,7 @@ interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   onDelete: () => void;
-  closeBar: Function;
+  closeBar: Function | null;
   setIsMessageWindowOpen: Function;
 }
 
@@ -54,7 +54,7 @@ const DeleteGraphDialog = (props: DialogProps) => {
           onClick={() => {
             setOpen(false); 
             onDelete();
-            closeBar();
+            closeBar && closeBar();
             setIsMessageWindowOpen(true);
           }}
         >
