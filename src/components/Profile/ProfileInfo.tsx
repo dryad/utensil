@@ -3,7 +3,7 @@ import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useShallow } from "zustand/react/shallow";
 import { THEME_COLORS } from "constants/colors";
 import { useEffect, useState } from 'react';
-import GraphMenuMessage from './GraphMenuMessage';
+import GraphMenuMessage from '../GraphMenuMessage';
 import EditProfileDialog from "components/Dialog/EditProfileDialog";
 
 function ProfileInfo() {

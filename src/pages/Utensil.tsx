@@ -71,7 +71,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   const [toCloseBar, setToCloseBar] = useState(false);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
 
-  const [graphName, graphNote, isDeletedGraph, setGraphName, setGraphNote, setIsPrivate, setGraphId, setIsDeletedGraph, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
+  const [graphName, graphNote, isDeletedGraph, setGraphName, setGraphNote, setIsPrivate, setGraphCreator, setGraphId, setIsDeletedGraph, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
       state.graphNote,
@@ -79,6 +79,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       state.setGraphName,
       state.setGraphNote,
       state.setIsPrivate,
+      state.setGraphCreator,
       state.setGraphId, 
       state.setIsDeletedGraph, 
       state.setPrevGraphName,
@@ -370,6 +371,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   
       setGraphName(graph.name);
       setGraphNote(graph.note);
+      setGraphCreator(graph.creator);
       const data = JSON.parse(graph.data);
   
       const nodesLevels = data.nodes.map((el: TreeNode) => el.level);
@@ -412,6 +414,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       initializeUndoTimer();
       setGraphName('');
       setGraphNote('');
+      setGraphCreator('');
       setGraphId(null);
 
       const existingGraph = JSON.parse(stringifyCurrentGraph(networkRef));

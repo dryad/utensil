@@ -10,8 +10,9 @@ interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   saveGraphToDatabase: () => void;
-  closeBar: Function;
+  closeBar: Function | null;
   setIsMessageWindowOpen: Function;
+  canBeDeletedOrBePrivate: boolean;
 }
 
 const StIcon = styled('span')(() => ({
@@ -49,7 +50,7 @@ function StRadio(props: RadioProps) {
 }
 
 const EditGraphDialog = (props: DialogProps) => {
-  const { open, setOpen, saveGraphToDatabase, closeBar, setIsMessageWindowOpen } = props;
+  const { open, setOpen, saveGraphToDatabase, closeBar, setIsMessageWindowOpen, canBeDeletedOrBePrivate } = props;
   const [graphName, graphNote, isPrivate, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
@@ -139,8 +140,20 @@ const EditGraphDialog = (props: DialogProps) => {
             value={isPrivate ? 'Private' : 'Public'}
             onChange={handleChange}
           >
-            <FormControlLabel value="Public" control={<StRadio />} label="Public" sx={{height:'20px'}}/>
-            <FormControlLabel value="Private" control={<StRadio />} label="Private" sx={{height:'20px'}}/>
+            <FormControlLabel 
+              value="Public" 
+              control={<StRadio />} 
+              label="Public" 
+              disabled={!canBeDeletedOrBePrivate}
+              sx={{height:'20px'}}
+            />
+            <FormControlLabel 
+              value="Private" 
+              control={<StRadio />} 
+              label="Private" 
+              disabled={!canBeDeletedOrBePrivate}
+              sx={{height:'20px'}}
+            />
           </RadioGroup>
         </FormControl>
       </div>
@@ -168,7 +181,7 @@ const EditGraphDialog = (props: DialogProps) => {
             } else {
               saveGraphToDatabase();
               setOpen(false);
-              closeBar();
+              closeBar && closeBar();
               setIsMessageWindowOpen(true);
             }
           }}

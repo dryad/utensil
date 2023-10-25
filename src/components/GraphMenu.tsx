@@ -74,11 +74,12 @@ type Props = {
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
 export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen, closeBar, networkRef, refreshList }: Props) {
-  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph] = useGraphStore(
+  const [graphName, graphNote, isPrivate, graphCreator, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
       state.graphNote,
       state.isPrivate,
+      state.graphCreator,
       state.graphId,
       state.setGraphName,
       state.setGraphNote,
@@ -114,6 +115,7 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
   const canBeDeletedGraph = graphId !== null && isPrivate;
+  const canBeDeletedOrBePrivate = graphCreator === metaMaskAccount;
 
   useEffect(() => {
     if (open) {
@@ -289,6 +291,7 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
         saveGraphToDatabase={saveGraphToDatabase}
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
+        canBeDeletedOrBePrivate={canBeDeletedOrBePrivate}
       />
 
       <ShareGraphDialog

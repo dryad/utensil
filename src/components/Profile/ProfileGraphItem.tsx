@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import SmallNetwork from "./SmallNetwork";
+import SmallNetwork from "../SmallNetwork";
 import VisCustomNetwork from "libs/vis-custom-network";
 import ProfileCreatorButton from './ProfileCreatorButton';
 import { Graph } from "models";
 import { THEME_COLORS } from "constants/colors";
-import ProfileGraphMenu from 'components/ProfileGraphMenu';
+import ProfileGraphMenu from './ProfileGraphMenu';
 import { useAllUsersStore } from "store/AllUsersStore";
 import { useShallow } from "zustand/react/shallow";
 

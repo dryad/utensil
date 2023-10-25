@@ -22,7 +22,7 @@ import { Graph } from "models";
 import MetaMaskButton from "./MetaMaskButton";
 import Utensil from "./Utensil";
 import ShowPromptDialog from './ShowPromptDialog';
-import ProfileGraphItem from './ProfileGraphItem';
+import ProfileGraphItem from './Profile/ProfileGraphItem';
 import ShareIcon from '@mui/icons-material/ShareOutlined';
 import ShareGraphDialog from "./ShareGraphDialog";
 

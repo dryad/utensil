@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import React, { useEffect, useRef, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
-import { saveGraphToDB, deleteGraphFromDB } from 'components/networkFunctions';
+import { deleteGraphFromDB, saveGraphFromProfileToDB } from 'components/networkFunctions';
 import GraphMenuMessage from 'components/GraphMenuMessage';
 import functionalGraphData from "functions/functionalGraphIds.json"; 
 import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
@@ -16,6 +16,8 @@ import { useGraphStore } from 'store/GraphStore';
 import { useShallow } from 'zustand/react/shallow'
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { Graph } from "models";
+import { useParams } from 'react-router-dom';
+import { useAllGraphsStore } from 'store/AllGraphsStore';
 
 const StyledButton = styled('div')({
   width: '28px',
@@ -58,7 +60,7 @@ type GraphProps = {
 type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
 
 export default function ProfileGraphMenu({ graph }: GraphProps) {
-  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph] = useGraphStore(
+  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setIsDeletedGraph, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
       state.graphNote,
@@ -71,13 +73,25 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
       state.prevGraphNote,
       state.prevGraphPrivate,  
       state.setGraphId, 
-      state.setIsDeletedGraph,   
+      state.setIsDeletedGraph,
+      state.setGraphName,
+      state.setGraphNote,
+      state.setIsPrivate   
     ])
   );
 
-  const [metaMaskAccount] = useMetaMaskAccountStore(
+  const [getPublicGraphs, getPrivateGraphs, getSharedGraphs] = useAllGraphsStore(
+    useShallow((state) => [
+      state.getPublicGraphs,
+      state.getPrivateGraphs,
+      state.getSharedGraphs
+    ])
+  );
+
+  const [metaMaskAccount, can_edit_profile] = useMetaMaskAccountStore(
     useShallow((state) => [
       state.metaMaskAccount,
+      state.can_edit_profile
     ])
   );
 
@@ -91,13 +105,28 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
   const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
+  const [isMessageWindowOpen, setIsMessageWindowOpen] = useState(false);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
-  const dropDownRef = useRef<HTMLDivElement>(null);
+  // const dropDownRef = useRef<HTMLDivElement>(null);
 
+  const canBeEditedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
   const canBeDeletedGraph = graphId !== null && isPrivate;
+  const canBeDeletedOrBePrivate = graph.creator === metaMaskAccount;
+
+  useEffect(() => {
+    if (openEditGraphDialog) {
+      setGraphName(graph.name);
+      setGraphNote(graph.note);
+      setIsPrivate(graph.private !== '');
+      setPrevGraphName(graph.name);
+      setPrevGraphNote(graph.note);
+      setPrevGraphPrivate(graph.private !== '');
+      setGraphId(graph.id!);
+    }
+  },[openEditGraphDialog])
 
   useEffect(() => {
     if (open) {
@@ -132,10 +161,23 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
     }
   }  
 
-  // const closeMessage = () => {
-  //   setIsMessageWindowOpen(false);
-  //   setGraphStatus('null');
-  // }  
+  const closeMessage = () => {
+    setIsMessageWindowOpen(false);
+    setGraphStatus('null');
+  }  
+
+  const { addressId } = useParams();
+
+
+  const refreshList = async () => {
+    getPublicGraphs();
+    if (can_edit_profile() && addressId) {
+      getPrivateGraphs(addressId);
+    }  
+    if (can_edit_profile() && addressId) {
+      getSharedGraphs(addressId);
+    } 
+  }
   
   const saveGraphToDatabase = async(isNew: boolean = false) => {
     if (isPrivate && !metaMaskAccount) {
@@ -144,7 +186,15 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         setShowGetAccountMessage(true);
         return;
     }
-    saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
+    const dataToSave = {
+      id: graphId,
+      name: graphName,
+      note: graphNote,
+      data: graph.data,
+      creator: graph.creator,
+      private: isPrivate ? metaMaskAccount : "",
+    }
+    saveGraphFromProfileToDB(dataToSave, refreshList, setIsSaveGraphResponseStatusOk); 
   }    
     
   const handleDeleteGraph = async() => {
@@ -175,15 +225,15 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           >
             <StyledMenuItem 
               onClick={() => {
-                if (canBeSavedGraph) {
+                if (canBeEditedGraph) {
                   handleClose(); 
                   setOpenEditGraphDialog(true);
                   setGraphStatus('edited')
                 }  
               }}
               sx={{
-                color: canBeSavedGraph ? '' : THEME_COLORS.get('lightGray'), 
-                cursor: canBeSavedGraph ? '' : 'auto'
+                color: canBeEditedGraph ? '' : THEME_COLORS.get('lightGray'), 
+                cursor: canBeEditedGraph ? '' : 'auto'
               }}
             >
               Edit graph info
@@ -267,6 +317,15 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         </ClickAwayListener>
       </Popper>
 
+      <EditGraphDialog
+        open={openEditGraphDialog} 
+        setOpen={setOpenEditGraphDialog}
+        saveGraphToDatabase={saveGraphToDatabase}
+        closeBar={null}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+        canBeDeletedOrBePrivate={canBeDeletedOrBePrivate}
+      />
+
       {/* <SaveGraphDialog
         open={openSaveGraphDialog} 
         setOpen={setOpenSaveGraphDialog}
@@ -275,13 +334,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       /> */}
 
-      {/* <EditGraphDialog
-        open={openEditGraphDialog} 
-        setOpen={setOpenEditGraphDialog}
-        saveGraphToDatabase={saveGraphToDatabase}
-        closeBar={closeBar}
-        setIsMessageWindowOpen={setIsMessageWindowOpen}
-      /> */}
+     
 
       {/* <ShareGraphDialog
         open={openShareGraphDialog} 
@@ -318,13 +371,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           message={'You have saved your graph.'}
         />
       }  */}
-      {/* {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'edited' &&
+      {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'edited' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph info edited'}
           message={'You have edited your graph info.'}
         />
-      }  */}
+      } 
       {/* {isShareGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'shared' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}

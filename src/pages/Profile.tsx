@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import EmptyProfilePopUp from 'components/EmptyProfilePopUp';
-import ProfileInfo from 'components/ProfileInfo';
+import ProfileInfo from 'components/Profile/ProfileInfo';
 import Navbar from "layout/Navbar";
 import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
@@ -10,8 +10,8 @@ import { useShallow } from "zustand/react/shallow";
 import { Button } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
 import styled from "@emotion/styled";
-import ProfileMenuBar from 'components/ProfileMenuBar';
-import ProfileGraphsContainer from 'components/ProfileGraphsContainer';
+import ProfileMenuBar from 'components/Profile/ProfileMenuBar';
+import ProfileGraphsContainer from 'components/Profile/ProfileGraphsContainer';
 import { useAllUsersStore } from 'store/AllUsersStore';
 
 const StyledButton = styled(Button)(() => ({

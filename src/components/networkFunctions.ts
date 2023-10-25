@@ -95,3 +95,16 @@ export const stringifyCurrentGraph = (networkRef: React.MutableRefObject<VisCust
         })
         .catch(err => {if (err) {console.log(err); setIsSaveProfileResponseStatusOk(false)}})
   };
+
+  export async function saveGraphFromProfileToDB (
+    dataToSave: any, 
+    refreshList: Function, 
+    setIsSaveGraphResponseStatusOk: Function   
+    ){    
+      saveGraph(dataToSave)
+        .then(() => {
+          refreshList();
+          setIsSaveGraphResponseStatusOk(true);
+        })
+        .catch(err => {if (err) {console.log(err); setIsSaveGraphResponseStatusOk(false)}})
+    };
