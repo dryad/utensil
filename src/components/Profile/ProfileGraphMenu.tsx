@@ -1,5 +1,5 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
-import { ChevronDownIcon, DotsVerticalIcon } from 'assets/icons/svg';
+import { ChevronDownIcon, DotsVerticalIcon, EyeClosedIcon, EyeOpenedIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import React, { useEffect, useRef, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
@@ -10,6 +10,7 @@ import functionalGraphData from "functions/functionalGraphIds.json";
 import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
 import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
+import MakeGraphPublicDialog from 'components/Dialog/MakeGraphPublicDialog';
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import ShowGetAccountDialog from 'components/Dialog/ShowGetAccountDialog';
 import { useGraphStore } from 'store/GraphStore';
@@ -18,6 +19,7 @@ import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { Graph } from "models";
 import { useParams } from 'react-router-dom';
 import { useAllGraphsStore } from 'store/AllGraphsStore';
+import MakeGraphPrivateDialog from 'components/Dialog/MakeGraphPrivateDialog';
 
 const StyledButton = styled('div')({
   width: '28px',
@@ -56,10 +58,11 @@ const StyledDivider = styled(Divider)(() => ({
 
 type GraphProps = {
   graph: Graph;
+  currentTab: number;
 };
-type GraphStatus = 'saved' | 'saved as new' | 'edited' | 'shared' | 'deleted' | 'null';
+type GraphStatus = 'saved' | 'changed status' | 'edited' | 'shared' | 'deleted' | 'null';
 
-export default function ProfileGraphMenu({ graph }: GraphProps) {
+export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
   const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
@@ -72,10 +75,10 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
       state.prevGraphName,
       state.prevGraphNote,
       state.prevGraphPrivate,  
-      state.setGraphId, 
-      state.setGraphName,
-      state.setGraphNote,
-      state.setIsPrivate   
+      state.setGraphId,
+      state.setPrevGraphName, 
+      state.setPrevGraphNote,
+      state.setPrevGraphPrivate,
     ])
   );
 
@@ -102,13 +105,14 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
   const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
+  const [openMakeGraphPublicDialog, setOpenMakeGraphPublicDialog] = useState(false);
+  const [openMakeGraphPrivateDialog, setOpenMakeGraphPrivateDialog] = useState(false);
   const [openDeleteGraphDialog, setOpenDeleteGraphDialog] = useState(false);
   const [showGetAccountMessage, setShowGetAccountMessage] = useState(false);
   const [isMessageWindowOpen, setIsMessageWindowOpen] = useState(false);
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popper' : undefined;
-  // const dropDownRef = useRef<HTMLDivElement>(null);
-
+  
   const canBeEditedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
@@ -136,17 +140,25 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
     }    
   },[open, anchorEl]);
 
-  useEffect(() => {
-    if (isSaveGraphResponseStatusOk === false) {
-      setIsPrivate(prevGraphPrivate); 
-      setGraphName(prevGraphName);
-      setGraphNote(prevGraphNote);
-    }
-  },[isSaveGraphResponseStatusOk])
+  // useEffect(() => {
+  //   if (isSaveGraphResponseStatusOk === false) {
+  //     setIsPrivate(prevGraphPrivate); 
+  //     setGraphName(prevGraphName);
+  //     setGraphNote(prevGraphNote);
+  //   }
+  // },[isSaveGraphResponseStatusOk])
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
+    setGraphName(graph.name);
+    setGraphNote(graph.note);
+    setIsPrivate(graph.private !== '');
+    setPrevGraphName(graph.name);
+    setPrevGraphNote(graph.note);
+    setPrevGraphPrivate(graph.private !== '');
+    setGraphId(graph.id!);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -167,7 +179,6 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
 
   const { addressId } = useParams();
 
-
   const refreshList = async () => {
     getPublicGraphs();
     if (can_edit_profile() && addressId) {
@@ -179,6 +190,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
   }
   
   const saveGraphToDatabase = async() => {
+    console.log(isPrivate ? metaMaskAccount : "", 'private')
     if (isPrivate && !metaMaskAccount) {
       
       if (metaMaskAccount === "")
@@ -188,7 +200,7 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
     const dataToSave = {
       id: graphId,
       name: graphName,
-      note: graphNote,
+      note: graphNote === graph.note ? null : graphNote,
       data: graph.data,
       creator: graph.creator,
       private: isPrivate ? metaMaskAccount : "",
@@ -268,34 +280,47 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
             >
               Share
             </StyledMenuItem>
-            <StyledDivider />
-            {/* <StyledMenuItem 
-              onClick={() => {
-                if (canBeSavedGraph) {
-                  handleClose(); 
-                  saveGraphToDatabase();
-                  closeBar();
-                  setIsMessageWindowOpen(true);
-                  setGraphStatus('saved')
-                }                
-              }}
-              sx={{
-                color: canBeSavedGraph ? '' : THEME_COLORS.get('lightGray'), 
-                cursor: canBeSavedGraph ? '' : 'auto'
-              }}
-            >
-              Save
-            </StyledMenuItem> */}
-            <StyledMenuItem 
-              onClick={() => {
-                handleClose(); 
-                setIsPrivate(false); 
-                setOpenSaveGraphDialog(true);
-                setGraphStatus('saved as new')
-              }}
-            >
-              Make private
-            </StyledMenuItem>
+            {currentTab === 0 &&
+              <>
+                <StyledDivider />
+                <StyledMenuItem 
+                  onClick={() => {
+                    if (canBePrivateGraph) {
+                      handleClose(); 
+                      setOpenMakeGraphPrivateDialog(true);
+                      setGraphStatus('changed status')
+                      setIsPrivate(true); 
+                    }                    
+                  }}
+                  sx={{
+                    display:'flex', 
+                    gap:'8px',
+                    color: canBePrivateGraph ? '' : THEME_COLORS.get('lightGray'), 
+                    cursor: canBePrivateGraph ? '' : 'auto'
+                  }}
+                >
+                  <EyeClosedIcon />
+                  Make private
+                </StyledMenuItem>
+              </>              
+            }
+            {currentTab === 1 &&
+              <>
+                <StyledDivider />
+                <StyledMenuItem 
+                  onClick={() => {
+                    handleClose(); 
+                    setOpenMakeGraphPublicDialog(true);
+                    setGraphStatus('changed status')
+                    setIsPrivate(false);
+                  }}
+                  sx={{display:'flex', gap:'8px'}}
+                >
+                  <EyeOpenedIcon />
+                  Make public
+                </StyledMenuItem>
+              </>              
+            }
             <StyledDivider />
             <StyledMenuItem 
               onClick={() => {
@@ -342,6 +367,19 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
         closeBar={closeBar}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       /> */}
+
+      <MakeGraphPrivateDialog
+        open={openMakeGraphPrivateDialog} 
+        setOpen={setOpenMakeGraphPrivateDialog}
+        saveGraphToDatabase={saveGraphToDatabase}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+      />
+      <MakeGraphPublicDialog
+        open={openMakeGraphPublicDialog} 
+        setOpen={setOpenMakeGraphPublicDialog}
+        saveGraphToDatabase={saveGraphToDatabase}
+        setIsMessageWindowOpen={setIsMessageWindowOpen}
+      />
 
       <DeleteGraphDialog
         open={openDeleteGraphDialog} 
@@ -391,13 +429,13 @@ export default function ProfileGraphMenu({ graph }: GraphProps) {
           message={'You have deleted your graph.'}
         />
       } 
-      {/* {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && ['saved', 'saved as new'].includes(graphStatus) &&
+      {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && ['changed status'].includes(graphStatus) &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
-          title={'Graph not saved'}
+          title={'Changes were not made'}
           message={'There was an error. Please try again.'}
         />
-      }  */}
+      } 
       {isSaveGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'edited' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}

@@ -10,10 +10,11 @@ import { useShallow } from "zustand/react/shallow";
 
 type GraphItemProps = {
   graph: Graph;
+  currentTab: number;
 };
 
 const ProfileGraphItem: React.FC<GraphItemProps> = ({
-  graph
+  graph, currentTab
 }) => {
   const networkRef = useRef<VisCustomNetwork | null>(null);
   
@@ -67,7 +68,7 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({
         </div>
         <div style={{height:'1.75rem', display:'flex', justifyContent:'start', gap:'4px'}}>
           <ProfileCreatorButton creator={user!} />
-          <ProfileGraphMenu graph={graph} />
+          <ProfileGraphMenu graph={graph} currentTab={currentTab} />
         </div>
       </div>
     </div>

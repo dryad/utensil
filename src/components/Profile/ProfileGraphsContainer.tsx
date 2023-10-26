@@ -80,7 +80,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                   return null;
                 return (
                   <div key={graph.id}>
-                    <ProfileGraphItem graph={graph} />
+                    <ProfileGraphItem graph={graph} currentTab={currentTab}/>
                   </div>
                 )
               })}
@@ -107,7 +107,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                     return null;
                   return (
                     <div key={graph.id}>
-                      <ProfileGraphItem graph={graph} />
+                      <ProfileGraphItem graph={graph} currentTab={currentTab} />
                     </div>
                   )
                 })}
@@ -134,7 +134,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                 return null;
               return (
                 <div key={graph.id}>
-                  <ProfileGraphItem graph={graph} />
+                  <ProfileGraphItem graph={graph} currentTab={currentTab} />
                 </div>
               )
             })}

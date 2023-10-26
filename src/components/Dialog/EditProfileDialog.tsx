@@ -113,6 +113,11 @@ const EditProfileDialog = (props: DialogProps) => {
       >
         Edit Profile 
       </DialogTitle>
+
+      <div style={{fontSize:'0.875rem', color:'#6b7280', marginTop: "-8px"}}>
+        Make changes to your profile here. Click save when you're done.      
+      </div>
+      
       <div style={{display:'flex', gap:'16px', alignItems:"center", margin:'-20px 0'}}>
         <div>
           {avatarPreview && !isDeletedAvatar && (

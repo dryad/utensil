@@ -41,7 +41,7 @@ const StyledButton = styled(Button)(() => ({
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
-    const [currentTab, setCurrentTab] = useState(0);
+    const [currentTab, setCurrentTab] = useState(0); // 0 -public, 1 - private, 2 - shared 
 
     const [metaMaskAccount, address, getAddress] = useMetaMaskAccountStore(
         useShallow((state) => [
