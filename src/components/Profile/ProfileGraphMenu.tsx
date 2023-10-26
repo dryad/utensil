@@ -1,13 +1,11 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
-import { ChevronDownIcon, DotsVerticalIcon, EyeClosedIcon, EyeOpenedIcon, ShareIcon } from 'assets/icons/svg';
+import { DotsVerticalIcon, EyeClosedIcon, EyeOpenedIcon, ShareIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
-import VisCustomNetwork from "libs/vis-custom-network";
-import { deleteGraphFromDB, saveGraphFromProfileToDB } from 'components/networkFunctions';
+import { deleteGraphFromDB, saveGraphFromProfileToDB, duplicateGraphToDB } from 'components/networkFunctions';
 import GraphMenuMessage from 'components/GraphMenuMessage';
 import functionalGraphData from "functions/functionalGraphIds.json"; 
-import SaveGraphDialog from "components/Dialog/SaveGraphDialog";
 import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 import MakeGraphPublicDialog from 'components/Dialog/MakeGraphPublicDialog';
@@ -60,10 +58,10 @@ type GraphProps = {
   graph: Graph;
   currentTab: number;
 };
-type GraphStatus = 'saved' | 'changed status' | 'edited' | 'shared' | 'deleted' | 'null';
+type GraphStatus = 'duplicated' | 'changed status' | 'edited' | 'shared' | 'deleted' | 'null';
 
 export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
-  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, prevGraphName, prevGraphNote, prevGraphPrivate, setGraphId, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
+  const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, setGraphId, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
       state.graphNote,
@@ -72,9 +70,6 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
       state.setGraphName,
       state.setGraphNote,
       state.setIsPrivate,
-      state.prevGraphName,
-      state.prevGraphNote,
-      state.prevGraphPrivate,  
       state.setGraphId,
       state.setPrevGraphName, 
       state.setPrevGraphNote,
@@ -99,10 +94,10 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
+  const [isDuplicateGraphResponseStatusOk, setIsDuplicateGraphResponseStatusOk] = useState<boolean | null>(null);
   const [isShareGraphResponseStatusOk, setIsShareGraphResponseStatusOk] = useState<boolean | null>(null);
   const [isDeleteGraphResponseStatusOk, setIsDeleteGraphResponseStatusOk] = useState<boolean | null>(null);
   const [graphStatus, setGraphStatus] = useState<GraphStatus>('null');
-  const [openSaveGraphDialog, setOpenSaveGraphDialog] = useState(false);
   const [openEditGraphDialog, setOpenEditGraphDialog] = useState(false);
   const [openShareGraphDialog, setOpenShareGraphDialog] = useState(false);
   const [openMakeGraphPublicDialog, setOpenMakeGraphPublicDialog] = useState(false);
@@ -114,10 +109,10 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
   const id = open ? 'simple-popper' : undefined;
   
   const canBeEditedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
-  const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
+  const canBeDuplicatedGraph = !functionalGraphData.hasOwnProperty(graph.id!) && metaMaskAccount;
   const canBeSharedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeDeletedGraph = (metaMaskAccount && graph.creator === metaMaskAccount) || isPrivate;
-  const canBePrivateGraph = graph.creator === metaMaskAccount;
+  const canBePrivateGraph = graph.creator === metaMaskAccount && !functionalGraphData.hasOwnProperty(graph.id!);
 
   useEffect(() => {
     if (openEditGraphDialog) {
@@ -137,16 +132,9 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
       setIsSaveGraphResponseStatusOk(null);
       setIsShareGraphResponseStatusOk(null);
       setIsDeleteGraphResponseStatusOk(null);
+      setIsDuplicateGraphResponseStatusOk(null);
     }    
   },[open, anchorEl]);
-
-  // useEffect(() => {
-  //   if (isSaveGraphResponseStatusOk === false) {
-  //     setIsPrivate(prevGraphPrivate); 
-  //     setGraphName(prevGraphName);
-  //     setGraphNote(prevGraphNote);
-  //   }
-  // },[isSaveGraphResponseStatusOk])
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -206,6 +194,24 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
     }
     saveGraphFromProfileToDB(dataToSave, refreshList, setIsSaveGraphResponseStatusOk); 
   }    
+
+  const duplicateGraph = async() => {
+
+    if (metaMaskAccount === ""){
+        setShowGetAccountMessage(true);
+        return;
+    }
+
+    const dataToSave = {
+      name: `${graph.name} (copy)`,
+      note: graph.note,
+      data: graph.data,
+      creator: metaMaskAccount,
+      private: currentTab === 0 ? "" : metaMaskAccount,
+    }
+    duplicateGraphToDB(dataToSave, refreshList, setIsDuplicateGraphResponseStatusOk); 
+    setIsMessageWindowOpen(true);
+  } 
     
   const handleDeleteGraph = async() => {
     deleteGraphFromDB(graphId!, setIsDeleteGraphResponseStatusOk);
@@ -250,15 +256,15 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
             </StyledMenuItem>
             <StyledMenuItem 
               onClick={() => {
-                if (canBeSavedGraph) {
+                if (canBeDuplicatedGraph) {
                   handleClose(); 
-                  setOpenEditGraphDialog(true);
-                  setGraphStatus('edited')
+                  duplicateGraph();
+                  setGraphStatus('duplicated')
                 }  
               }}
               sx={{
-                color: canBeSavedGraph ? '' : THEME_COLORS.get('lightGray'), 
-                cursor: canBeSavedGraph ? '' : 'auto'
+                color: canBeDuplicatedGraph ? '' : THEME_COLORS.get('lightGray'), 
+                cursor: canBeDuplicatedGraph ? '' : 'auto'
               }}
             >
               Duplicate
@@ -351,14 +357,6 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
         canBePrivateGraph={canBePrivateGraph}
       />
 
-      {/* <SaveGraphDialog
-        open={openSaveGraphDialog} 
-        setOpen={setOpenSaveGraphDialog}
-        saveGraphToDatabase={saveGraphToDatabase}
-        closeBar={closeBar}
-        setIsMessageWindowOpen={setIsMessageWindowOpen}
-      /> */}
-
       <ShareGraphDialog
         open={openShareGraphDialog} 
         setOpen={setOpenShareGraphDialog}
@@ -393,20 +391,13 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
         setShowGetAccountMessage={setShowGetAccountMessage} 
       />
      
-      {/* {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&
+      {isDuplicateGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'duplicated' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
-          title={'Changes saved'}
-          message={'All changes in your graph were saved.'}
+          title={'Graph duplicated'}
+          message={'The graph was successfully duplicated.'}
         />
-      }  */}
-      {/* {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved as new' &&
-        <GraphMenuMessage 
-          closeMessage={closeMessage}
-          title={'Graph saved'}
-          message={'You have saved your graph.'}
-        />
-      }  */}
+      } 
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'edited' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -453,6 +444,13 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph not deleted'}
+          message={'There was an error. Please try again.'}
+        />
+      }
+      {isDuplicateGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'duplicated' &&
+        <GraphMenuMessage 
+          closeMessage={closeMessage}
+          title={'Graph not duplicated'}
           message={'There was an error. Please try again.'}
         />
       }
