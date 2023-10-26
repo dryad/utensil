@@ -9,7 +9,7 @@ interface DialogProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   setIsShareGraphResponseStatusOk: Dispatch<SetStateAction<boolean | null>>;
-  closeBar: Function;
+  closeBar: Function | null;
   setIsMessageWindowOpen: Function;
 }
 
@@ -111,7 +111,7 @@ const ShareGraphDialog = ({ open, setOpen, setIsShareGraphResponseStatusOk, clos
             else {
               saveSharedGraphToDatabase(walletAddress);
               setOpen(false);
-              closeBar();
+              closeBar && closeBar();
               setIsMessageWindowOpen(true);
             }
           }}

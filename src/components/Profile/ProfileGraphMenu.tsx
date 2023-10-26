@@ -1,5 +1,5 @@
 import { ClickAwayListener, Divider, MenuItem, MenuList, Popper } from '@mui/material';
-import { ChevronDownIcon, DotsVerticalIcon, EyeClosedIcon, EyeOpenedIcon } from 'assets/icons/svg';
+import { ChevronDownIcon, DotsVerticalIcon, EyeClosedIcon, EyeOpenedIcon, ShareIcon } from 'assets/icons/svg';
 import { styled } from '@mui/material/styles';
 import React, { useEffect, useRef, useState } from 'react';
 import { THEME_COLORS } from "constants/colors";
@@ -115,7 +115,7 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
   
   const canBeEditedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
-  const canBeSharedGraph = canBeSavedGraph;
+  const canBeSharedGraph = !functionalGraphData.hasOwnProperty(graph.id!);
   const canBeDeletedGraph = (metaMaskAccount && graph.creator === metaMaskAccount) || isPrivate;
   const canBePrivateGraph = graph.creator === metaMaskAccount;
 
@@ -212,10 +212,10 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
   } 
 
   useEffect(() => {
-    if (isDeleteGraphResponseStatusOk) {
+    if (isDeleteGraphResponseStatusOk || isShareGraphResponseStatusOk) {
       refreshList();
     } 
-  },[isDeleteGraphResponseStatusOk])
+  },[isDeleteGraphResponseStatusOk, isShareGraphResponseStatusOk])
 
   return (
     <>
@@ -267,16 +267,18 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
               onClick={() => {
                 if (canBeSharedGraph) {
                   handleClose(); 
-                  saveGraphToDatabase();
                   setOpenShareGraphDialog(true);
                   setGraphStatus('shared')
                 }                
               }}
               sx={{
+                display:'flex', 
+                gap:'8px',
                 color: canBeSharedGraph ? '' : THEME_COLORS.get('lightGray'), 
                 cursor: canBeSharedGraph ? '' : 'auto'
               }}            
             >
+              <ShareIcon />
               Share
             </StyledMenuItem>
             {currentTab === 0 &&
@@ -357,15 +359,13 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
         setIsMessageWindowOpen={setIsMessageWindowOpen}
       /> */}
 
-     
-
-      {/* <ShareGraphDialog
+      <ShareGraphDialog
         open={openShareGraphDialog} 
         setOpen={setOpenShareGraphDialog}
         setIsShareGraphResponseStatusOk={setIsShareGraphResponseStatusOk}
-        closeBar={closeBar}
+        closeBar={null}
         setIsMessageWindowOpen={setIsMessageWindowOpen}
-      /> */}
+      />
 
       <MakeGraphPrivateDialog
         open={openMakeGraphPrivateDialog} 
@@ -414,13 +414,13 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
           message={'You have edited your graph info.'}
         />
       } 
-      {/* {isShareGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'shared' &&
+      {isShareGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'shared' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph shared'}
           message={'You have shared your graph.'}
         />
-      }  */}
+      } 
       {isDeleteGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'deleted' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
@@ -442,13 +442,13 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
           message={'There was an error. Please try again.'}
         />
       } 
-      {/* {isShareGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'shared' &&
+      {isShareGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'shared' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
           title={'Graph not shared'}
           message={'There was an error. Please try again.'}
         />
-      } */}
+      }
       {isDeleteGraphResponseStatusOk === false && isMessageWindowOpen && graphStatus === 'deleted' &&
         <GraphMenuMessage 
           closeMessage={closeMessage}
