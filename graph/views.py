@@ -97,14 +97,19 @@ def graphs(request, graphId=None):
             data = json_data['data']
             creator = json_data['creator']
             private = json_data['private']
-            
+
             if id is not None:
                 graph = Graph.objects.get(id=id)
-                graph.name = name
-                graph.note = note
-                graph.data = data
-                graph.creator = creator
-                graph.private = private
+                if name is not None: 
+                    graph.name = name
+                if note is not None:
+                    graph.note = note
+                if data is not None:
+                    graph.data = data
+                if creator is not None:
+                    graph.creator = creator
+                if private is not None:
+                    graph.private = private
                 graph.save()
             else:
                 graph = Graph.objects.create(name=name, note=note, data=data, creator=creator, private=private)

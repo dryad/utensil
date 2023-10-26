@@ -190,7 +190,6 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
   }
   
   const saveGraphToDatabase = async() => {
-    console.log(isPrivate ? metaMaskAccount : "", 'private')
     if (isPrivate && !metaMaskAccount) {
       
       if (metaMaskAccount === "")
@@ -199,10 +198,10 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
     }
     const dataToSave = {
       id: graphId,
-      name: graphName,
+      name: graphName === graph.name ? null : graphName,
       note: graphNote === graph.note ? null : graphNote,
-      data: graph.data,
-      creator: graph.creator,
+      data: null,
+      creator: null,
       private: isPrivate ? metaMaskAccount : "",
     }
     saveGraphFromProfileToDB(dataToSave, refreshList, setIsSaveGraphResponseStatusOk); 

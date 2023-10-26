@@ -3,10 +3,10 @@ import { Address } from 'models';
 
 type DataProps = {
     id?: number | null;
-    name: string;
-    note: string;
-    data: string;
-    creator: string;
+    name: string | null;
+    note: string | null;
+    data: string | null;
+    creator: string | null;
     private: string; 
 }
 
