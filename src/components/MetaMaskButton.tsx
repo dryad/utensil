@@ -7,9 +7,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export default function MetaMaskButton() {
 
-  const [address, getMetaMaskAccount, getAddress] = useMetaMaskAccountStore(
+  const [address, avatar, getMetaMaskAccount, getAddress] = useMetaMaskAccountStore(
     useShallow((state) => [
       state.address,
+      state.avatar,
       state.getMetaMaskAccount,
       state.getAddress
     ])
@@ -52,12 +53,12 @@ export default function MetaMaskButton() {
             )}
             {window.ethereum.isMetaMask && window.ethereum.selectedAddress && (
               <>
-                {address?.avatar_url &&
-                  <Avatar sx={{width: '36px', height: '36px'}} src={address?.avatar_url} />
+                {avatar?.avatar_url &&
+                  <Avatar sx={{width: '36px', height: '36px'}} src={avatar?.avatar_url} />
                 }
-                {!address?.avatar_url &&
+                {!avatar?.avatar_url &&
                   <Avatar sx={{width: '36px', height: '36px', bgcolor: THEME_COLORS.get('blue'), fontSize:'1rem', fontWeight:'500' }} >
-                    { address?.name == undefined ? null : address.name[0]}
+                    { avatar?.name == undefined ? null : avatar.name[0]}
                   </Avatar> 
                 }     
                 <div 

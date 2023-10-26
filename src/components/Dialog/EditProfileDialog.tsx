@@ -8,6 +8,7 @@ import Avatar from "react-avatar-edit";
 import { Avatar as AvatarMaterial } from "@mui/material";
 import { saveProfileToDB } from 'components/networkFunctions';
 import { DeleteIcon, EditIcon } from 'assets/icons/svg';
+import { useAllUsersStore } from 'store/AllUsersStore';
 
 interface DialogProps {
   open: boolean;
@@ -36,6 +37,12 @@ const EditProfileDialog = (props: DialogProps) => {
       state.address,
       state.getMetaMaskAccount,
       state.getAddress
+    ])
+  );
+
+  const [getAllUsers] = useAllUsersStore(
+    useShallow((state) => [
+      state.getAllUsers
     ])
   );
 
@@ -81,6 +88,10 @@ const EditProfileDialog = (props: DialogProps) => {
     }
   }
 
+  const refreshList = async () => {
+    getAllUsers();
+  }
+
   const saveChanges = async () => {
     let editAddress = {
       ...address,
@@ -97,7 +108,9 @@ const EditProfileDialog = (props: DialogProps) => {
     }
 
     await saveProfileToDB(address!.address!, editAddress, setIsSaveProfileResponseStatusOk);
+    getMetaMaskAccount();
     getAddress(metaMaskAccount);  
+    refreshList();
 }
 
   return (
