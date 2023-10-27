@@ -1,5 +1,8 @@
 import { Avatar } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
+import { useNavigate } from "react-router-dom";
+import { useProfileGraphsTabStore } from "store/ProfileGraphsTabStore";
+import { useShallow } from "zustand/react/shallow";
 
 type User = {
   name: string;
@@ -8,7 +11,14 @@ type User = {
 }
 
 export default function ProfileCreatorButton({creator}: {creator: User}) {
-   
+  let navigate = useNavigate();
+
+  const [setCurrentTab] = useProfileGraphsTabStore(
+    useShallow((state) => [
+        state.setCurrentTab
+    ])
+  );
+
   const shortenAddress = (address: string) => {
     // display the first 9 characters of the address, then "..." then the last 3 characters
     const first = address.slice(0, 9).toLowerCase();
@@ -28,8 +38,10 @@ export default function ProfileCreatorButton({creator}: {creator: User}) {
             gap:'8px', 
             padding: '4px 8px', 
             border:`1px solid ${THEME_COLORS.get('gray200')}`, 
-            borderRadius:'4px'
+            borderRadius:'4px',
+            cursor:'pointer'
           }}
+          onClick={() => {navigate(`/profile/${creator.address}`); setCurrentTab(0);}}
         > 
           {creator?.avatar_url &&
             <Avatar sx={{width: '24px', height: '24px'}} src={creator?.avatar_url} />

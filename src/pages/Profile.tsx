@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {useParams, useNavigate} from "react-router-dom";
 import EmptyProfilePopUp from 'components/EmptyProfilePopUp';
 import ProfileInfo from 'components/Profile/ProfileInfo';
@@ -6,6 +6,7 @@ import Navbar from "layout/Navbar";
 import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useAllGraphsStore } from 'store/AllGraphsStore';
+import { useProfileGraphsTabStore } from 'store/ProfileGraphsTabStore';
 import { useShallow } from "zustand/react/shallow";
 import { Button } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
@@ -41,7 +42,13 @@ const StyledButton = styled(Button)(() => ({
 function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
-    const [currentTab, setCurrentTab] = useState(0); // 0 -public, 1 - private, 2 - shared 
+        
+    const [currentTab, setCurrentTab] = useProfileGraphsTabStore(
+        useShallow((state) => [
+            state.currentTab,
+            state.setCurrentTab
+        ])
+    );
 
     const [metaMaskAccount, address, getAddress] = useMetaMaskAccountStore(
         useShallow((state) => [
@@ -153,15 +160,10 @@ function Profile() {
                                 Graphs
                             </div>
                             <div style={{height:"36px"}}>
-                                <ProfileMenuBar 
-                                    currentTab={currentTab}
-                                    setCurrentTab={setCurrentTab}
-                                />
+                                <ProfileMenuBar />
                             </div>
                             <ScrollBox>
-                                <ProfileGraphsContainer 
-                                        currentTab={currentTab}
-                                    />
+                                <ProfileGraphsContainer currentTab={currentTab} />
                             </ScrollBox>                           
                         </div>
                     </div>                    

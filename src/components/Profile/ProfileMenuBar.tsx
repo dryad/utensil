@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import {
   Tabs,
   Tab,
@@ -9,6 +9,7 @@ import { THEME_COLORS } from 'constants/colors';
 import ShowAccessPrivateGraphsDialog from 'components/Dialog/ShowAccessPrivateGraphsDialog';
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from 'zustand/react/shallow';
+import { useProfileGraphsTabStore } from 'store/ProfileGraphsTabStore';
 
 function a11yProps(index: number) {
   return {
@@ -54,15 +55,17 @@ const StyledTabs = styled((props: StyledTabsProps) => (
   />
 ))();
 
-type Props = {
-  currentTab: number;
-  setCurrentTab: Dispatch<SetStateAction<number>>;  
-}
-
-function ProfileMenuBar({ currentTab, setCurrentTab }: Props) {
+function ProfileMenuBar() {
   const [can_edit_profile] = useMetaMaskAccountStore(
     useShallow((state) => [
       state.can_edit_profile,
+    ])
+  );
+
+  const [currentTab, setCurrentTab] = useProfileGraphsTabStore(
+    useShallow((state) => [
+        state.currentTab,
+        state.setCurrentTab
     ])
   );
 

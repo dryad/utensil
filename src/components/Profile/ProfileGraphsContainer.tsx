@@ -15,7 +15,6 @@ interface TabPanelProps {
   value: number;
 }
 
-
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -80,7 +79,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                   return null;
                 return (
                   <div key={graph.id}>
-                    <ProfileGraphItem graph={graph} currentTab={currentTab}/>
+                    <ProfileGraphItem graph={graph} />
                   </div>
                 )
               })}
@@ -107,7 +106,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                     return null;
                   return (
                     <div key={graph.id}>
-                      <ProfileGraphItem graph={graph} currentTab={currentTab} />
+                      <ProfileGraphItem graph={graph} />
                     </div>
                   )
                 })}
@@ -134,7 +133,7 @@ const [can_edit_profile] = useMetaMaskAccountStore(
                 return null;
               return (
                 <div key={graph.id}>
-                  <ProfileGraphItem graph={graph} currentTab={currentTab} />
+                  <ProfileGraphItem graph={graph} />
                 </div>
               )
             })}

@@ -18,6 +18,7 @@ import { Graph } from "models";
 import { useParams } from 'react-router-dom';
 import { useAllGraphsStore } from 'store/AllGraphsStore';
 import MakeGraphPrivateDialog from 'components/Dialog/MakeGraphPrivateDialog';
+import { useProfileGraphsTabStore } from 'store/ProfileGraphsTabStore';
 
 const StyledButton = styled('div')({
   width: '28px',
@@ -56,11 +57,10 @@ const StyledDivider = styled(Divider)(() => ({
 
 type GraphProps = {
   graph: Graph;
-  currentTab: number;
 };
 type GraphStatus = 'duplicated' | 'changed status' | 'edited' | 'shared' | 'deleted' | 'null';
 
-export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
+export default function ProfileGraphMenu({ graph }: GraphProps) {
   const [graphName, graphNote, isPrivate, graphId, setGraphName, setGraphNote, setIsPrivate, setGraphId, setPrevGraphName, setPrevGraphNote, setPrevGraphPrivate] = useGraphStore(
     useShallow((state) => [
       state.graphName, 
@@ -89,6 +89,12 @@ export default function ProfileGraphMenu({ graph, currentTab }: GraphProps) {
     useShallow((state) => [
       state.metaMaskAccount,
       state.can_edit_profile
+    ])
+  );
+
+  const [currentTab] = useProfileGraphsTabStore(
+    useShallow((state) => [
+        state.currentTab
     ])
   );
 
