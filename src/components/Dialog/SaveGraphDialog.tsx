@@ -75,7 +75,7 @@ const SaveGraphDialog = (props: DialogProps) => {
 
   useEffect(() => {
     open && setIsPrivate(value === "Private");
-  }, [value]);
+  }, [value, setValue]);
 
   useEffect(() => {
     setValue('Public'); 

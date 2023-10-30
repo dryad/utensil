@@ -343,8 +343,7 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
         setOpen={setShowWarningUnsaved} 
         setOpenSaveGraphDialog={setOpenSaveGraphDialog}
         setOpenUtensilModal={setOpenUtensilModal}
-        // isSelectedGraph={Boolean(selectedGraph)}
-        // handleSave={handleSave}
+        saveGraphToDatabase={saveGraphToDatabase}
       />
      
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&

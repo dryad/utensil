@@ -79,11 +79,10 @@ function UtensilNavbar(props: any) {
   const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
   const [isMessageWindowOpen, setIsMessageWindowOpen] = useState(false);
 
-  const [openUtensilModal, setClickCloseButton, setOpenUtensilModal] = useUtensilModalStore(
+  const [openUtensilModal, setClickCloseButton] = useUtensilModalStore(
     useShallow((state) => [
       state.openUtensilModal,
       state.setClickCloseButton,
-      state.setOpenUtensilModal
     ])
   );
 

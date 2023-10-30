@@ -7,6 +7,7 @@ import { THEME_COLORS } from "constants/colors";
 import ProfileGraphMenu from './ProfileGraphMenu';
 import { useAllUsersStore } from "store/AllUsersStore";
 import { useShallow } from "zustand/react/shallow";
+import { useUtensilModalStore } from "store/UtensilModalStore";
 
 type GraphItemProps = {
   graph: Graph;
@@ -14,6 +15,13 @@ type GraphItemProps = {
 
 const ProfileGraphItem: React.FC<GraphItemProps> = ({ graph }) => {
   const networkRef = useRef<VisCustomNetwork | null>(null);
+
+  const [setOpenUtensilModal, setSelectedGraph] = useUtensilModalStore(
+    useShallow((state) => [
+      state.setOpenUtensilModal,
+      state.setSelectedGraph
+    ])
+  );
   
   const [allUsers] = useAllUsersStore(
     useShallow((state) => [
@@ -35,12 +43,18 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({ graph }) => {
         gap:'16px'
       }}
     >
-      <SmallNetwork networkRef={networkRef} width={'216px'} height={'160px'} /> 
+      <div
+        style={{cursor:'pointer'}}
+        onClick={() => {setSelectedGraph(graph); setOpenUtensilModal(true)}}
+      >
+        <SmallNetwork networkRef={networkRef} width={'216px'} height={'160px'} /> 
+      </div>
       <div
         style={{width: '206px', padding:'16px 0', display:'flex', flexDirection:'column', justifyContent:'space-between'}}
       >
         <div 
-          style={{display:'flex',flexDirection:'column', gap:'12px'}}
+          style={{display:'flex',flexDirection:'column', gap:'12px', cursor:'pointer'}}
+          onClick={() => {setSelectedGraph(graph); setOpenUtensilModal(true)}}
         >
           <div
             style={{fontWeight:'500',fontSize:'1rem', color:THEME_COLORS.get('black'), overflowWrap: 'break-word'}}

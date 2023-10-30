@@ -1,5 +1,0 @@
-/* disable blue box on cell */
-.MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
-.MuiDataGrid-root .MuiDataGrid-cell:focus {
-  outline: none !important;
-}

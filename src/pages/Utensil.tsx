@@ -24,26 +24,31 @@ import { useUtensilModalStore } from "store/UtensilModalStore";
 function Utensil() {
   const UNDO_STEPS_LIMIT = 250;
 
+  const [selectedGraph, clickCloseButton, setOpenUtensilModal, setShowWarningUnsaved, setClickCloseButton] = useUtensilModalStore(
+    useShallow((state) => [
+      state.selectedGraph,
+      state.clickCloseButton,
+      state.setOpenUtensilModal,
+      state.setShowWarningUnsaved,
+      state.setClickCloseButton
+    ])
+  );
+
   const networkRef = useRef<VisCustomNetwork | null>(null);
   const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
   const [graph, setGraph] = useState<GraphData | null>(null); // The currently loaded graph object.
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
   const [graphToLoad, setGraphToLoad] = useState<Graph | null | undefined>(null); // Before confirming a graph load, we store the graph to be loaded. This lets us show the name of the graph to the user.
-  const [graphToDelete, setGraphToDelete] = useState<Graph | null>(null); // Before confirming a graph delete, we store the graph to be deleted. This lets us show the name of the graph to the user.
   const [historyListBack, setHistoryListBack, historyListBackRef] = useState([]); // The list of undo steps, for Undo.
   const [historyListForward, setHistoryListForward, historyListForwardRef] = useState([]); // The list of redo steps, for Redo.
   const [isUserDragging, setIsUserDragging, isUserDraggingRef] = useState(false); // Whether the user is currently dragging a node or the network. This temporarily disables the undo timer from saving steps.
   const [buttonMode, setButtonMode, buttonModeRef] = useState('pan'); // The button that is selected in the toolbar.
-  const [searchQuery, setSearchQuery] = useState(""); // The search query, used by the text box for Search
   const [deleteMode, setDeleteMode, deleteModeRef] = useState(false); // Whether the user is currently in delete mode. This allows clicks to perform the delete action.
   const [addEdgeType, setAddEdgeType, addEdgeTypeRef] = useState("directed"); // The two add edge buttons enable "edge mode" in vis, but we store whether a directed or undirected edge should be created when the mouse is released.
   const [trees, setTrees] = useState<Tree[]>([]); // The list of trees shown on the bottom of the app.
-  const [confirmGraphLoadOpen, setConfirmGraphLoadOpen] = useState(false); // Whether the user is currently confirming a graph load.
-  const [confirmGraphDeleteOpen, setConfirmGraphDeleteOpen] = useState(false); // Whether the user is currently confirming a graph delete.
-  // const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
-  const [isEmptyUtensil, setIsEmptyUtensil] = useState(true);
+  const [isEmptyUtensil, setIsEmptyUtensil] = useState(selectedGraph === null);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
   const stringifyGraph = () => stringifyCurrentGraph(networkRef);
@@ -66,20 +71,9 @@ function Utensil() {
   );
 
   // The metamask account that is currently selected.
-  const [metaMaskAccount, getMetaMaskAccount] = useMetaMaskAccountStore(
+  const [metaMaskAccount] = useMetaMaskAccountStore(
     useShallow((state) => [
       state.metaMaskAccount,
-      state.getMetaMaskAccount,
-    ])
-  );
-
-  const [selectedGraph, clickCloseButton, setOpenUtensilModal, setShowWarningUnsaved, setClickCloseButton] = useUtensilModalStore(
-    useShallow((state) => [
-      state.selectedGraph,
-      state.clickCloseButton,
-      state.setOpenUtensilModal,
-      state.setShowWarningUnsaved,
-      state.setClickCloseButton
     ])
   );
 
@@ -115,6 +109,9 @@ function Utensil() {
       setGraphNote(selectedGraph.note);
       setGraphId(selectedGraph.id!);
       setIsPrivate(selectedGraph.private !== '');
+      setPrevGraphName(selectedGraph.name);
+      setPrevGraphNote(selectedGraph.note);
+      setPrevGraphPrivate(selectedGraph.private !== '');
     }
   },[selectedGraph]);  
 
@@ -171,7 +168,7 @@ function Utensil() {
 
   useEffect(() => {
     refreshList(); // when the text of the search query changes, we want to refresh the list of graphs.
-  }, [searchQuery, metaMaskAccount]);
+  }, [metaMaskAccount]);
 
   useEffect(() => {
     console.log('Switching to buttonMode: ', buttonMode); // when the text of the search query changes, we want to refresh the list of graphs.
@@ -937,17 +934,48 @@ function Utensil() {
     const currentGraph = stringifyGraph();
     
     if (selectedGraph) {
-      if (JSON.stringify(JSON.parse(selectedGraph.data).edges) === JSON.stringify(JSON.parse(currentGraph).edges) 
-        && JSON.stringify(JSON.parse(selectedGraph.data).nodes) === JSON.stringify(JSON.parse(currentGraph).nodes)
-        && selectedGraph.name === graphName && selectedGraph.note === graphNote) {
-          setOpenUtensilModal?.(false);
+      // if it is functional graph, check if it hasn't been changed
+      if (functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
+        const prevData = JSON.parse(selectedGraph.data);
+        const nodesLevels = prevData.nodes.map((el: TreeNode) => el.level);
+        const maxLevelOfNodes = Math.max(...nodesLevels);
+
+        prevData.nodes.map((el: TreeNode) => {
+          if (el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
+            el.subGraphId = selectedGraph.id;
+          }
+          if (el.opacity === 1 && el.level === maxLevelOfNodes && !el.isLabelNode && functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
+            el.isUneditable = true;
+          }
+          return el;
+        })
+
+        if (JSON.stringify(prevData.edges) === JSON.stringify(JSON.parse(currentGraph).edges) 
+          && JSON.stringify(prevData.nodes) === JSON.stringify(JSON.parse(currentGraph).nodes)
+          && selectedGraph.name === graphName && selectedGraph.note === graphNote) {
+            setOpenUtensilModal?.(false);
+            setClickCloseButton(false);
+            return;
+        } else {
+          setShowWarningUnsaved(true);
           setClickCloseButton(false);
           return;
-      } else {
-        setShowWarningUnsaved(true);
-        setClickCloseButton(false);
-        return;
+        }        
       }
+      // if it is non-functional graph, check if it hasn't been changed
+      if (!functionalGraphData.hasOwnProperty(selectedGraph.id!)) {
+        if (JSON.stringify(JSON.parse(selectedGraph.data).edges) === JSON.stringify(JSON.parse(currentGraph).edges) 
+          && JSON.stringify(JSON.parse(selectedGraph.data).nodes) === JSON.stringify(JSON.parse(currentGraph).nodes)
+          && selectedGraph.name === graphName && selectedGraph.note === graphNote) {
+            setOpenUtensilModal?.(false);
+            setClickCloseButton(false);
+            return;
+        } else {
+          setShowWarningUnsaved(true);
+          setClickCloseButton(false);
+          return;
+        }
+      }      
     }
     networkRef.current?.nodes.get().length === 0 ? setOpenUtensilModal?.(false) : setShowWarningUnsaved(true);
     setClickCloseButton(false);
@@ -961,11 +989,13 @@ function Utensil() {
 
   useEffect(() => {
     refreshList();
-    initializeUndoTimer();    
-    setGraphName('');
-    setGraphNote('');
-    setGraphCreator('');
-    setGraphId(null);
+    initializeUndoTimer();  
+    if (!selectedGraph) {
+      setGraphName('');
+      setGraphNote('');
+      setGraphCreator('');
+      setGraphId(null);
+    }      
   }, []);
 
   useEffect(() => {

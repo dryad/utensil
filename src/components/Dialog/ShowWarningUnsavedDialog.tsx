@@ -1,15 +1,26 @@
+import { useGraphStore } from "store/GraphStore";
 import { DialogTitle, DialogActions, DialogWindow, DialogButton } from ".";
 import { THEME_COLORS } from 'constants/colors';
+import { useShallow } from "zustand/react/shallow";
+import functionalGraphData from "functions/functionalGraphIds.json"; 
 
 interface DialogProps {
   open: boolean;
   setOpen: Function;
   setOpenSaveGraphDialog: Function;
   setOpenUtensilModal: Function;
+  saveGraphToDatabase: Function;
 }
 
-const ShowWarningUnsavedDialog = ({ open, setOpen, setOpenSaveGraphDialog, setOpenUtensilModal }: DialogProps) => {
-      
+const ShowWarningUnsavedDialog = ({ open, setOpen, setOpenSaveGraphDialog, setOpenUtensilModal, saveGraphToDatabase }: DialogProps) => {
+    
+  const [graphName, graphId] = useGraphStore(
+    useShallow((state) => [
+      state.graphName,   
+      state.graphId
+    ])
+  );
+
   return (
     <DialogWindow
       open={open}
@@ -33,7 +44,9 @@ const ShowWarningUnsavedDialog = ({ open, setOpen, setOpenSaveGraphDialog, setOp
           variant="outlined"
           sx={{color: THEME_COLORS.get('gray700'), background: THEME_COLORS.get('white'), border: '1px solid #e5e7eb'}}
           onClick={() => {
-            setOpenSaveGraphDialog(true);
+            graphName && graphId && !functionalGraphData.hasOwnProperty(graphId)
+              ? saveGraphToDatabase() 
+              : setOpenSaveGraphDialog(true);
           }}
         >
           Save
