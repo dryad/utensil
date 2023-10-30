@@ -12,9 +12,11 @@ import EditGraphDialog from "components/Dialog/EditGraphDialog";
 import ShareGraphDialog from "components/Dialog/ShareGraphDialog";
 import DeleteGraphDialog from "components/Dialog/DeleteGraphDialog";
 import ShowGetAccountDialog from 'components/Dialog/ShowGetAccountDialog';
+import ShowWarningUnsavedDialog from 'components/Dialog/ShowWarningUnsavedDialog';
 import { useGraphStore } from 'store/GraphStore';
 import { useShallow } from 'zustand/react/shallow'
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
+import { useUtensilModalStore } from 'store/UtensilModalStore';
 
 const StyledButton = styled('div')({
   fontSize: '14px',
@@ -98,6 +100,16 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
     ])
   );
 
+  const [selectedGraph, openUtensilModal, showWarningUnsaved, setOpenUtensilModal, setShowWarningUnsaved] = useUtensilModalStore(
+    useShallow((state) => [
+      state.selectedGraph,
+      state.openUtensilModal,
+      state.showWarningUnsaved,
+      state.setOpenUtensilModal,
+      state.setShowWarningUnsaved
+    ])
+  );
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaveGraphResponseStatusOk, setIsSaveGraphResponseStatusOk] = useState<boolean | null>(null);
   const [isShareGraphResponseStatusOk, setIsShareGraphResponseStatusOk] = useState<boolean | null>(null);
@@ -114,7 +126,6 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
 
   const canBeSavedGraph = !(graphId === null || functionalGraphData.hasOwnProperty(graphId));
   const canBeSharedGraph = canBeSavedGraph;
-  // const canBeDeletedGraph = graphId !== null && isPrivate;
   const canBeDeletedGraph = (graphId !== null) && 
     ((metaMaskAccount && graphCreator === metaMaskAccount) || isPrivate);
   const canBePrivateGraph = graphCreator === metaMaskAccount;
@@ -167,6 +178,10 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
         return;
     }
     saveGraphToDB(isNew, graphName, graphNote, metaMaskAccount, isPrivate, networkRef, refreshList, setIsSaveGraphResponseStatusOk, setGraphId, graphId ); 
+    if (openUtensilModal && showWarningUnsaved) {
+      setShowWarningUnsaved(false);
+      setOpenUtensilModal(false);
+    }
   }    
     
   const handleDeleteGraph = async() => {
@@ -192,7 +207,13 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
         </div>                    
       </StyledButton>
 
-      <Popper id={id} open={open} anchorEl={anchorEl} >
+      <Popper 
+        id={id} 
+        open={open} 
+        anchorEl={anchorEl}  
+        style={{zIndex:'1000'}}
+        disablePortal
+      >
         <ClickAwayListener onClickAway={handleClose}>
           <StyledMenuList
             id="graph-menu"
@@ -315,6 +336,15 @@ export default function GraphMenu({ isMessageWindowOpen, setIsMessageWindowOpen,
       <ShowGetAccountDialog 
         showGetAccountMessage={showGetAccountMessage} 
         setShowGetAccountMessage={setShowGetAccountMessage} 
+      />
+
+      <ShowWarningUnsavedDialog 
+        open={showWarningUnsaved} 
+        setOpen={setShowWarningUnsaved} 
+        setOpenSaveGraphDialog={setOpenSaveGraphDialog}
+        setOpenUtensilModal={setOpenUtensilModal}
+        // isSelectedGraph={Boolean(selectedGraph)}
+        // handleSave={handleSave}
       />
      
       {isSaveGraphResponseStatusOk && isMessageWindowOpen && graphStatus === 'saved' &&

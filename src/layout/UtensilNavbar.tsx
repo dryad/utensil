@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ConceptsIcon, SearchIcon } from 'assets/icons/svg';
+import { CloseIcon, ConceptsIcon, SearchIcon } from 'assets/icons/svg';
 import MetaMaskButton from 'components/MetaMaskButton';
 import { THEME_COLORS } from "constants/colors";
 import { styled } from '@mui/material/styles';
@@ -8,8 +8,10 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import SearchGraphBar from '../components/SearchGraphBar/SearchGraphBar';
 import ConceptsBar from '../components/ConceptsBar';
 import GraphMenu from '../components/GraphMenu';
+import { useUtensilModalStore } from 'store/UtensilModalStore';
+import { useShallow } from 'zustand/react/shallow';
 
-const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
+const StyledToggleButton = styled(ToggleButton)(() => ({
   height: '47px',
   width: '47px',
   background: 'white', 
@@ -77,6 +79,14 @@ function UtensilNavbar(props: any) {
   const [isConceptsModeFirstOpened, setIsConceptsModeFirstOpened] = useState(true);
   const [isMessageWindowOpen, setIsMessageWindowOpen] = useState(false);
 
+  const [openUtensilModal, setClickCloseButton, setOpenUtensilModal] = useUtensilModalStore(
+    useShallow((state) => [
+      state.openUtensilModal,
+      state.setClickCloseButton,
+      state.setOpenUtensilModal
+    ])
+  );
+
   const handleChange = (event: React.MouseEvent<HTMLElement>, nextMode: string) => {
     setIsMessageWindowOpen(false);
     setNavbarMode(nextMode);
@@ -87,7 +97,7 @@ function UtensilNavbar(props: any) {
   }
 
   useEffect(() => {
-    if (props.trees.length > 0 && isConceptsModeFirstOpened) {
+    if (props.trees && props.trees.length > 0 && isConceptsModeFirstOpened) {
       setNavbarMode('concepts');
       setIsConceptsModeFirstOpened(false);
     }
@@ -97,7 +107,7 @@ function UtensilNavbar(props: any) {
     if (props.toCloseBar) {
       closeBar();
     }
-  },[props.toCloseBar])
+  },[props.toCloseBar]);
 
   return (
     <>
@@ -137,7 +147,22 @@ function UtensilNavbar(props: any) {
             <StyledToggleButton aria-label="concepts" value='concepts'>
               <ConceptsIcon />
             </StyledToggleButton>
-          </StyledToggleButtonGroup>        
+          </StyledToggleButtonGroup>  
+
+          {openUtensilModal && (
+            <StyledToggleButtonGroup
+              orientation="horizontal"
+              value={openUtensilModal} 
+              exclusive
+              onChange={() => {
+                setClickCloseButton(true);
+              }}
+            >
+              <StyledToggleButton aria-label="closeModal" value='true'>
+                <CloseIcon />
+              </StyledToggleButton>
+            </StyledToggleButtonGroup> 
+          )}  
         </div>
       </StyledBar>
 

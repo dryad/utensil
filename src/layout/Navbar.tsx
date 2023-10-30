@@ -3,10 +3,19 @@ import ProfileNavbar from './ProfileNavbar';
 import UtensilNavbar from './UtensilNavbar';
 import Logo from '../components/Logo';
 import PageSwitcher from '../components/PageSwitcher';
+import { useUtensilModalStore } from 'store/UtensilModalStore';
+import { useShallow } from 'zustand/react/shallow';
 
 function Navbar(props: any) {
   const location = useLocation();
 	const path = location.pathname.split('/')[1];
+
+
+  const [openUtensilModal] = useUtensilModalStore(
+    useShallow((state) => [
+      state.openUtensilModal,
+    ])
+  );
 
   return (
     <div 
@@ -18,14 +27,20 @@ function Navbar(props: any) {
         justifyContent:"space-between" 
       }}
     >
-      <div style={{display:'flex',alignItems:'center', gap:'0.5rem'}}>
+      { (props.page === 'profile' || (props.page === 'utensil' && !openUtensilModal)) &&  
+        <div style={{display:'flex',alignItems:'center', gap:'0.5rem'}}>
           <Logo />
           <PageSwitcher />
-      </div>
+        </div>
+      }
+   
       <div style={{flex:'1'}}>
-          {path === 'profile' 
+          {props.page === 'profile' 
             ? <ProfileNavbar /> 
-            : <UtensilNavbar 
+            : null
+          }
+          {props.page === 'utensil' || openUtensilModal
+            ? <UtensilNavbar 
                 graphs={props.graphs}
                 trees={props.trees} 
                 hoveredNodes={props.hoveredNodes} 
@@ -38,6 +53,7 @@ function Navbar(props: any) {
                 onGraphSelected={props.onGraphSelected}
                 toCloseBar={props.toCloseBar}
               />
+            : null
           }
       </div>
     </div>

@@ -7,13 +7,26 @@ import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useAllGraphsStore } from 'store/AllGraphsStore';
 import { useProfileGraphsTabStore } from 'store/ProfileGraphsTabStore';
+import { useUtensilModalStore } from 'store/UtensilModalStore';
 import { useShallow } from "zustand/react/shallow";
-import { Button } from "@mui/material";
+import { Button, Drawer } from "@mui/material";
 import { THEME_COLORS } from "constants/colors";
-import styled from "@emotion/styled";
 import ProfileMenuBar from 'components/Profile/ProfileMenuBar';
 import ProfileGraphsContainer from 'components/Profile/ProfileGraphsContainer';
 import { useAllUsersStore } from 'store/AllUsersStore';
+import Utensil from "./Utensil";
+import { Graph } from "models";
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+    palette: {
+        background: {
+            default: THEME_COLORS.get('bg')
+          },
+        contrastThreshold: 3,
+        tonalOffset: 0.2,
+    }
+});
 
 const StyledButton = styled(Button)(() => ({
     backgroundColor: THEME_COLORS.get('blue'), 
@@ -43,10 +56,9 @@ function Profile() {
     let navigate = useNavigate();
     const { addressId } = useParams() // the addressId parameter from the URL
         
-    const [currentTab, setCurrentTab] = useProfileGraphsTabStore(
+    const [currentTab] = useProfileGraphsTabStore(
         useShallow((state) => [
             state.currentTab,
-            state.setCurrentTab
         ])
     );
 
@@ -66,6 +78,14 @@ function Profile() {
             state.getPublicGraphs,
             state.getPrivateGraphs,
             state.getSharedGraphs
+        ])
+    );
+
+    const [openUtensilModal, setOpenUtensilModal, setSelectedGraph] = useUtensilModalStore(
+        useShallow((state) => [
+          state.openUtensilModal,
+          state.setOpenUtensilModal,
+          state.setSelectedGraph
         ])
     );
 
@@ -99,6 +119,18 @@ function Profile() {
         } 
     },[metaMaskAccount, addressId, address]);
 
+    useEffect(() => {
+        if (!openUtensilModal) {
+            refreshGraphLists();
+          }
+    },[openUtensilModal])
+
+    const refreshGraphLists = async () => {
+        getPublicGraphs();
+        getPrivateGraphs(addressId!);
+        getSharedGraphs(addressId!);
+    }
+
     console.log(publicGraphs, '====public');
     console.log(privateGraphs, '===private');
     console.log(sharedGraphs, '===shared');
@@ -112,7 +144,22 @@ function Profile() {
                 navigate(`/profile/${metaMaskAccount}`);
             }
         }
-    },[addressId, metaMaskAccount]);  
+    },[addressId, metaMaskAccount]); 
+    
+    const toggleDrawer =
+    (open: boolean, graph: Graph | null) =>
+    (event: React.KeyboardEvent | React.MouseEvent) => {
+       
+        if (
+            event.type === 'keydown' &&
+            ((event as React.KeyboardEvent).key === 'Tab' ||
+              (event as React.KeyboardEvent).key === 'Shift')
+          ) {
+            return;
+        }
+        setSelectedGraph(graph);
+        setOpenUtensilModal(open);
+    };
         
     const address_is_whitelisted = () => {
         return WhitelistedAddresses.includes(metaMaskAccount);
@@ -121,7 +168,7 @@ function Profile() {
     return (
         <>
             <nav>
-                <Navbar />
+                <Navbar page={'profile'} />
             </nav>
             <main style={{ width: '100%', flex: '1 1 auto' }}>
                 {addressId === undefined &&
@@ -150,11 +197,32 @@ function Profile() {
                         >
                             <ProfileInfo />
                             {can_edit_profile() && 
-                                <StyledButton variant="contained">
+                                <StyledButton variant="contained" onClick={toggleDrawer(true, null)}>
                                     + Create new graph
                                 </StyledButton>
                             }                            
                         </div>
+                        <ThemeProvider theme={theme}>
+                            <Drawer
+                                anchor={"right"}
+                                open={openUtensilModal}
+                                onClose={toggleDrawer(false, null)}
+                                hideBackdrop={true}
+                                transitionDuration={500}
+                            >
+                                <div 
+                                    style={{
+                                        width: `calc(100vw - 332px)`,
+                                        padding: '0.5rem 1rem 1rem',
+                                        backgroundColor: THEME_COLORS.get('bg'),
+                                        height: '100vh',
+                                        overflowY: 'auto'
+                                    }}
+                                >
+                                    <Utensil />
+                                </div>  
+                            </Drawer>                                 
+                        </ThemeProvider>  
                         <div style={{width:'100%', display:'flex', flexDirection:'column', gap:'20px'}}>
                             <div style={{height: '39px', fontSize:"1.75rem", fontWeight:'500', color: THEME_COLORS.get('black')}}>
                                 Graphs

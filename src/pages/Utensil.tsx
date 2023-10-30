@@ -1,26 +1,10 @@
 import _ from "lodash";
-import { useRef, useEffect, Dispatch, SetStateAction } from "react";
-import {
-  Container,
-  Paper,
-  Box,
-  Button,
-  Grid,
-  TextField,
-  Card,
-  CardContent,
-  ButtonGroup,
-} from "@mui/material";
+import { useRef, useEffect } from "react";
 import VisCustomNetwork from "libs/vis-custom-network";
 import VisNetwork from "components/VisNetwork";
-import GraphList from "components/GraphList";
 import NetworkButtons from "components/NetworkButtons";
 import useState from 'react-usestateref';
-import ConfirmLoadDialog from "components/ConfirmLoadDialog";
-import ShowWarningDialog from "components/ShowWarningDialog";
-import TreeList from "components/Tree/TreeList";
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
-import MetaMaskButton from "components/MetaMaskButton";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "components/WhitelistedAddresses";
 import { contractAction } from "components/ContractButtonFunctions";
@@ -35,18 +19,12 @@ import { stringifyCurrentGraph } from 'components/networkFunctions';
 import { useGraphStore } from 'store/GraphStore';
 import { useMetaMaskAccountStore } from 'store/MetaMaskAccountStore';
 import { useShallow } from 'zustand/react/shallow'
+import { useUtensilModalStore } from "store/UtensilModalStore";
 
-interface UtensilProps {
-  startNewConcept?: boolean;
-  setStartNewConcept?: Dispatch<SetStateAction<boolean>>;
-  selectedGraph?: Graph | null | undefined;
-}
-
-function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: UtensilProps) {
+function Utensil() {
   const UNDO_STEPS_LIMIT = 250;
 
   const networkRef = useRef<VisCustomNetwork | null>(null);
-  const [graphs, setGraphs] = useState<Graph[]>([]); // The list of graphs seen on the right hand side of the app.
   const [publicPrivateGraphs, setPublicPrivateGraphs] = useState<Graph[]>([]); // The list of all public and current user private graphs
   const [graph, setGraph] = useState<GraphData | null>(null); // The currently loaded graph object.
   const [graphToIdToLoad, setGraphIdToLoad] = useState<number | null>(null); // Before confirming a graph load, we store the id of the graph to be loaded. The id is not stored in the graph data, but we need it to communicate with the server.
@@ -65,7 +43,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
   // const [metaMaskAccount, setMetaMaskAccount] = useState(""); // The metamask account that is currently selected.
   const [hoveredNodes, setHoveredNodes, hoveredNodesRef] = useState<string[]>([]); // The list of node IDs that are currently hovered.
   const [selectedNodes, setSelectedNodes, selectedNodesRef] = useState<string[]>([]); // The list of node IDs that are currently selected.
-  const [showWarning, setShowWarning] = useState(false);
   const [isEmptyUtensil, setIsEmptyUtensil] = useState(true);
   const [isAddShapeButtonClicked, setIsAddShapeButtonClicked] = useState(false);
   const [toCloseBar, setToCloseBar] = useState(false);
@@ -93,6 +70,16 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     useShallow((state) => [
       state.metaMaskAccount,
       state.getMetaMaskAccount,
+    ])
+  );
+
+  const [selectedGraph, clickCloseButton, setOpenUtensilModal, setShowWarningUnsaved, setClickCloseButton] = useUtensilModalStore(
+    useShallow((state) => [
+      state.selectedGraph,
+      state.clickCloseButton,
+      state.setOpenUtensilModal,
+      state.setShowWarningUnsaved,
+      state.setClickCloseButton
     ])
   );
 
@@ -130,10 +117,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       setIsPrivate(selectedGraph.private !== '');
     }
   },[selectedGraph]);  
-
-  const clearSearch = () => {
-    setSearchQuery('');
-  }
 
   function initializeUndoTimer() {
     console.log('Undo timer started with new graph');
@@ -957,18 +940,26 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
       if (JSON.stringify(JSON.parse(selectedGraph.data).edges) === JSON.stringify(JSON.parse(currentGraph).edges) 
         && JSON.stringify(JSON.parse(selectedGraph.data).nodes) === JSON.stringify(JSON.parse(currentGraph).nodes)
         && selectedGraph.name === graphName && selectedGraph.note === graphNote) {
-          setStartNewConcept?.(false);
+          setOpenUtensilModal?.(false);
+          setClickCloseButton(false);
           return;
       } else {
-        setShowWarning(true);
+        setShowWarningUnsaved(true);
+        setClickCloseButton(false);
         return;
       }
     }
-    networkRef.current?.nodes.get().length === 0 ? setStartNewConcept?.(false) : setShowWarning(true);
+    networkRef.current?.nodes.get().length === 0 ? setOpenUtensilModal?.(false) : setShowWarningUnsaved(true);
+    setClickCloseButton(false);
   }
 
   useEffect(() => {
-    // getMetaMaskAccount();
+    if (clickCloseButton) {
+      handleCloseButton();
+    }
+  },[clickCloseButton])
+
+  useEffect(() => {
     refreshList();
     initializeUndoTimer();    
     setGraphName('');
@@ -987,6 +978,7 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
     <>
       <nav>
         <Navbar 
+          page={'utensil'}
           graphs={publicPrivateGraphs}
           trees={trees} 
           hoveredNodes={hoveredNodesRef} 
@@ -1047,220 +1039,6 @@ function Utensil({startNewConcept = false, setStartNewConcept, selectedGraph}: U
           {/* <ZoomActions />           */}
         </div>
       </main>
-      
-      {/* <VisNetwork
-            networkRef={networkRef}
-            addNodeComplete={addNodeComplete}
-            addEdgeComplete={addEdgeComplete}
-            historyListBack={historyListBack}
-            historyListForward={historyListForward}
-            historyListBackRef={historyListBackRef}
-            setIsUserDragging={setIsUserDraggingGlobal}
-            stringifyGraph={stringifyGraph}
-            deleteIfDeleteMode={deleteIfDeleteMode}
-            setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
-            addEdgeDirectedOrNot={addEdgeDirectedOrNot}
-            buttonModeRef={buttonModeRef}
-            hoveredNodes={hoveredNodesRef}
-            setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
-            selectedNodes={selectedNodesRef}
-            setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
-            graphs={publicPrivateGraphs}
-            handleGraphImport={handleGraphImport}
-          /> */}
-      {/* </div> */}
-    
-    
-    {/* <Container>
-      <Grid container spacing={startNewConcept ? 2 : 0} >
-        <Grid item xs={selectedGraph ? 2 : 'auto'}>
-          <Paper>
-            <NetworkButtons
-              networkRef={networkRef}
-              onButton={onButton} // The function to handle button presses lives in Utensil.tsx and is passed down here. This lets us set the button mode programmatically within Utensil.tsx
-              undoDisabled={historyListBack.length <= 1}
-              redoDisabled={historyListForward.length === 0}
-              onUndo={onUndo}
-              onRedo={onRedo}
-              buttonMode={buttonMode} // this is a React state string of which button is selected. It is passed to the NetworkButtons component which causes the appropriate button to be selected.
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={7}>
-          <Paper>
-            <ConfirmLoadDialog
-              title={graphToLoad && graphToLoad.name}
-              open={confirmGraphLoadOpen}
-              setOpen={setConfirmGraphLoadOpen}
-              onConfirmReplace={confirmReplaceGraph}
-              onConfirmImport={confirmImportGraph}
-              canImportGraph={canImportGraph}
-            >
-            </ConfirmLoadDialog>
-            <ShowWarningDialog 
-              showWarning={showWarning} 
-              setShowWarning={setShowWarning} 
-              setOpenSaveGraphDialog={setOpenSaveGraphDialog}
-              setStartNewConcept={setStartNewConcept}
-              isSelectedGraph={Boolean(selectedGraph)}
-              handleSave={handleSave}
-            >
-            </ShowWarningDialog>   
-            <ShowGetAccountDialog 
-              showGetAccountMessage={showGetAccountMessage} 
-              setShowGetAccountMessage={setShowGetAccountMessage} 
-              setIsPrivate={setIsPrivate}
-            >
-            </ShowGetAccountDialog> 
-            <VisNetwork
-              networkRef={networkRef}
-              addNodeComplete={addNodeComplete}
-              addEdgeComplete={addEdgeComplete}
-              historyListBack={historyListBack}
-              historyListForward={historyListForward}
-              historyListBackRef={historyListBackRef}
-              setIsUserDragging={setIsUserDraggingGlobal}
-              stringifyGraph={stringifyGraph}
-              deleteIfDeleteMode={deleteIfDeleteMode}
-              setGraphFromNodesAndEdges={setGraphFromNodesAndEdges}
-              addEdgeDirectedOrNot={addEdgeDirectedOrNot}
-              buttonModeRef={buttonModeRef}
-              hoveredNodes={hoveredNodesRef}
-              setHoveredNodesFromNetwork={setHoveredNodesFromNetwork}
-              selectedNodes={selectedNodesRef}
-              setSelectedNodesFromNetwork={setSelectedNodesFromNetwork}
-              graphs={publicPrivateGraphs}
-              handleGraphImport={handleGraphImport}
-            />
-            <Box m={5}>
-              <TreeList Trees={trees} hoveredNodes={hoveredNodesRef} selectedNodes={selectedNodesRef} setHoveredChipToVis={setHoveredChipToVis}/>
-            </Box>
-          </Paper>
-        </Grid>
-        {startNewConcept && (
-          <>
-            <Grid item xs 
-              sx={{
-                'display': 'flex', 
-                'flexDirection' : 'column', 
-              }}
-            >
-              <Button 
-                variant="outlined" 
-                sx={{ 
-                  'borderColor': '#6d6d6d', 
-                  'borderRadius': '10px',
-                  "fontSize": "1rem",
-                  "color": "#fff", 
-                  "fontWeight": "900",
-                  "marginBottom": '1rem',
-                  'marginLeft': selectedGraph ? '' : 'auto' 
-                }}
-                onClick={handleCloseButton}
-              >
-                X
-              </Button>
-            {selectedGraph && (
-              <Card variant="outlined">
-                <CardContent>
-                  <Box mb={1}>
-                    <TextField
-                      id="outlined-basic"
-                      label="Graph Name"
-                      variant="outlined"
-                      size="small"
-                      value={graphName}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setGraphName(event.target.value);
-                      }}
-                      fullWidth
-                    />
-                  </Box>              
-                  <TextField
-                    id="outlined-basic"
-                    label="Note"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    size="small"
-                    value={graphNote === "" ? " " : graphNote}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setGraphNote(event.target.value);
-                    }}
-                    fullWidth
-                  />
-                </CardContent>
-              </Card>
-            )}
-            </Grid>            
-          </>
-          
-          )
-        }  
-        {!startNewConcept && 
-          <Grid item xs={3}>  
-            <Paper sx={{'height': "50px", 'backgroundColor': 'transparent', 'border': 'none'}}>
-              <MetaMaskButton getMetaMaskAccount={getMetaMaskAccount} />
-            </Paper>
-            <Paper>
-              <Box m={1}>
-                <TextField
-                  margin="normal"
-                  id="outlined-basic"
-                  label="Search"
-                  rows={1}
-                  variant="outlined"
-                  size="small"
-                  value={searchQuery}
-                  onChange={(e: any) => setSearchQuery(e.target.value)}
-                  fullWidth
-                  InputProps={{ disableUnderline: true, endAdornment: <Button onClick={clearSearch} className="materialBtn">Clear</Button> }}
-                />
-              </Box>
-            </Paper>
-            <GraphList
-              graphs={graphs}
-              onGraphSelected={handleGraphSelected}
-              onGraphDelete={handleGraphDelete}
-              searchQuery={searchQuery}
-              address_is_whitelisted={address_is_whitelisted}
-            />
-            {graph && (
-              <Card variant="outlined">
-                <CardContent>
-                  <Box mb={1}>
-                    <TextField
-                      id="outlined-basic"
-                      label="Graph Name"
-                      variant="outlined"
-                      size="small"
-                      value={graphName}
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setGraphName(event.target.value);
-                      }}
-                      fullWidth
-                    />
-                  </Box>              
-                  <TextField
-                    id="outlined-basic"
-                    label="Note"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    size="small"
-                    value={graphNote === "" ? " " : graphNote}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      setGraphNote(event.target.value);
-                    }}
-                    fullWidth
-                  />
-                </CardContent>
-              </Card>
-            )}
-          </Grid>
-        }  
-      </Grid>
-    </Container> */}
     </>
   );
 }
