@@ -4,12 +4,9 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, Theme, StyledEngineProvider } from "@mui/material/styles";
-import App from "components/App";
+import App from "./App";
 import theme from "./theme";
 import "./index.css";
-
-
-
 
 declare module '@mui/styles/defaultTheme' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

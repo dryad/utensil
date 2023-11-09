@@ -1,4 +1,3 @@
-import { red } from "@mui/material/colors";
 import { createTheme, adaptV4Theme } from "@mui/material/styles";
 
 // A custom theme for this app
@@ -19,8 +18,11 @@ const theme = createTheme(adaptV4Theme({
     //   main: red.A400,
     // },
     background: {
-      default: "#211f24",
+      default: "#f5f5f5",
     },
+  },
+  typography: {
+    fontFamily: 'Inter'
   },
   overrides: {
     MuiPaper: {

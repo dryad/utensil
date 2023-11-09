@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import { Network } from "vis-network";
 import { DataSet } from "vis-data";
-
 import { NODE_COLORS } from "constants/colors";
-import { truncateSync } from "fs";
+import Circle from '../../assets/icons/circle.svg';
 
 export default class VisCustomNetwork extends EventTarget {
   dom: HTMLElement;
@@ -34,16 +33,18 @@ export default class VisCustomNetwork extends EventTarget {
         hoverConnectedEdges: false,
       },
       edges: {
-        color: "#411811",
+        color: '#191919',
         chosen: false,
-        width: 3,
+        width: 1,         
       },
       nodes: {
-        shape: 'dot',
         size: 10,
         opacity: 1.0,
+        shape: 'dot',
         borderWidth: 3,
         borderWidthSelected: 5,
+        // shape: 'image',
+        // image: Circle,
       },
       physics: {
         enabled: false,
@@ -171,8 +172,12 @@ export default class VisCustomNetwork extends EventTarget {
           id,
           label: "",
           level,
-          color: NODE_COLORS[level],
           opacity: 0,
+          // shape: 'image',
+          // image: Circle,
+          // size: 10,
+          // opacity: 1,
+          color: NODE_COLORS[level],
           x: (from.x + to.x) / 2,
           y: (from.y + to.y) / 2,
         };
@@ -184,7 +189,7 @@ export default class VisCustomNetwork extends EventTarget {
         this.edges.add([
           //create the three-part edge, from -> to -> eventual
           //set whether the edge is directed or not, from the original edge that vis tries to create
-          { from: from.id, to: id, eventual: to.id, directed: edge.directed},
+          { from: from.id, to: id, eventual: to.id, directed: edge.directed },
         ]);
       }
       // Unary edges are disabled, uncomment below to enable

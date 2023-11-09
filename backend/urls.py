@@ -26,7 +26,11 @@ urlpatterns = [
     path('admin', RedirectView.as_view(url='/admin/', permanent=True)),
     path('admin/', admin.site.urls),         
     path('api/graphs/', views.graphs),
+    path('api/graphs/private/', views.privateGraphs),
+    path('api/graphs/public/', views.publicGraphs),
+    path('api/graphs/shared/', views.sharedGraphs),
     path('api/graphs/<int:graphId>/', views.graphs),
     path('api/address/<str:addressId>/', views.address),
+    path('api/addresses/', views.addresses),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]

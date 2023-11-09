@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, forwardRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Node, Edge } from "models";
 import { NODE_COLORS } from "constants/colors";
 import VisCustomNetwork from "libs/vis-custom-network";
-import NodeDialog from "./NodeDialog";
+import EditNodeDialog from 'components/Dialog/EditNodeDialog';
 import EdgeDialog from "./EdgeDialog";
 import useState from 'react-usestateref';
 import { v4 as uuidv4 } from "uuid";
-import { memo } from "react";
+import Circle from '../assets/icons/circle.svg';
+import { stringifyCurrentGraph } from 'components/networkFunctions';
 
 type INetworkProps = {
   networkRef: any;
@@ -18,7 +19,6 @@ type INetworkProps = {
   historyListBack: string[];
   historyListForward: string[];
   historyListBackRef: any;
-  stringifyGraph: Function;
   setIsUserDragging: Function;
   deleteIfDeleteMode: Function;
   setGraphFromNodesAndEdges: Function;
@@ -28,9 +28,11 @@ type INetworkProps = {
   setHoveredNodesFromNetwork: Function;
   selectedNodes: any;
   setSelectedNodesFromNetwork: Function;
+  graphs: any;
+  handleGraphImport: Function;
 };
 
-const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef, stringifyGraph, setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork }: INetworkProps) => {
+const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, addEdgeComplete, historyListBack, historyListForward, historyListBackRef,  setIsUserDragging, deleteIfDeleteMode, setGraphFromNodesAndEdges, addEdgeDirectedOrNot, buttonModeRef, hoveredNodes, setHoveredNodesFromNetwork, selectedNodes, setSelectedNodesFromNetwork, graphs, handleGraphImport }: INetworkProps) => {
     const domRef = useRef<HTMLDivElement>(null);
 
     const [nodeDialogTitle, setNodeDialogTitle] = useState("");
@@ -48,13 +50,15 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
     const toggleNodeDialog = () => {
       setNodeDialogOpen(!nodeDialogOpen);
     }
-
     const handleNodeDialogOk = (label: any) => () => {
       const node = nodeRef.current;
       node.label = label;
-      
+      if (node.hasOwnProperty('name') && node.hasOwnProperty('subGraphData')) {
+        node.name = label;
+      }
+
       if (node.label && node.label.length > 0) {
-        node.opacity = 1.0;
+        node.opacity = 1;
       }
       else {
         node.opacity = 0;
@@ -75,7 +79,8 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
       }
 
       //set graph from nodes and edges, this is needed to update the opacity of the nodes
-      const existingGraph = JSON.parse(stringifyGraph());
+      const existingGraph = JSON.parse(stringifyCurrentGraph(networkRef));
+      existingGraph.nodes = [node, ...existingGraph.nodes.filter((el: any) => el.id !== node.id)];
       setGraphFromNodesAndEdges(existingGraph.nodes, existingGraph.edges);
       networkRef.current?.setData(existingGraph);
 
@@ -129,7 +134,7 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
                 
                 //get node by id from networkRef.current?.network.body.data.nodes.get()
                 let mergeNodes = [networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[0].id), networkRef.current?.network.body.data.nodes.get(nodesWithinDistance[1].id)];
-                mergeNodes.sort(function (a, b) {
+                mergeNodes && mergeNodes.sort(function (a, b) {
                   return a.level - b.level;
                 });
                 const mergeNode1 = mergeNodes[0]; // the node with the lower level
@@ -390,7 +395,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
           if (!node.level) {
             node.level = 0;
             node.color = NODE_COLORS[node.level];
+            // node.shape = 'image';
+            // node.image = Circle;
             node.font = { color: "#fff" };
+            // node.opacity = 1;
             node.opacity = 0;
           }
           node.label = "";          
@@ -428,6 +436,10 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
         }
           
         nodeRef.current = node;
+
+        if (node.hasOwnProperty('isUneditable') && node.isUneditable) {
+          return;
+        }
 
         setNodeDialogTitle("Edit Node");
         setNodeDialogLabel(node.label);
@@ -468,22 +480,23 @@ const VisNetwork = ({ networkRef, nodes, edges, onSelectNode, addNodeComplete, a
 
     }, [networkRef]);
 
+    const canvasHeight = (window.innerHeight - 80).toString() + 'px';
 
     return (
       <>
-        <div ref={domRef} style={{ height: `480px`, width: `100%` }} />
-        <NodeDialog
+        <div ref={domRef} style={{ height: canvasHeight, width: `100%` }} className="canvasWindow"/>
+        <EditNodeDialog
           open={nodeDialogOpen}
           title={nodeDialogTitle}
           nodeLabel={nodeDialogLabel}
           onClose={handleNodeDialogClose}
           onOk={handleNodeDialogOk}
           setNodeLabel={setNodeDialogLabel}
+          graphs={graphs}
+          handleGraphImport={handleGraphImport}
         />
       </>
     );
   }
-// );
 
 export default memo(VisNetwork);
-// export default VisNetwork;

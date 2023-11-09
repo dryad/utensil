@@ -1,101 +1,82 @@
 import React from "react";
-import {
-  Paper,
-  TextField,
-  Chip,
-  Stack,
-  Typography,
-  Divider,
-  Box
-} from "@mui/material";
-import { Node, TreeNode } from "models";
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { TreeNode } from "models";
+import { styled } from '@mui/material/styles';
+import { THEME_COLORS } from "constants/colors";
 
 type IGraphListProps = {
     line: TreeNode[];
-    lineIndex: number;
-    lineLength: number;
-    hoveredNodes: string[];
-    selectedNodes: string[];
+    hoveredNodes: any;
+    selectedNodes: any;
     setHoveredChipToVis: Function;
 };
 
-
-const StyledChip = styled(Chip)`
+const StyledNode = styled('div')`
   &:hover {
-    background-color: rgba(0, 0, 255, 0.4);
+    color: THEME_COLORS.get('blue')
   }
 `;
 const TreeLine: React.FC<IGraphListProps> = (props) => {
   const line = props.line;
 
-  const onClick = (node) => {
-    // console.log('Clicked', node);
+  const onClick = (node: TreeNode) => {
+    props.setHoveredChipToVis(node.id)
   }
-  const onHover = (node) => {
-    console.log('Hover', node.id);
+  const onHover = (node: TreeNode) => {
     props.setHoveredChipToVis(node.id);
   }
-  const onLeave = (node) => {
-    console.log('Left', node.id);
+  const onLeave = (node: TreeNode) => {
     props.setHoveredChipToVis(null);
   }
-  // console.log('props.hoverNodes', props.hoveredNodes.current?.includes('a0e91e03-21bd-4413-b875-4c8cb801f335'));
-  let borderTopLeftRadius = 0;
-  let borderTopRightRadius = 0;
-  let borderBottomLeftRadius = 0;
-  let borderBottomRightRadius = 0;
 
-  let marginRight = "0px";
-  let marginLeft = "0px";
-//   let firstLine = false;
-  if (props.lineIndex === 0) {
-    // firstLine = true;
-    borderTopLeftRadius = 16;
-    borderBottomLeftRadius = 16;
-  }
-  else {
-      marginLeft = "10px";
-  }
-  
-//   let lastLine = false;
-  if (props.lineIndex === props.lineLength -1)  {
-    // lastLine = true;
-    borderTopRightRadius = 16;
-    borderBottomRightRadius = 16;
-    marginRight = "0px";
-  }
-  else {
-      marginRight = "10px";
-  }
   return (
-    <Box sx={{ 
-            p: 1, 
-            borderTopLeftRadius: borderTopLeftRadius, 
-            borderBottomLeftRadius: borderBottomLeftRadius, 
-            borderTopRightRadius: borderTopRightRadius, 
-            borderBottomRightRadius: borderBottomRightRadius, 
-            marginLeft: marginLeft,
-            marginRight: marginRight,
-            backgroundColor: 'rgba(0, 0, 0, 0.1)' 
-        }}>
-    {line.map((node, nodeIndex) => {
-        return <StyledChip
-        sx={{ backgroundColor: props.selectedNodes.current?.includes(node.id) ? 'rgba(255, 0, 0, 0.4)' : props.hoveredNodes.current?.includes(node.id) ? 'rgba(0, 0, 255, 0.4)' : 'rgba(0, 0, 0, 0)' }}
-        key={nodeIndex}
-        label={node.label}
-        onClick={() => {
-        onClick(node);
-        }}
-        onMouseEnter={() => {
-        onHover(node);
-        }}
-        onMouseLeave={() => {
-        onLeave(node);
-        }}        
-    />
-    })}
-    </Box>
+    <>
+      {line.map((node, nodeIndex) => {
+        return (
+          <StyledNode
+            sx={{ 
+              fontSize: '0.75rem',
+              lineHeight: '1rem',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 2px',
+              color: props.selectedNodes.current?.includes(node.id) 
+                ? THEME_COLORS.get("blue") 
+                : props.hoveredNodes.current?.includes(node.id) 
+                  ? THEME_COLORS.get("blue") 
+                  : THEME_COLORS.get("black"),
+              background: props.selectedNodes.current?.includes(node.id) 
+                ? 'rgba(245, 245, 245, 1)' 
+                : props.hoveredNodes.current?.includes(node.id) 
+                  ? 'rgba(245, 245, 245, 1)' 
+                  : '',
+              border: props.selectedNodes.current?.includes(node.id) 
+              ? '1px solid rgba(141, 121, 255, 1)' 
+              : props.hoveredNodes.current?.includes(node.id) 
+                ? '1px solid rgba(141, 121, 255, 1)'  
+                : 'none',
+              borderRadius: props.selectedNodes.current?.includes(node.id) 
+              ? '4px' 
+              : props.hoveredNodes.current?.includes(node.id) 
+                ? '4px'  
+                : '',  
+            }}
+            key={nodeIndex}
+            onClick={() => {
+              onClick(node);
+            }}
+            onMouseEnter={() => {
+              onHover(node);
+            }}
+            onMouseLeave={() => {
+              onLeave(node);
+            }}        
+          >
+            {node.label}
+          </StyledNode>
+        )          
+      })}
+    </>
   )
 };
 
