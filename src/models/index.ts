@@ -58,10 +58,10 @@ export type Tree = {
 }
 
 export interface Address {
-  id: number;
-  name: string | null;
-  address: string | null | undefined;
-  about: string;
-  avatar_url: string;
-  avatar?: string;
+  id?: number | undefined;
+  name: string | null | undefined;
+  address?: string | null | undefined;
+  about: string | undefined;
+  avatar_url?: string | undefined;
+  avatar?: string | undefined;
 }
