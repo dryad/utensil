@@ -2,17 +2,16 @@ import { Avatar, Button, Stack } from '@mui/material';
 import { useMetaMaskAccountStore } from "store/MetaMaskAccountStore";
 import { useShallow } from "zustand/react/shallow";
 import { THEME_COLORS } from "constants/colors";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import GraphMenuMessage from '../GraphMenuMessage';
 import EditProfileDialog from "components/Dialog/EditProfileDialog";
 
 function ProfileInfo() {
-  const [metaMaskAccount, address, can_edit_profile, getAddress] = useMetaMaskAccountStore(
+  const [address, avatar, can_edit_profile] = useMetaMaskAccountStore(
     useShallow((state) => [
-      state.metaMaskAccount,
       state.address,
+      state.avatar,
       state.can_edit_profile,
-      state.getAddress
     ])
   );
 
@@ -33,12 +32,12 @@ function ProfileInfo() {
   return (
     <>
       <Stack alignItems={"center"} spacing={'20px'} sx={{bgcolor:'white', padding:'42px', borderRadius:'4px'}}>
-        {address?.avatar_url && 
-          <Avatar src={`${address.avatar_url}`} sx={{ width: 96, height: 96 }} />        
+        {avatar?.avatar_url && 
+          <Avatar src={`${avatar.avatar_url}`} sx={{ width: 96, height: 96 }} />        
         }
-        {!address?.avatar_url &&
+        {!avatar?.avatar_url &&
           <Avatar sx={{ width: 96, height: 96, bgcolor: THEME_COLORS.get('blue'), fontSize:'3rem' }} >
-            { address?.name == undefined ? null : address?.name[0]}
+            { avatar?.name == undefined ? null : avatar?.name[0]}
           </Avatar>
         }
         <h3 style={{fontSize:'1.125rem', fontWeight:'500', color: THEME_COLORS.get('black')}}>

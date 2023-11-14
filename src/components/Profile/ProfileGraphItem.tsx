@@ -28,6 +28,7 @@ const ProfileGraphItem: React.FC<GraphItemProps> = ({ graph }) => {
         state.allUsers,
     ])
   );
+  
   const user = allUsers.find(el => el.address === graph.creator);
 
   useEffect(() => {

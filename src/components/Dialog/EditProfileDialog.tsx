@@ -107,11 +107,13 @@ const EditProfileDialog = (props: DialogProps) => {
       editAddress['avatar'] = '';
     }
 
-    await saveProfileToDB(address!.address!, editAddress, setIsSaveProfileResponseStatusOk);
-    getMetaMaskAccount();
-    getAddress(metaMaskAccount);  
-    refreshList();
-}
+    saveProfileToDB(address!.address!, editAddress, setIsSaveProfileResponseStatusOk)
+      .then(() => {
+        getMetaMaskAccount();
+        getAddress(metaMaskAccount);  
+        refreshList();
+      });    
+  }
 
   return (
     <DialogWindow
