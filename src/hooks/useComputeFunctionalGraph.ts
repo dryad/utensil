@@ -20,14 +20,17 @@ export const useComputeFunctionalGraph = (networkRef: React.MutableRefObject<Vis
                     const eventualNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);
                     const toNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.to || el?.labelOfNode === edgeToSelNode.to);
         
-                    const inputGraphData = { 
-                        edges: edgeToSelNode, 
-                        nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
-                    };
-
-                    let functionName = functionalGraphData[node.subGraphId?.toString() as keyof typeof functionalGraphData];
-                                                   
-                    functionName && functions[functionName as keyof typeof functions](node, inputGraphData);
+                    if (fromNodes && eventualNodes && toNodes) {
+                        const inputGraphData = { 
+                            edges: edgeToSelNode, 
+                            nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
+                        };
+    
+                        let functionName = functionalGraphData[node.subGraphId?.toString() as keyof typeof functionalGraphData];
+                                                       
+                        functionName && functions[functionName as keyof typeof functions](node, inputGraphData);
+                    }
+                    
                 }    
             }
         }

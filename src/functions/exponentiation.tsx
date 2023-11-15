@@ -39,6 +39,7 @@ export function exponentiation(selNode:TreeNode, inputGraphData: any) {
         result = Math.pow(firstNumber, secondNumber);
     }
     console.log('EXPONENTIATION function result: ', result);  
+    return result;
   }
 
   

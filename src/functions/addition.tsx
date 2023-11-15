@@ -34,5 +34,6 @@ export function addition(selNode:TreeNode, inputGraphData: any) {
         result = firstNumber + secondNumber;
     }
     console.log('ADDITION function result: ', result);  
+    return result;
   }
   

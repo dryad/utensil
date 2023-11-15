@@ -41,7 +41,8 @@ export function naturalLogarithm(selNode:TreeNode, inputGraphData: any) {
                 
         result = Math.log(secondNumber);
     }
-    console.log('NATURAL LOGARITHM function result: ', result);  
+    console.log('NATURAL LOGARITHM function result: ', result);
+    return result;  
   }
 
   

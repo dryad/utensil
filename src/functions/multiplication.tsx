@@ -34,6 +34,7 @@ export function multiplication(selNode:TreeNode, inputGraphData: any) {
         result = firstNumber * secondNumber;
     }
     console.log('MULTIPLICATION function result: ', result);  
+    return result;
   }
 
   

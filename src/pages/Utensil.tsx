@@ -7,7 +7,7 @@ import useState from 'react-usestateref';
 import { Tree, TreeNode, Edge, Graph, GraphData } from "models";
 import { v4 as uuidv4 } from "uuid";
 import WhitelistedAddresses from "components/WhitelistedAddresses";
-import { contractAction } from "components/ContractButtonFunctions";
+import { contractAction, contractedNodeName } from "components/ContractButtonFunctions";
 import { NODE_COLORS } from "constants/colors";
 import { useComputeFunctionalGraph } from 'hooks/useComputeFunctionalGraph';
 import EmptyUtensilPopUp from 'components/EmptyUtensilPopUp';
@@ -809,8 +809,15 @@ function Utensil() {
               scale: scale 
             };
             const subGraph = JSON.stringify(subGraphObject);
-            const nodeName = foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';
-                          
+            let nodeName = '';
+            
+            if (foundSelectedNode.hasOwnProperty('subGraphId')) {
+              const funcGraphContractedNodeName = contractedNodeName(foundSelectedNode, subGraphData?.nodes, subGraphData?.edges);
+              nodeName = funcGraphContractedNodeName ? funcGraphContractedNodeName.toString() : '';
+            } else {
+              nodeName = foundSelectedNode.hasOwnProperty('name') ? foundSelectedNode.name : '';
+            };
+
             const updatedNodes = externalGraphData.nodes.map((el: any) => {
               
               if (el.id === externalGraphData.nodeId) {
