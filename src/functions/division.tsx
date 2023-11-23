@@ -40,6 +40,7 @@ export function division(selNode:TreeNode, inputGraphData: any) {
         result = firstNumber / secondNumber;
     }
     console.log('DIVISION function result: ', result);  
+    return result;
   }
 
   

@@ -1,4 +1,6 @@
 import { TreeNode, Edge } from "models";
+import * as functions from '../functions';
+import mathFunctionalGraphData from "../functions/mathFunctionalGraphIds.json"; 
 
 export function contractAction(selNode:TreeNode, nodes: TreeNode[], edges: Edge[]) {
 
@@ -80,3 +82,25 @@ export function contractAction(selNode:TreeNode, nodes: TreeNode[], edges: Edge[
       
     return {canBeContracted, subGraphData, externalGraphData}
   }
+
+export function contractedNodeName(selNode:TreeNode, nodes: TreeNode[], edges: Edge[]) {
+  const edgeToSelNode = edges.find((el: Edge) => el.to === selNode.id);
+  const fromNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.from || el?.labelOfNode === edgeToSelNode.from);
+  const eventualNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.eventual || el?.labelOfNode === edgeToSelNode.eventual);
+  const toNodes = edgeToSelNode && nodes.filter((el: TreeNode) => el.id === edgeToSelNode.to || el?.labelOfNode === edgeToSelNode.to);
+
+  let name = null;
+
+  if (fromNodes && eventualNodes && toNodes) {
+      const inputGraphData = { 
+          edges: edgeToSelNode, 
+          nodes: [...fromNodes, ...eventualNodes, ...toNodes], 
+      };
+
+      let functionName = mathFunctionalGraphData[selNode.subGraphId?.toString() as keyof typeof mathFunctionalGraphData];
+                                      
+      name = functionName && functions[functionName as keyof typeof functions](selNode, inputGraphData);
+  }
+
+  return name;
+}  

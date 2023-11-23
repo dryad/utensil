@@ -39,6 +39,7 @@ export function subtraction(selNode:TreeNode, inputGraphData: any) {
         result = firstNumber - secondNumber;
     }
     console.log('SUBTRACTION function result: ', result);  
+    return result;
   }
 
   

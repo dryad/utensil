@@ -49,7 +49,8 @@ export function logarithm(selNode:TreeNode, inputGraphData: any) {
                 
         result = getBaseLog(firstNumber, secondNumber);
     }
-    console.log('LOGARITHM function result: ', result);  
+    console.log('LOGARITHM function result: ', result); 
+    return result; 
   }
 
   
