@@ -35,14 +35,14 @@ export default class VisCustomNetwork extends EventTarget {
       edges: {
         color: '#191919',
         chosen: false,
-        width: 1,         
+        width: 2,         
       },
       nodes: {
-        size: 10,
+        size: 8,
         opacity: 1.0,
         shape: 'dot',
-        borderWidth: 3,
-        borderWidthSelected: 5,
+        borderWidth: 8,
+        borderWidthSelected: 10,
         // shape: 'image',
         // image: Circle,
       },
